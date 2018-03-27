@@ -7,8 +7,8 @@ import sinon from 'sinon';
 chai.should();
 chai.use(chaiAsPromised);
 
-describe('downloading WAD', () => {
-  it('should throw an error if we are not on windows', async () => {
+describe('downloading WAD', function () {
+  it('should throw an error if we are not on windows', async function () {
     sinon.stub(system, "isWindows", () => { return false; });
     await setupWAD().should.be.rejectedWith(/Windows/);
   });

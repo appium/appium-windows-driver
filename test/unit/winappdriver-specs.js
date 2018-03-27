@@ -16,9 +16,9 @@ function buildWinAppDriverOpts () {
   };
 }
 
-describe('WinAppDriverServer', () => {
-  describe('#constructor', () => {
-    it('should complain if required options not sent', () => {
+describe('WinAppDriverServer', function () {
+  describe('#constructor', function () {
+    it('should complain if required options not sent', function () {
       (() => {
         new WinAppDriverServer();
       }).should.throw(/Option.*app.*required/);
@@ -31,7 +31,7 @@ describe('WinAppDriverServer', () => {
   describe('#startSession', withMocks({ }, (mocks, S) => {
     let winAppDriver = new WinAppDriverServer(buildWinAppDriverOpts());
 
-    it('should start a session', async () => {
+    it('should start a session', async function () {
       let caps = { foo: 'bar' };
       mocks.jwproxy = S.sandbox.mock(winAppDriver.jwproxy);
       mocks.jwproxy.expects("command").once()
