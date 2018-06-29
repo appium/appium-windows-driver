@@ -25,7 +25,7 @@
     "lib": "lib"
   },
   "dependencies": {
-    "appium-base-driver": "^2.0.1",
+    "appium-base-driver": "^3.0.0",
     "appium-support": "^2.5.0",
     "asyncbox": "^2.3.1",
     "babel-runtime": "=5.8.24",
