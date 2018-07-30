@@ -8,8 +8,8 @@ import chaiAsPromised from 'chai-as-promised';
 chai.should();
 chai.use(chaiAsPromised);
 
-describe('downloading WAD', () => {
-  before(async () => {
+describe('downloading WAD', function () {
+  before(async function () {
     // uninstall WAD first
     try {
       await exec('msiexec', [`/X{${WAD_GUID}}`, '/q']);
@@ -25,7 +25,7 @@ describe('downloading WAD', () => {
     }
   });
 
-  it('should download and validate WinAppDriver', async () => {
+  it('should download and validate WinAppDriver', async function () {
     await setupWAD(); // contains its own verification of md5 so not much to do
   });
 });

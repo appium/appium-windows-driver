@@ -1,6 +1,6 @@
 {
   "name": "appium-windows-driver",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Appium bridge to WinAppDriver",
   "keywords": [
     "appium",
@@ -25,37 +25,63 @@
     "lib": "lib"
   },
   "dependencies": {
-    "appium-base-driver": "^2.0.1",
+    "appium-base-driver": "^3.0.0",
     "appium-support": "^2.5.0",
     "asyncbox": "^2.3.1",
     "babel-runtime": "=5.8.24",
-    "bluebird": "^2.9.32",
+    "bluebird": "^3.5.1",
     "lodash": "^4.6.1",
     "punycode": "^2.0.0",
-    "request-promise": "^3.0.0",
-    "source-map-support": "^0.3.1",
+    "request-promise": "^4.2.2",
+    "source-map-support": "^0.5.5",
     "teen_process": "^1.7.0",
-    "yargs": "^3.10.0"
+    "yargs": "^12.0.1"
   },
   "scripts": {
-    "prepublish": "./node_modules/.bin/gulp prepublish",
-    "test": "./node_modules/.bin/gulp once",
-    "watch": "./node_modules/.bin/gulp",
-    "install": "node install-npm.js"
+    "build": "gulp transpile",
+    "mocha": "mocha",
+    "prepublish": "gulp prepublish",
+    "test": "gulp once",
+    "e2e-test": "gulp e2e-test",
+    "watch": "gulp watch",
+    "coverage": "gulp coveralls",
+    "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
+    "precommit-test": "REPORTER=dot gulp once",
+    "lint": "gulp eslint",
+    "lint:fix": "gulp eslint --fix"
   },
+  "pre-commit": [
+    "precommit-msg",
+    "precommit-test"
+  ],
   "devDependencies": {
-    "appium-gulp-plugins": "^1.4.0",
-    "appium-test-support": "0.0.5",
-    "babel-eslint": "^6.1.2",
-    "chai": "^3.0.0",
-    "chai-as-promised": "^5.1.0",
-    "eslint": "^2.12.0",
-    "eslint-config-appium": "0.0.6",
+    "appium-gulp-plugins": "^2.2.0",
+    "appium-test-support": "1.0.0",
+    "babel-eslint": "^7.1.1",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^3.10.2",
+    "eslint-config-appium": "^2.0.1",
     "eslint-plugin-babel": "^3.3.0",
-    "eslint-plugin-import": "^1.10.3",
-    "eslint-plugin-mocha": "^3.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-mocha": "^4.7.0",
+    "eslint-plugin-promise": "^3.3.1",
     "gulp": "^3.8.11",
-    "sinon": "^1.17.4",
-    "wd": "^0.4.0"
+    "pre-commit": "^1.2.2",
+    "sinon": "^6.0.0",
+    "wd": "^1.6.2"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "babel-eslint",
+      "babel-preset-env",
+      "eslint",
+      "eslint-plugin-babel",
+      "eslint-plugin-import",
+      "eslint-plugin-mocha",
+      "eslint-plugin-promise",
+      "gulp",
+      "babel-runtime"
+    ]
   }
 }

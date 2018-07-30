@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
+/* eslint-disable promise/prefer-await-to-callbacks */
 
-var fs = require('fs')
-  , path = require('path')
-  , system = require('appium-support').system;
+const fs = require('fs');
+const path = require('path');
+const system = require('appium-support').system;
 
 
 function waitForDeps (cb) {
   // see if we can import the necessary code
   // try it a ridiculous (but finite) number of times
-  var i = 0;
+  let i = 0;
   function check () {
     i++;
     try {
@@ -37,7 +38,7 @@ if (require.main === module) {
     process.exit(0);
   }
   // check if cur dir exists
-  var installScript = path.resolve(__dirname, 'build', 'lib', 'installer.js');
+  const installScript = path.resolve(__dirname, 'build', 'lib', 'installer.js');
   waitForDeps(function (err) {
     if (err) {
       console.warn("Unable to import install script. Re-run `install appium-windows-driver` manually.");
@@ -56,4 +57,3 @@ if (require.main === module) {
     });
   });
 }
-

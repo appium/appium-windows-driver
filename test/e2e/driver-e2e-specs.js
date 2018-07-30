@@ -10,24 +10,24 @@ const TEST_HOST = "localhost";
 
 let server, driver;
 
-describe('Driver', () => {
-  before(async () => {
+describe('Driver', function () {
+  before(async function () {
     server = await startServer(TEST_PORT, TEST_HOST);
   });
 
-  after(async () => {
+  after(async function () {
     await server.close();
   });
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
   });
 
-  afterEach(async () => {
+  afterEach(async function () {
     await driver.quit();
   });
 
-  it('should run a basic session using a real client', async () => {
+  it('should run a basic session using a real client', async function () {
     await driver.init({
       app: "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App",
       platformName: "Windows",
