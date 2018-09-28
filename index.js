@@ -20,7 +20,6 @@ if (require.main === module) {
   asyncify(main);
 }
 
-export { WindowsDriver,  commonCapConstraints };
+export { WindowsDriver, commonCapConstraints };
 
 export default WindowsDriver;
-

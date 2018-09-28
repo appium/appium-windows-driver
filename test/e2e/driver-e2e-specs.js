@@ -19,7 +19,7 @@ describe('Driver', function () {
     await server.close();
   });
 
-  beforeEach(async function () {
+  beforeEach(function () {
     driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
   });
 
