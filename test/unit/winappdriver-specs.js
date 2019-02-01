@@ -1,4 +1,4 @@
-﻿// transpile:mocha
+// transpile:mocha
 
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -29,8 +29,8 @@ describe('WinAppDriverServer', function () {
     it('should start a session', async function () {
       let caps = { foo: 'bar' };
       S.mocks.jwproxy = S.sandbox.mock(winAppDriver.jwproxy);
-      S.mocks.jwproxy.expects("command").once()
-        .withExactArgs("/session", "POST", { desiredCapabilities: caps })
+      S.mocks.jwproxy.expects('command').once()
+        .withExactArgs('/session', 'POST', { desiredCapabilities: caps })
         .returns(B.resolve());
       await winAppDriver.startSession(caps);
     });

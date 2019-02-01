@@ -6,7 +6,7 @@ chai.should();
 chai.use(chaiAsPromised);
 
 const TEST_PORT = 4788;
-const TEST_HOST = "localhost";
+const TEST_HOST = 'localhost';
 
 let server, driver;
 
@@ -29,10 +29,10 @@ describe('Driver', function () {
 
   it('should run a basic session using a real client', async function () {
     await driver.init({
-      app: "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App",
-      platformName: "Windows",
-      deviceName: "WindowsPC"
+      app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
+      platformName: 'Windows',
+      deviceName: 'WindowsPC'
     });
-    await driver.elementByName("Calculator");
+    await driver.elementByName('Calculator');
   });
 });

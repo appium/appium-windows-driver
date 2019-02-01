@@ -14,7 +14,7 @@ chai.use(chaiAsPromised);
 describe('driver.js', function () {
   let isWindowsStub;
   before(function () {
-    isWindowsStub = sinon.stub(system, "isWindows").returns(true);
+    isWindowsStub = sinon.stub(system, 'isWindows').returns(true);
   });
   after(function () {
     isWindowsStub.restore();

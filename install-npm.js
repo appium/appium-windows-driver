@@ -34,14 +34,14 @@ function waitForDeps (cb) {
 
 if (require.main === module) {
   if (!system.isWindows()) {
-    console.warn("Not installing WinAppDriver since did not detect a Windows system");
+    console.warn('Not installing WinAppDriver since did not detect a Windows system');
     process.exit(0);
   }
   // check if cur dir exists
   const installScript = path.resolve(__dirname, 'build', 'lib', 'installer.js');
   waitForDeps(function (err) {
     if (err) {
-      console.warn("Unable to import install script. Re-run `install appium-windows-driver` manually.");
+      console.warn('Unable to import install script. Re-run `install appium-windows-driver` manually.');
       return;
     }
     fs.stat(installScript, function (err) {
@@ -51,8 +51,8 @@ if (require.main === module) {
       }
       require('./build/lib/installer').setupWAD().catch(function (err) {
         console.error(err.message);
-        console.error("WinAppDriver was not installed; please check your " +
-                      "system and re-run npm install if you need WinAppDriver");
+        console.error('WinAppDriver was not installed; please check your ' +
+                      'system and re-run npm install if you need WinAppDriver');
       });
     });
   });

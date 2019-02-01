@@ -17,7 +17,7 @@ describe('downloading WAD', function () {
       // if we get a 1605 error, that's ok, that means nothing was installed
       // if we get some other kind of error, we should fail this test
       if (err.code === 1603) {
-        console.log("You need to be an admin to run this test");
+        console.log('You need to be an admin to run this test');
       }
       if (err.code !== 1605) {
         throw err;

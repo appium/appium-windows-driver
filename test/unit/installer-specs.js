@@ -10,7 +10,7 @@ chai.use(chaiAsPromised);
 describe('downloading WAD', function () {
   let isWindowsStub;
   before(function () {
-    isWindowsStub = sinon.stub(system, "isWindows").returns(false);
+    isWindowsStub = sinon.stub(system, 'isWindows').returns(false);
   });
   after(function () {
     isWindowsStub.restore();
