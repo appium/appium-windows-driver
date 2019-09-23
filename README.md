@@ -26,6 +26,13 @@ let driver = new WindowsDriver();
 await driver.createSession(defaultCaps);
 ```
 
+## WindowsDriver-specific capabilities
+
+|Capability|Description|Values|
+|----------|-----------|------|
+|`createSessionTimeout`|Timeout in milliseconds used to retry `WinAppDriver` session startup. This capability could be used as a workaround for the long startup times of UWP applications (aka `Failed to locate opened application window with appId: TestCompany.my_app4!App, and processId: 8480`). Default value `20000`|e.g., `15000`|
+
+
 ## Watch code for changes, re-transpile and run unit tests:
 
 ```

@@ -54,7 +54,7 @@
     "watch": "gulp watch",
     "coverage": "gulp coveralls",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
-    "precommit-test": "REPORTER=dot gulp once",
+    "precommit-test": "env REPORTER=dot bash -c 'gulp once'",
     "lint": "gulp lint",
     "lint:fix": "gulp lint --fix",
     "install": "node install-npm.js"
