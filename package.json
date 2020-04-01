@@ -73,8 +73,5 @@
     "pre-commit": "^1.2.2",
     "sinon": "^9.0.0",
     "wd": "^1.6.2"
-  },
-  "greenkeeper": {
-    "ignore": []
   }
 }

@@ -1,8 +1,6 @@
 Appium Windows Driver
 ===================
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/appium/appium-windows-driver.svg)](https://greenkeeper.io/)
-
 Appium Windows Driver is a test automation tool for Windows devices. Appium Windows Driver automates UWP apps on Windows 10.  In the future it will automate other kinds of native, hybrid and mobile web apps on Windows 10 and Windows 10 mobile simulators and real devices. Appium Windows Driver is part of the [Appium](https://github.com/appium/appium) mobile test automation tool.
 
 
