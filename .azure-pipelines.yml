@@ -13,14 +13,14 @@ stages:
     - template: azure-templates/node_setup_steps.yml
     - script: npm run lint
 
-  - job: Unit_Tests
-    steps:
-    - template: azure-templates/node_setup_steps.yml
-    - script: npm run test
+#   - job: Unit_Tests
+#     steps:
+#     - template: azure-templates/node_setup_steps.yml
+#     - script: npm run test
 
-- stage: Integration_Tests
-  jobs:
-  - job: Integration_Tests
-    steps:
-    - template: azure-templates/node_setup_steps.yml
-    - script: npm run e2e-test
+# - stage: Integration_Tests
+#   jobs:
+#   - job: Integration_Tests
+#     steps:
+#     - template: azure-templates/node_setup_steps.yml
+#     - script: npm run e2e-test
