@@ -15,7 +15,7 @@ describe('Driver', function () {
 
   before(async function () {
     if (!await isAdmin()) {
-      return this.skip();
+      return;
     }
 
     server = await startServer(TEST_PORT, TEST_HOST);
@@ -28,7 +28,11 @@ describe('Driver', function () {
     server = null;
   });
 
-  beforeEach(function () {
+  beforeEach(async function () {
+    if (!await isAdmin()) {
+      return;
+    }
+
     driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
   });
 
@@ -40,6 +44,10 @@ describe('Driver', function () {
   });
 
   it('should run a basic session using a real client', async function () {
+    if (!await isAdmin()) {
+      return this.skip();
+    }
+
     await driver.init({
       app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
       platformName: 'Windows',
