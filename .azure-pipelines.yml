@@ -18,12 +18,12 @@ stages:
     - template: azure-templates/node_setup_steps.yml
     - script: npm run test
 
-# Integration tests cannot run in the hosted pool, because they require Administrator access:
+# Most of the integration tests cannot run in the hosted pool, because they require Administrator access:
 # > You are not running as an administrator so WinAppDriver cannot be installed for you; please reinstall as admin
 
-# - stage: Integration_Tests
-#   jobs:
-#   - job: Integration_Tests
-#     steps:
-#     - template: azure-templates/node_setup_steps.yml
-#     - script: npm run e2e-test
+- stage: Integration_Tests
+  jobs:
+  - job: Integration_Tests
+    steps:
+    - template: azure-templates/node_setup_steps.yml
+    - script: npm run e2e-test
