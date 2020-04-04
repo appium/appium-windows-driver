@@ -14,18 +14,14 @@ describe('installer', function () {
   });
 
   it('should fail if not admin', async function () {
-    if (await isAdmin()) {
-      return this.skip();
+    if (!await isAdmin()) {
+      await setupWAD().should.be.rejectedWith(/administrator/);
     }
-
-    await setupWAD().should.be.rejectedWith(/administrator/);
   });
 
   it('should setup and validate WinAppDriver as admin', async function () {
-    if (!await isAdmin()) {
-      return this.skip();
+    if (await isAdmin()) {
+      await setupWAD(); // contains its own verification of md5 so not much to do
     }
-
-    await setupWAD(); // contains its own verification of md5 so not much to do
   });
 });
