@@ -18,7 +18,9 @@ describe('Driver', async function () {
   let driver;
 
   before(async function () {
-    server = await startServer(TEST_PORT, TEST_HOST);
+    if (await isAdmin()) {
+      server = await startServer(TEST_PORT, TEST_HOST);
+    }
   });
 
   after(async function () {
@@ -29,7 +31,9 @@ describe('Driver', async function () {
   });
 
   beforeEach(function () {
-    driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
+    if (server) {
+      driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
+    }
   });
 
   afterEach(async function () {
