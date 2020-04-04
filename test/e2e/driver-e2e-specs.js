@@ -9,15 +9,15 @@ chai.use(chaiAsPromised);
 const TEST_PORT = 4788;
 const TEST_HOST = 'localhost';
 
-describe('Driver', function () {
+describe('Driver', async function () {
+  if (!await isAdmin()) {
+    return;
+  }
+
   let server;
   let driver;
 
   before(async function () {
-    if (!await isAdmin()) {
-      return;
-    }
-
     server = await startServer(TEST_PORT, TEST_HOST);
   });
 
@@ -28,11 +28,7 @@ describe('Driver', function () {
     server = null;
   });
 
-  beforeEach(async function () {
-    if (!await isAdmin()) {
-      return;
-    }
-
+  beforeEach(function () {
     driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
   });
 
@@ -44,10 +40,6 @@ describe('Driver', function () {
   });
 
   it('should run a basic session using a real client', async function () {
-    if (!await isAdmin()) {
-      return this.skip();
-    }
-
     await driver.init({
       app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
       platformName: 'Windows',
