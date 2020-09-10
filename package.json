@@ -42,7 +42,7 @@
     "portscanner": "2.2.0",
     "source-map-support": "^0.5.5",
     "teen_process": "^1.7.0",
-    "yargs": "^15.0.1"
+    "yargs": "^16.0.2"
   },
   "scripts": {
     "clean": "rm -rf node_modules && rm -f package-lock.json && npm install",
