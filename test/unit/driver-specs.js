@@ -61,8 +61,8 @@ describe('driver.js', function () {
       it('should exist', function () {
         driver.proxyActive.should.be.an.instanceof(Function);
       });
-      it('should return true', function () {
-        driver.proxyActive('abc').should.be.true;
+      it('should return false by default', function () {
+        driver.proxyActive('abc').should.be.false;
       });
       it('should throw an error if session id is wrong', function () {
         (() => { driver.proxyActive('aaa'); }).should.throw;
