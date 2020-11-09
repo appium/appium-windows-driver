@@ -1,9 +1,7 @@
 Appium Windows Driver
 ===================
 
-Appium Windows Driver is a test automation tool for Windows devices. Appium Windows Driver automates UWP and classic apps on Windows 10. In the future it will automate other kinds of native, hybrid and mobile web apps on Windows 10 and Windows 10 mobile simulators and real devices.
-
-The driver is maintained by Microsoft at https://github.com/microsoft/WinAppDriver. Check its [release notes](https://github.com/microsoft/WinAppDriver/releases) to get more details on the supported features and possible pitfalls.
+Appium Windows Driver is a test automation tool for Windows devices. Appium Windows Driver automates UWP and classic apps on Windows 10. The driver is maintained by Microsoft at https://github.com/microsoft/WinAppDriver. Check its [release notes](https://github.com/microsoft/WinAppDriver/releases) and the [vendor documentation](https://github.com/microsoft/WinAppDriver/tree/master/Docs) to get more details on the supported features and possible pitfalls.
 
 
 ## Usage
