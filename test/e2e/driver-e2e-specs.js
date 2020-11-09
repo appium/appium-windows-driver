@@ -10,15 +10,15 @@ chai.use(chaiAsPromised);
 const TEST_PORT = 4788;
 const TEST_HOST = 'localhost';
 
-describe('Driver', function () {
+describe('Driver', async function () {
+  if (!await isAdmin()) {
+    return;
+  }
+
   let server;
   let driver;
 
   before(async function () {
-    if (!await isAdmin()) {
-      return this.skip();
-    }
-
     server = await startServer(TEST_PORT, TEST_HOST);
   });
 
