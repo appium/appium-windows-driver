@@ -21,7 +21,7 @@ Capability Name | Description
 --- | ---
 platformName | Must be set to `windows` (case-insensitive).
 automationName | Must be set to `windows` (case-insensitive).
-app | The name of the UWP application to test or full path to a classic app, for example `Microsoft.WindowsCalculator_8wekyb3d8bbwe!App` or `C:\Windows\System32\notepad.exe`. Either this capability or `appTopLevelWindow` must be provided on session startup.
+app | The name of the UWP application to test or full path to a classic app, for example `Microsoft.WindowsCalculator_8wekyb3d8bbwe!App` or `C:\Windows\System32\notepad.exe`. It is also possible to set `app` to `Root`. In such case the session will be invoked without any explicit target application (actually, it will be Explorer). Either this capability or `appTopLevelWindow` must be provided on session startup.
 appArguments | Application arguments string, for example `/?`.
 appTopLevelWindow | The hexadecimal handle of an existing application top level window to attach to, for example `0x12345` (should be of string type). Either this capability or `app` must be provided on session startup.
 appWorkingDir | Full path to folder, which is going to be set as the working dir for the application under test. This is only applicable for classic apps.
@@ -65,7 +65,10 @@ def generate_caps():
         # Check https://docs.microsoft.com/en-us/windows/win32/winauto/inspect-objects
         # or https://accessibilityinsights.io/.
         # Also, it is possible to use the corresponding WinApi calls for this purpose,
-        # for example https://stackoverflow.com/questions/44735798/pywin32-how-to-get-window-handle-from-process-handle-and-vice-versa
+        # for example https://referencesource.microsoft.com/#System/services/monitoring/system/diagnosticts/ProcessManager.cs,db7ac68b7cb40db1
+        #
+        # This capability could be used to create a workaround for UWP apps startup.
+        # Check https://github.com/microsoft/WinAppDriver/blob/master/Samples/C%23/StickyNotesTest/StickyNotesSession.cs
         'appTopLevelWindow': hex(12345),
     }
     return [uwp_caps, classic_caps, use_existing_app_caps]
