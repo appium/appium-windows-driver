@@ -57,8 +57,8 @@ def generate_caps():
         'appWorkingDir': 'D:\\',
     }
     use_existing_app_caps: {
-       **common_caps,
-       'appTopLevelWindow': hex(12345),
+        **common_caps,
+        'appTopLevelWindow': hex(12345),
     }
     return [uwp_caps, classic_caps, use_existing_app_caps]
 
