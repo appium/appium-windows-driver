@@ -3,6 +3,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { startServer } from '../../lib/server';
 import { isAdmin } from '../../lib/installer';
+
 chai.should();
 chai.use(chaiAsPromised);
 
@@ -46,6 +47,6 @@ describe('Driver', function () {
       app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
       platformName: 'Windows',
     });
-    await driver.elementByName('Calculator');
+    await driver.source().should.eventually.be.not.empty;
   });
 });
