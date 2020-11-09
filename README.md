@@ -24,10 +24,10 @@ automationName | Must be set to `windows` (case-insensitive).
 app | The name of the UWP application to test or full path to a classic app, for example `Microsoft.WindowsCalculator_8wekyb3d8bbwe!App` or `C:\Windows\System32\notepad.exe`. It is also possible to set `app` to `Root`. In such case the session will be invoked without any explicit target application (actually, it will be Explorer). Either this capability or `appTopLevelWindow` must be provided on session startup.
 appArguments | Application arguments string, for example `/?`.
 appTopLevelWindow | The hexadecimal handle of an existing application top level window to attach to, for example `0x12345` (should be of string type). Either this capability or `app` must be provided on session startup.
-appWorkingDir | Full path to folder, which is going to be set as the working dir for the application under test. This is only applicable for classic apps.
+appWorkingDir | Full path to the folder, which is going to be set as the working dir for the application under test. This is only applicable for classic apps.
 createSessionTimeout | Timeout in milliseconds used to retry Appium Windows Driver session startup. This capability could be used as a workaround for the long startup times of UWP applications (aka `Failed to locate opened application window with appId: TestCompany.my_app4!App, and processId: 8480`). Default value is `20000`.
-ms:waitForAppLaunch | Similar to `createSessionTimeout`, but in seconds and happens on the server side. Enables Appium Windows Driver to wait for a defined amount of time after an app launch is initiated prior to attaching to the application session. The limit for this is 50 seconds.
-ms:experimental-webdriver | Enables experimental features and optimizations. See Appium Windows Driver release notes for more details on this capability. `false` by default
+ms:waitForAppLaunch | Similar to `createSessionTimeout`, but in seconds and is applied on the server side. Enables Appium Windows Driver to wait for a defined amount of time after an app launch is initiated prior to attaching to the application session. The limit for this is 50 seconds.
+ms:experimental-webdriver | Enables experimental features and optimizations. See Appium Windows Driver release notes for more details on this capability. `false` by default.
 systemPort | The port number to execute Appium Windows Driver server listener on, for example `5556`. The port must not be occupied. The default starting port number for a new Appium Windows Driver session is `4724`. If this port is already busy then the next free port will be automatically selected.
 
 
@@ -48,27 +48,28 @@ def generate_caps():
     }
     uwp_caps = {
         **common_caps,
+        # How to get the app ID for Universal Windows Apps (UWP):
         # https://www.securitylearningacademy.com/mod/book/view.php?id=13829&chapterid=678
         'app': 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
     }
     classic_caps = {
         **common_caps,
         'app': 'C:\\Windows\\System32\\notepad.exe',
-        # Make sure arguments are quoted/escaped properly if necessary
+        # Make sure arguments are quoted/escaped properly if necessary:
         # https://ss64.com/nt/syntax-esc.html
         'appArguments': 'D:\\log.txt',
         'appWorkingDir': 'D:\\',
     }
     use_existing_app_caps: {
         **common_caps,
-        # Active window handles could be retrieved from any compatible UI inspector app
-        # Check https://docs.microsoft.com/en-us/windows/win32/winauto/inspect-objects
+        # Active window handles could be retrieved from any compatible UI inspector app:
+        # https://docs.microsoft.com/en-us/windows/win32/winauto/inspect-objects
         # or https://accessibilityinsights.io/.
-        # Also, it is possible to use the corresponding WinApi calls for this purpose,
-        # for example https://referencesource.microsoft.com/#System/services/monitoring/system/diagnosticts/ProcessManager.cs,db7ac68b7cb40db1
+        # Also, it is possible to use the corresponding WinApi calls for this purpose:
+        # https://referencesource.microsoft.com/#System/services/monitoring/system/diagnosticts/ProcessManager.cs,db7ac68b7cb40db1
         #
-        # This capability could be used to create a workaround for UWP apps startup.
-        # Check https://github.com/microsoft/WinAppDriver/blob/master/Samples/C%23/StickyNotesTest/StickyNotesSession.cs
+        # This capability could be used to create a workaround for UWP apps startup:
+        # https://github.com/microsoft/WinAppDriver/blob/master/Samples/C%23/StickyNotesTest/StickyNotesSession.cs
         'appTopLevelWindow': hex(12345),
     }
     return [uwp_caps, classic_caps, use_existing_app_caps]
@@ -85,7 +86,7 @@ def test_app_source_could_be_retrieved(driver):
     assert len(driver.page_source) > 0
 ```
 
-You could also find more examples for different programming languages at https://github.com/microsoft/WinAppDriver/tree/master/Samples
+You could find more examples for different programming languages at https://github.com/microsoft/WinAppDriver/tree/master/Samples
 
 
 ## Power Shell commands execution
