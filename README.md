@@ -48,16 +48,24 @@ def generate_caps():
     }
     uwp_caps = {
         **common_caps,
+        # https://www.securitylearningacademy.com/mod/book/view.php?id=13829&chapterid=678
         'app': 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
     }
     classic_caps = {
         **common_caps,
         'app': 'C:\\Windows\\System32\\notepad.exe',
+        # Make sure arguments are quoted/escaped properly if necessary
+        # https://ss64.com/nt/syntax-esc.html
         'appArguments': 'D:\\log.txt',
         'appWorkingDir': 'D:\\',
     }
     use_existing_app_caps: {
         **common_caps,
+        # Active window handles could be retrieved from any compatible UI inspector app
+        # Check https://docs.microsoft.com/en-us/windows/win32/winauto/inspect-objects
+        # or https://accessibilityinsights.io/.
+        # Also, it is possible to use the corresponding WinApi calls for this purpose,
+        # for example https://stackoverflow.com/questions/44735798/pywin32-how-to-get-window-handle-from-process-handle-and-vice-versa
         'appTopLevelWindow': hex(12345),
     }
     return [uwp_caps, classic_caps, use_existing_app_caps]
