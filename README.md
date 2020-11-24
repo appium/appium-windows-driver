@@ -26,7 +26,7 @@ createSessionTimeout | Timeout in milliseconds used to retry Appium Windows Driv
 ms:waitForAppLaunch | Similar to `createSessionTimeout`, but in seconds and is applied on the server side. Enables Appium Windows Driver to wait for a defined amount of time after an app launch is initiated prior to attaching to the application session. The limit for this is 50 seconds.
 ms:experimental-webdriver | Enables experimental features and optimizations. See Appium Windows Driver release notes for more details on this capability. `false` by default.
 systemPort | The port number to execute Appium Windows Driver server listener on, for example `5556`. The port must not be occupied. The default starting port number for a new Appium Windows Driver session is `4724`. If this port is already busy then the next free port will be automatically selected.
-
+prerun | An object containing either `script` or `command` key. The value of each key must be a valid PowerShell script or command to be executed prior to the WinAppDriver session startup. See [Power Shell commands execution](#power-shell-commands-execution) for more details. Example: `{script: 'Get-Process outlook -ErrorAction SilentlyContinue'}`
 
 ## Example
 
