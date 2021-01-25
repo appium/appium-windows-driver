@@ -24,6 +24,14 @@
   "directories": {
     "lib": "lib"
   },
+  "appium": {
+    "driverName": "windows",
+    "automationName": "Windows",
+    "platformNames": [
+      "Windows"
+    ],
+    "mainClass": "WindowsDriver"
+  },
   "files": [
     "index.js",
     "install-npm.js",
