@@ -79,7 +79,7 @@
     "eslint-config-appium": "^4.0.1",
     "gulp": "^4.0.0",
     "pre-commit": "^1.2.2",
-    "sinon": "^9.0.0",
+    "sinon": "^10.0.0",
     "wd": "^1.6.2"
   }
 }
