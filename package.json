@@ -1,6 +1,6 @@
 {
   "name": "appium-windows-driver",
-  "version": "1.18.0",
+  "version": "1.18.2",
   "description": "Appium bridge to WinAppDriver",
   "keywords": [
     "appium",
@@ -49,8 +49,7 @@
     "lodash": "^4.6.1",
     "portscanner": "2.2.0",
     "source-map-support": "^0.5.5",
-    "teen_process": "^1.7.0",
-    "yargs": "^16.0.2"
+    "teen_process": "^1.7.0"
   },
   "scripts": {
     "clean": "rm -rf node_modules && rm -f package-lock.json && npm install",
@@ -79,7 +78,7 @@
     "eslint-config-appium": "^4.0.1",
     "gulp": "^4.0.0",
     "pre-commit": "^1.2.2",
-    "sinon": "^9.0.0",
+    "sinon": "^10.0.0",
     "wd": "^1.6.2"
   }
 }
