@@ -4,6 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import path from 'path';
 import { tempDir, fs } from 'appium-support';
 import { startServer } from '../../../lib/server';
+import { isAdmin } from '../../../lib/installer';
 
 chai.should();
 chai.use(chaiAsPromised);
@@ -12,7 +13,11 @@ const TEST_PORT = 4788;
 const TEST_HOST = 'localhost';
 
 
-describe('file movement', function () {
+describe('file movement', async function () {
+  if (!await isAdmin()) {
+    return;
+  }
+
   let server;
   let driver;
   let remotePath;
@@ -52,15 +57,15 @@ describe('file movement', function () {
   });
 
   it('should push and pull a file', async function () {
-    let stringData = `random string data ${Math.random()}`;
-    let base64Data = Buffer.from(stringData).toString('base64');
+    const stringData = `random string data ${Math.random()}`;
+    const base64Data = Buffer.from(stringData).toString('base64');
     remotePath = await tempDir.path({ prefix: 'appium', suffix: '.tmp' });
 
     await driver.pushFile(remotePath, base64Data);
 
     // get the file and its contents, to check
-    let remoteData64 = await driver.pullFile(remotePath);
-    let remoteData = Buffer.from(remoteData64, 'base64').toString();
+    const remoteData64 = await driver.pullFile(remotePath);
+    const remoteData = Buffer.from(remoteData64, 'base64').toString();
     remoteData.should.equal(stringData);
   });
 
@@ -71,8 +76,8 @@ describe('file movement', function () {
 
     await driver.pushFile(remotePath, base64Data);
 
-    let remoteData64 = await driver.pullFile(remotePath);
-    let remoteData = Buffer.from(remoteData64, 'base64').toString();
+    const remoteData64 = await driver.pullFile(remotePath);
+    const remoteData = Buffer.from(remoteData64, 'base64').toString();
     remoteData.should.equal(stringData);
 
     await driver.execute('windows: deleteFile', { remotePath });

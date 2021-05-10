@@ -165,6 +165,25 @@ formFields | Map or `Array<Pair>` | no | Additional form fields for multipart ht
 
 Base64-encoded content of the recorded media file if `remotePath` parameter is falsy or an empty string.
 
+### windows: deleteFile
+
+Remove the file from the file system.
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+remotePath | string | yes | The path to a file. | `C:\\Program Files\\MyApp\\SomeFile.txt` or `%PROGRAMFILES%\\MyApp\\SomeFile.txt`
+
+### windows: deleteFolder
+
+Remove the folder from the file system.
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+remotePath | string | yes | The path to a folder. | `C:\\Program Files\\MyApp\\` or `%PROGRAMFILES%\\MyApp\\`
 
 ## Development
 
