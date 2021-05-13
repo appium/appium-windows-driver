@@ -175,19 +175,20 @@ of enabled insecure features. Refer to [Appium Security document](https://github
 
 Name | Type | Required | Description | Example
 --- | --- | --- | --- | ---
-remotePath | string | yes | The path to a file. The path may contains environment variables that can be expanded on the server side. By security reason only variables listed below would be expanded: `APPDATA`, `LOCALAPPDATA`, `PROGRAMFILES`, `PROGRAMFILES(X86)`, `PROGRAMDATA`, `ALLUSERSPROFILE`, `TEMP`, `TMP`, `HOMEPATH`, `USERPROFILE`, `PUBLIC` | `%HOMEPATH%\\SomeFile.txt` or `C:\\Users\\user\\SomeFile.txt`
+remotePath | string | yes | The path to a file. The path may contain environment variables that could be expanded on the server side. Due to security reasons only variables listed below would be expanded: `APPDATA`, `LOCALAPPDATA`, `PROGRAMFILES`, `PROGRAMFILES(X86)`, `PROGRAMDATA`, `ALLUSERSPROFILE`, `TEMP`, `TMP`, `HOMEPATH`, `USERPROFILE`, `PUBLIC` | `%HOMEPATH%\\SomeFile.txt` or `C:\\Users\\user\\SomeFile.txt`
 
 
 ### windows: deleteFolder
 
-Remove the folder from the file system. This feature is potentially insecure and thus needs to be explicitly enabled when executing the server by providing `modify_fs` key to the list
+Remove the folder from the file system. This feature is potentially insecure and thus needs to 
+be explicitly enabled when executing the server by providing `modify_fs` key to the list
 of enabled insecure features. Refer to [Appium Security document](https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/security.md) for more details.
 
 #### Arguments
 
 Name | Type | Required | Description | Example
 --- | --- | --- | --- | ---
-remotePath | string | yes | The path to a folder. The path may contains environment variables that can be expanded on the server side. By security reason only variables listed below would be expanded: `APPDATA`, `LOCALAPPDATA`, `PROGRAMFILES`, `PROGRAMFILES(X86)`, `PROGRAMDATA`, `ALLUSERSPROFILE`, `TEMP`, `TMP`, `HOMEPATH`, `USERPROFILE`, `PUBLIC` | `%HOMEPATH%\\SomeFolder\\` or `C:\\Users\\user\\SomeFolder\\`
+remotePath | string | yes | The path to a folder. The path may contain environment variables that could be expanded on the server side. Due to security reasons only variables listed below would be expanded: `APPDATA`, `LOCALAPPDATA`, `PROGRAMFILES`, `PROGRAMFILES(X86)`, `PROGRAMDATA`, `ALLUSERSPROFILE`, `TEMP`, `TMP`, `HOMEPATH`, `USERPROFILE`, `PUBLIC` | `%HOMEPATH%\\SomeFolder\\` or `C:\\Users\\user\\SomeFolder\\`
 
 ## Development
 
