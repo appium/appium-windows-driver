@@ -37,7 +37,7 @@ describe('file movement', async function () {
     if (server) {
       driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
       await driver.init({
-        app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
+        app: 'Root',
         platformName: 'Windows',
       });
     }
@@ -82,6 +82,6 @@ describe('file movement', async function () {
 
     await driver.execute('windows: deleteFile', { remotePath });
 
-    await driver.pullFile(remotePath).should.eventually.be.rejectedWith(/No such file/);
+    await driver.pullFile(remotePath).should.eventually.be.rejectedWith(/not exists/);
   });
 });

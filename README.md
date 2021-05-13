@@ -167,23 +167,26 @@ Base64-encoded content of the recorded media file if `remotePath` parameter is f
 
 ### windows: deleteFile
 
-Remove the file from the file system.
+Remove the file from the file system. This feature is potentially insecure and thus needs to be
+explicitly enabled when executing the server by providing `delete_files` key to the list
+of enabled insecure features. Refer https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/security.md for more details.
 
 #### Arguments
 
 Name | Type | Required | Description | Example
 --- | --- | --- | --- | ---
-remotePath | string | yes | The path to a file. | `C:\\Program Files\\MyApp\\SomeFile.txt` or `%PROGRAMFILES%\\MyApp\\SomeFile.txt`
+remotePath | string | yes | The path to a file. | `C:\\Users\\user\AppData\Local\\MyApp\\SomeFile.txt` or `%LOCALAPPDATA%\\MyApp\\SomeFile.txt`
 
 ### windows: deleteFolder
 
-Remove the folder from the file system.
+Remove the folder from the file system. This feature is potentially insecure and thus needs to be explicitly enabled when executing the server by providing `delete_files` key to the list
+of enabled insecure features. Refer https://github.com/appium/appium/blob/master/docs/en/writing-running-appium/security.md for more details.
 
 #### Arguments
 
 Name | Type | Required | Description | Example
 --- | --- | --- | --- | ---
-remotePath | string | yes | The path to a folder. | `C:\\Program Files\\MyApp\\` or `%PROGRAMFILES%\\MyApp\\`
+remotePath | string | yes | The path to a folder. | `C:\\Users\\user\AppData\Local\\MyApp\\LocalState\\` or `%LOCALAPPDATA%\\MyApp\\LocalState\\`
 
 ## Development
 
