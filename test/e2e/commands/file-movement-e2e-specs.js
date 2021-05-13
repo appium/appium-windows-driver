@@ -23,7 +23,7 @@ describe('file movement', async function () {
   let remotePath;
 
   before(async function () {
-    server = await startServer(TEST_PORT, TEST_HOST);
+    server = await startServer(TEST_PORT, TEST_HOST, true);
   });
 
   after(async function () {
@@ -82,6 +82,6 @@ describe('file movement', async function () {
 
     await driver.execute('windows: deleteFile', { remotePath });
 
-    await driver.pullFile(remotePath).should.eventually.be.rejectedWith(/not exists/);
+    await driver.pullFile(remotePath).should.eventually.be.rejectedWith(/does not exist/);
   });
 });
