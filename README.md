@@ -192,15 +192,15 @@ remotePath | string | yes | The path to a folder. The path may contain environme
 
 ## Custom Path
 
-If you want to set your custom path like wda then you can set path as follow as:  
+If you want to set your custom path like WAD then you can set path as follow as:  
 ```
-process.env.WDA_PATH = 'C:\\Windows\\Program Files\\Windows Application Driver\\WinAppDriver.exe'
+process.env.WAD_PATH = 'C:\\Windows\\Program Files\\Windows Application Driver\\WinAppDriver.exe'
 ```
 
 #### Custom paths
 Env Name | Description
 --- | ---
-WDA_PATH | WinAppDriver.exe path (Must full path)
+WAD_PATH | WinAppDriver.exe path (Must full path)
 
 
 ## Development
