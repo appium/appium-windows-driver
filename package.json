@@ -41,9 +41,9 @@
     "build/lib"
   ],
   "dependencies": {
+    "@appium/base-driver": "^8.0.0",
+    "@appium/support": "^2.55.3",
     "@babel/runtime": "^7.0.0",
-    "appium-base-driver": "^7.10.1",
-    "appium-support": "^2.49.0",
     "asyncbox": "^2.3.1",
     "bluebird": "^3.5.1",
     "es6-error": "^4.1.1",
@@ -72,12 +72,16 @@
     "precommit-test"
   ],
   "devDependencies": {
-    "appium-gulp-plugins": "^5.1.0",
-    "appium-test-support": "^1.1.0",
+    "@appium/gulp-plugins": "^6.0.0",
+    "@appium/eslint-config-appium": "^5.0.0",
+    "@appium/test-support": "^1.0.0",
     "@semantic-release/git": "^10.0.1",
-     "chai": "^4.1.2",
+    "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "eslint-config-appium": "^4.0.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-mocha": "^9.0.0",
+    "eslint-plugin-promise": "^6.0.0",
     "gulp": "^4.0.0",
     "pre-commit": "^1.2.2",
     "semantic-release": "^19.0.2",

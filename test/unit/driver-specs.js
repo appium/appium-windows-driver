@@ -5,7 +5,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import B from 'bluebird';
-import { system } from 'appium-support';
+import { system } from '@appium/support';
 
 
 chai.should();
@@ -34,7 +34,7 @@ describe('driver.js', function () {
       sinon.mock(driver).expects('startWinAppDriverSession')
         .once()
         .returns(B.resolve());
-      await driver.createSession({ cap: 'foo' });
+      await driver.createSession(null, null, { alwaysMatch: { 'appium:cap': 'foo' }});
       driver.sessionId.should.exist;
       driver.caps.cap.should.equal('foo');
     });

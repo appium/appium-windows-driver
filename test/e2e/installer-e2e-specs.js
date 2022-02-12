@@ -1,5 +1,5 @@
 import { setupWAD, downloadWAD, isAdmin } from '../../lib/installer';
-import { fs } from 'appium-support';
+import { fs } from '@appium/support';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 

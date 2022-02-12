@@ -2,7 +2,7 @@ import wd from 'wd';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import path from 'path';
-import { tempDir, fs } from 'appium-support';
+import { tempDir, fs } from '@appium/support';
 import { startServer } from '../../../lib/server';
 import { isAdmin } from '../../../lib/installer';
 

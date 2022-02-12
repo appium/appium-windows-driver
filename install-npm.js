@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const system = require('appium-support').system;
+const system = require('@appium/support').system;
 
 
 function waitForDeps (cb) {
