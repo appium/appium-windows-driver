@@ -1,3 +1,4 @@
+// FIXME: convert test to with webdriverio
 // import wd from 'wd';
 // import chai from 'chai';
 // import chaiAsPromised from 'chai-as-promised';

@@ -1,52 +1,59 @@
-// import wd from 'wd';
-// import chai from 'chai';
-// import chaiAsPromised from 'chai-as-promised';
-// import { startServer } from '../../lib/server';
-// import { isAdmin } from '../../lib/installer';
+import { remote as wdio } from 'webdriverio';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import { startServer } from '../../lib/server';
+import { isAdmin } from '../../lib/installer';
 
-// chai.should();
-// chai.use(chaiAsPromised);
+chai.should();
+chai.use(chaiAsPromised);
 
-// const TEST_PORT = 4788;
-// const TEST_HOST = 'localhost';
+const TEST_PORT = 4788;
+const TEST_HOST = 'localhost';
 
-// describe('Driver', async function () {
-//   if (!await isAdmin()) {
-//     return;
-//   }
+const TEST_CAPS = {
+  platformName: 'Windows',
+  app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App'
+};
 
-//   let server;
-//   let driver;
+const WDIO_OPTS = {
+  hostname: TEST_HOST,
+  connectionRetryCount: 0,
+  capabilities: TEST_CAPS
+};
 
-//   before(async function () {
-//     server = await startServer(TEST_PORT, TEST_HOST);
-//   });
+describe('Driver', async function () {
+  if (!await isAdmin()) {
+    return;
+  }
 
-//   after(async function () {
-//     if (server) {
-//       await server.close();
-//     }
-//     server = null;
-//   });
+  let server;
+  let driver;
 
-//   beforeEach(function () {
-//     if (server) {
-//       driver = wd.promiseChainRemote(TEST_HOST, TEST_PORT);
-//     }
-//   });
+  before(async function () {
+    server = await startServer(TEST_PORT, TEST_HOST);
+  });
 
-//   afterEach(async function () {
-//     if (driver) {
-//       await driver.quit();
-//     }
-//     driver = null;
-//   });
+  after(async function () {
+    if (server) {
+      await server.close();
+    }
+    server = null;
+  });
 
-//   it('should run a basic session using a real client', async function () {
-//     await driver.init({
-//       app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
-//       platformName: 'Windows',
-//     });
-//     await driver.source().should.eventually.be.not.empty;
-//   });
-// });
+  beforeEach(async function () {
+    if (server) {
+      driver = await wdio({...WDIO_OPTS, port: this.port});
+    }
+  });
+
+  afterEach(async function () {
+    if (driver) {
+      await driver.quit();
+    }
+    driver = null;
+  });
+
+  it('should run a basic session using a real client', async function () {
+    await driver.source().should.eventually.be.not.empty;
+  });
+});
