@@ -82,6 +82,6 @@
     "pre-commit": "^1.2.2",
     "semantic-release": "^19.0.2",
     "sinon": "^13.0.0",
-    "wd": "^1.6.2"
+    "webdriverio": "^7.0.0"
   }
 }
