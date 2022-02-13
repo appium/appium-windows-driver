@@ -12,7 +12,7 @@ const TEST_HOST = 'localhost';
 
 const TEST_CAPS = {
   platformName: 'Windows',
-  app: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App'
+  'appium:app': 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App'
 };
 
 const WDIO_OPTS = {

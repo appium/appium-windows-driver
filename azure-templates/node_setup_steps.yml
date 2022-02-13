@@ -2,4 +2,6 @@ steps:
   - task: NodeTool@0
     inputs:
       versionSpec: "$(DEFAULT_NODE_VERSION)"
+  - script: npm install -g npm@8.3.1
+    name: Install nwer npm version to avoid Node v14 error in Windows https://github.com/actions/setup-node/issues/411#issuecomment-1025543081
   - script: npm install
