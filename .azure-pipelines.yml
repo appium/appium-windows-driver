@@ -1,6 +1,7 @@
 # https://github.com/actions/virtual-environments
 variables:
-  DEFAULT_NODE_VERSION: "14.x"
+  # v14 fails on Win env: https://github.com/actions/setup-node/issues/411
+  DEFAULT_NODE_VERSION: "16.x"
 
 pool:
   vmImage: "windows-latest"
