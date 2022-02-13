@@ -1,6 +1,6 @@
 # https://github.com/actions/virtual-environments
 variables:
-  DEFAULT_NODE_VERSION: "10.x"
+  DEFAULT_NODE_VERSION: "14.x"
 
 pool:
   vmImage: "windows-latest"
