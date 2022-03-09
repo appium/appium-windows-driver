@@ -17,6 +17,7 @@ const TEST_CAPS = {
 
 const WDIO_OPTS = {
   hostname: TEST_HOST,
+  port: TEST_PORT,
   connectionRetryCount: 0,
   capabilities: TEST_CAPS
 };
@@ -42,7 +43,7 @@ describe('Driver', async function () {
 
   beforeEach(async function () {
     if (server) {
-      driver = await wdio({...WDIO_OPTS, port: this.port});
+      driver = await wdio(WDIO_OPTS);
     }
   });
 
