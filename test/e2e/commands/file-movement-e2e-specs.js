@@ -2,8 +2,8 @@ import { remote as wdio } from 'webdriverio';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import path from 'path';
-import { tempDir, fs } from '@appium/support';
-import { startServer } from '../../../lib/server';
+import { tempDir, fs } from 'appium/support';
+import { startServer } from '../../server';
 import { isAdmin } from '../../../lib/installer';
 
 chai.should();
@@ -14,6 +14,7 @@ const TEST_HOST = 'localhost';
 
 const TEST_CAPS = {
   platformName: 'Windows',
+  'appium:automationName': 'windows',
   'appium:app': 'Root',
 };
 

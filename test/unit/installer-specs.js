@@ -1,5 +1,5 @@
 import { setupWAD } from '../../lib/installer';
-import { system } from '@appium/support';
+import { system } from 'appium/support';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';

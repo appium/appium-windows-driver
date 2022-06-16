@@ -4,7 +4,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const system = require('@appium/support').system;
 
 
 function waitForDeps (cb) {
@@ -33,7 +32,7 @@ function waitForDeps (cb) {
 }
 
 if (require.main === module) {
-  if (!system.isWindows()) {
+  if (process.platform !== 'win32') {
     console.warn('Not installing WinAppDriver since did not detect a Windows system');
     process.exit(0);
   }

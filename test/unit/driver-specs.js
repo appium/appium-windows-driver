@@ -5,7 +5,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import B from 'bluebird';
-import { system } from '@appium/support';
+import { system } from 'appium/support';
 
 
 chai.should();
