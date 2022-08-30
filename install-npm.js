@@ -1,58 +1,28 @@
-#!/usr/bin/env node
-/* eslint-disable no-console */
-/* eslint-disable promise/prefer-await-to-callbacks */
-
 const fs = require('fs');
 const path = require('path');
+const log = require('fancy-log');
 
-
-function waitForDeps (cb) {
-  // see if we can import the necessary code
-  // try it a ridiculous (but finite) number of times
-  let i = 0;
-  function check () {
-    i++;
-    try {
-      require('./build/lib/installer');
-      cb();
-    } catch (err) {
-      if (err.message.indexOf("Cannot find module './build/lib/installer'") !== -1) {
-        console.warn('Project does not appear to built yet. Please run `gulp transpile` first.');
-        return cb('Could not install module: ' + err);
-      }
-      console.warn('Error trying to install WinAppDriver MSI. Waiting and trying again.', err.message);
-      if (i <= 200) {
-        setTimeout(check, 1000);
-      } else {
-        cb('Could not import installation module: ' + err);
-      }
-    }
-  }
-  check();
-}
-
-if (require.main === module) {
+async function installWadServer () {
   if (process.platform !== 'win32') {
-    console.warn('Not installing WinAppDriver since did not detect a Windows system');
+    log.info('Not installing WinAppDriver since did not detect a Windows system');
     process.exit(0);
   }
-  // check if cur dir exists
+
   const installScript = path.resolve(__dirname, 'build', 'lib', 'installer.js');
-  waitForDeps(function checkInstallScript (err) {
-    if (err) {
-      console.warn('Unable to import install script. Re-run `install appium-windows-driver` manually.');
-      return;
-    }
-    fs.stat(installScript, function attemptInstall (err) {
-      if (err) {
-        console.warn("NOTE: Run 'gulp transpile' before using");
-        return;
-      }
-      require('./build/lib/installer').setupWAD().catch(function onError (err) {
-        console.error(err.message);
-        console.error('WinAppDriver was not installed; please check your ' +
-                      'system and re-run npm install if you need WinAppDriver');
-      });
-    });
-  });
+  try {
+    await fs.promises.access(installScript, fs.constants.R_OK);
+  } catch (ign) {
+    log.warn(`Unable to import the install script at '${installScript}'. ` +
+      `Consider installing WinAppDriver server manually.`);
+    return;
+  }
+  const { setupWAD } = require(installScript);
+  try {
+    await setupWAD();
+  } catch (err) {
+    log.error(`WinAppDriver server was not installed, consider installing it manually. `
+      + `Original error: ${err.message}`);
+  }
 }
+
+(async () => await installWadServer())();

@@ -1,6 +1,6 @@
 // transpile:mocha
 
-import WindowsDriver from '../..';
+import WindowsDriver from '../../lib/driver';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
