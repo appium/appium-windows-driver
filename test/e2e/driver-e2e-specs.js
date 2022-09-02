@@ -35,7 +35,7 @@ describe('Driver', function () {
   afterEach(async function () {
     try {
       if (driver) {
-        await driver.quit();
+        await driver.deleteSession();
       }
     } finally {
       driver = null;
