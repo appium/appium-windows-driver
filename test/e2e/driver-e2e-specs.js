@@ -1,14 +1,12 @@
 import { remote as wdio } from 'webdriverio';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { startServer } from '../server';
 import { isAdmin } from '../../lib/installer';
+import { TEST_HOST, TEST_PORT } from './constants';
 
 chai.should();
 chai.use(chaiAsPromised);
 
-const TEST_PORT = 4788;
-const TEST_HOST = 'localhost';
 
 const TEST_CAPS = {
   platformName: 'Windows',
@@ -28,24 +26,10 @@ describe('Driver', async function () {
     return;
   }
 
-  let server;
   let driver;
 
-  before(async function () {
-    server = await startServer(TEST_PORT, TEST_HOST);
-  });
-
-  after(async function () {
-    if (server) {
-      await server.close();
-    }
-    server = null;
-  });
-
   beforeEach(async function () {
-    if (server) {
-      driver = await wdio(WDIO_OPTS);
-    }
+    driver = await wdio(WDIO_OPTS);
   });
 
   afterEach(async function () {
