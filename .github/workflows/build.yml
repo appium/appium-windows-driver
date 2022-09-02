@@ -51,6 +51,7 @@ jobs:
           --relaxed-security \
           2>&1 > "$cwd/appium.log" &
         popd
+      shell: bash
       name: Start Appium server
     - run: npm run e2e-test
       name: Run e2e tests
