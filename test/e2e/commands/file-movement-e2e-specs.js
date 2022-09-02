@@ -24,29 +24,32 @@ const WDIO_OPTS = {
   capabilities: TEST_CAPS
 };
 
-describe('file movement', async function () {
-  if (!await isAdmin()) {
-    return;
-  }
-
+describe('file movement', function () {
   let driver;
   let remotePath;
 
   beforeEach(async function () {
+    if (!await isAdmin()) {
+      return this.skip();
+    }
+
     driver = await wdio(WDIO_OPTS);
   });
 
   afterEach(async function () {
-    if (driver) {
-      await driver.quit();
-    }
-    if (remotePath) {
-      if (await fs.exists(remotePath)) {
-        await fs.rimraf(path.dirname(remotePath));
+    try {
+      if (driver) {
+        await driver.quit();
       }
+      if (remotePath) {
+        if (await fs.exists(remotePath)) {
+          await fs.rimraf(path.dirname(remotePath));
+        }
+      }
+    } finally {
+      remotePath = null;
+      driver = null;
     }
-    remotePath = null;
-    driver = null;
   });
 
   it('should push and pull a file', async function () {

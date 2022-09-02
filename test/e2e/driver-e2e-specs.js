@@ -21,22 +21,25 @@ const WDIO_OPTS = {
   capabilities: TEST_CAPS
 };
 
-describe('Driver', async function () {
-  if (!await isAdmin()) {
-    return;
-  }
-
+describe('Driver', function () {
   let driver;
 
   beforeEach(async function () {
+    if (!await isAdmin()) {
+      return;
+    }
+
     driver = await wdio(WDIO_OPTS);
   });
 
   afterEach(async function () {
-    if (driver) {
-      await driver.quit();
+    try {
+      if (driver) {
+        await driver.quit();
+      }
+    } finally {
+      driver = null;
     }
-    driver = null;
   });
 
   it('should run a basic session using a real client', async function () {
