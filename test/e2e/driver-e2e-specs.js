@@ -25,8 +25,8 @@ describe('Driver', function () {
   let driver;
 
   beforeEach(async function () {
-    if (!await isAdmin()) {
-      return;
+    if (process.env.CI || !await isAdmin()) {
+      return this.skip();
     }
 
     driver = await wdio(WDIO_OPTS);

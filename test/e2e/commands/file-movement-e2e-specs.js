@@ -29,7 +29,7 @@ describe('file movement', function () {
   let remotePath;
 
   beforeEach(async function () {
-    if (!await isAdmin()) {
+    if (process.env.CI || !await isAdmin()) {
       return this.skip();
     }
 
