@@ -71,7 +71,7 @@ def generate_options():
     return [uwp_options, classic_options, use_existing_app_options]
 
 
-@pytest.fixture(params=generate_caps())
+@pytest.fixture(params=generate_options())
 def driver(request):
     # The default URL is http://127.0.0.1:4723/wd/hub in Appium 1
     drv = webdriver.Remote('http://127.0.0.1:4723', options=request.param)
