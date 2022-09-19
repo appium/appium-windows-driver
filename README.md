@@ -63,7 +63,7 @@ def generate_caps():
         'appArguments': 'D:\\log.txt',
         'appWorkingDir': 'D:\\',
     }
-    use_existing_app_caps: {
+    use_existing_app_caps = {
         **common_caps,
         # Active window handles could be retrieved from any compatible UI inspector app:
         # https://docs.microsoft.com/en-us/windows/win32/winauto/inspect-objects
