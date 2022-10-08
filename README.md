@@ -135,11 +135,12 @@ appium-windows driver supports the same location strategies [the WinApopDriver s
 
 Name | Description | Example
 --- | --- | ---
-accessibility id | This strategy is AutomationId in inspect.exe | AppNameTitle
-class name | This strategy is ClassName in inspect.exe | TextBlock
-id | This strategy is RuntimeId (decimal) in inspect.exe | 42.333896.3.1
-name | This strategy is LocalizedControlType (upper camel case) in inspect.exe | Text
-xpath | This strategy is any attributes in inspect.exe | //Button[0]
+accessibility id | This strategy is AutomationId attribute in inspect.exe | AppNameTitle
+class name | This strategy is ClassName attribute in inspect.exe | TextBlock
+id | This strategy is RuntimeId (decimal) attribute in inspect.exe | 42.333896.3.1
+name | This strategy is Name attribute in inspect.exe | Calculator
+tag name | This strategy is LocalizedControlType (upper camel case) attribute in inspect.exe | Text
+xpath | This strategy is any attributes attribute in inspect.exe | //Button[0]
 
 ## Platform-Specific Extensions
 
