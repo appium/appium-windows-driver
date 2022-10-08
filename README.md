@@ -129,6 +129,18 @@ else:
 ```
 
 
+## Element Location
+
+appium-windows driver supports the same location strategies [the WinApopDriver supports](https://github.com/microsoft/WinAppDriver/blob/master/Docs/AuthoringTestScripts.md#supported-locators-to-find-ui-elements):
+
+Name | Description | Example
+--- | --- | ---
+accessibility id | This strategy is AutomationId in inspect.exe | AppNameTitle
+class name | This strategy is ClassName in inspect.exe | TextBlock
+id | This strategy is RuntimeId (decimal) in inspect.exe | 42.333896.3.1
+name | This strategy is LocalizedControlType (upper camel case) in inspect.exe | Text
+xpath | This strategy is any attributes in inspect.exe | //Button[0]
+
 ## Platform-Specific Extensions
 
 Beside of standard W3C APIs the driver provides the following custom command extensions to execute platform specific scenarios:
