@@ -131,7 +131,7 @@ else:
 
 ## Element Location
 
-appium-windows driver supports the same location strategies [the WinApopDriver supports](https://github.com/microsoft/WinAppDriver/blob/master/Docs/AuthoringTestScripts.md#supported-locators-to-find-ui-elements):
+Appium Windows Driver supports the same location strategies [the WinApopDriver supports](https://github.com/microsoft/WinAppDriver/blob/master/Docs/AuthoringTestScripts.md#supported-locators-to-find-ui-elements):
 
 Name | Description | Example
 --- | --- | ---
@@ -139,7 +139,7 @@ accessibility id | This strategy is AutomationId attribute in inspect.exe | AppN
 class name | This strategy is ClassName attribute in inspect.exe | TextBlock
 id | This strategy is RuntimeId (decimal) attribute in inspect.exe | 42.333896.3.1
 name | This strategy is Name attribute in inspect.exe | Calculator
-tag name | This strategy is LocalizedControlType (upper camel case) attribute in inspect.exe | Text
+tag name | This strategy is LocalizedControlType (upper camel case) attribute in inspect.exe since Appium Windows Sriver 2.1.1 | Text
 xpath | This strategy is any attributes attribute in inspect.exe | //Button[0]
 
 ## Platform-Specific Extensions
