@@ -10,7 +10,7 @@ Appium Windows Driver is a test automation tool for Windows devices and acts as 
 
 > **Note**
 >
-> Since version 2.0.0 Windows driver has dropped the support of Appium 1, and is only compatible to Appium 2. Use the `appium driver install windows` 
+> Since version 2.0.0 Windows driver has dropped the support of Appium 1, and is only compatible to Appium 2. Use the `appium driver install windows`
 > command to add it to your Appium 2 dist.
 
 
@@ -140,7 +140,7 @@ class name | This strategy is ClassName attribute in inspect.exe | TextBlock
 id | This strategy is RuntimeId (decimal) attribute in inspect.exe | 42.333896.3.1
 name | This strategy is Name attribute in inspect.exe | Calculator
 tag name | This strategy is LocalizedControlType (upper camel case) attribute in inspect.exe since Appium Windows Sriver 2.1.1 | Text
-xpath | This strategy allows to create custom XPath queries on any attribute exposed by inspect.exe. Only XPath 1.0 is supported | //Button[0]
+xpath | This strategy allows to create custom XPath queries on any attribute exposed by inspect.exe. Only XPath 1.0 is supported | (//Button)[2]
 
 ## Platform-Specific Extensions
 
