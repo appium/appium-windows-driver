@@ -17,8 +17,11 @@ jobs:
         cat eol.list
         lts1=$(cat eol.list | head -1)
         lts2=$(cat eol.list | head -2 | tail -1)
-        lts3=$(cat eol.list | head -3 | tail -1)
-        VERSIONS="[$lts1, $lts2, $lts3]"
+        # TODO: npm upgrade with node14@Windows fails with EPERM
+        # TODO: uncomment the below stuff after Node14 reaches its EOL
+        # lts3=$(cat eol.list | head -3 | tail -1)
+        # VERSIONS="[$lts1, $lts2, $lts3]"
+        VERSIONS="[$lts1, $lts2]"
         echo ::set-output name=versions::${VERSIONS}
 
   test:
@@ -33,10 +36,6 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - run: |
-        npm cache clean --force
-        npm i -g npm --force
-      name: Update NPM
     - run: npm install --no-package-lock
       name: Install dev dependencies
     - run: npm run lint
