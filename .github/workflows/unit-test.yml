@@ -33,7 +33,9 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm i -g npm
+    - run: |
+        npm cache clean
+        npm i -g npm
       name: Update NPM
     - run: npm install --no-package-lock
       name: Install dev dependencies
