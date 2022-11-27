@@ -213,7 +213,7 @@ remotePath | string | yes | The path to a folder. The path may contain environme
 on the session startup.
 Generally this API would create a new app window and point the current active session to it, but the actual result may vary depending on how the actual application under test handles multiple instances creation. Check
 [AppiumAppLaunch.cs](https://github.com/microsoft/WinAppDriver/blob/master/Tests/WebDriverAPI/AppiumAppLaunch.cs) for more examples.
-It is possible switch between app windows using WebDriver [Windows API](https://www.selenium.dev/documentation/webdriver/interactions/windows/)
+It is possible to switch between app windows using WebDriver [Windows API](https://www.selenium.dev/documentation/webdriver/interactions/windows/)
 
 ### windows: closeApp
 
