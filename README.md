@@ -207,6 +207,22 @@ Name | Type | Required | Description | Example
 --- | --- | --- | --- | ---
 remotePath | string | yes | The path to a folder. The path may contain environment variables that could be expanded on the server side. Due to security reasons only variables listed below would be expanded: `APPDATA`, `LOCALAPPDATA`, `PROGRAMFILES`, `PROGRAMFILES(X86)`, `PROGRAMDATA`, `ALLUSERSPROFILE`, `TEMP`, `TMP`, `HOMEPATH`, `USERPROFILE`, `PUBLIC` | `%HOMEPATH%\\SomeFolder\\` or `C:\\Users\\user\\SomeFolder\\`
 
+### windows: launchApp
+
+(Re)launch app under test in the same session using the same capabilities configuration given
+on the session startup.
+Generally this API would create a new app window and point the current active session to it, but the actual result may vary depending on how the actual application under test handles multiple instances creation. Check
+[AppiumAppLaunch.cs](https://github.com/microsoft/WinAppDriver/blob/master/Tests/WebDriverAPI/AppiumAppLaunch.cs) for more examples.
+It is possible switch between app windows using WebDriver [Windows API](https://www.selenium.dev/documentation/webdriver/interactions/windows/)
+
+### windows: closeApp
+
+Close the active window of the app under test. Check [AppiumAppClose.cs](https://github.com/microsoft/WinAppDriver/blob/master/Tests/WebDriverAPI/AppiumAppClose.cs) for more examples.
+It is possible to switch between opened app windows using WebDriver [Windows API](https://www.selenium.dev/documentation/webdriver/interactions/windows/).
+After the current app window is closed it is required to use the above API to switch to another active window if there is any. `windows: closeApp` call does not perform the switch automatically.
+An error is thrown if the app under test is not running.
+
+
 ## Environment Variables
 
 Appium Windows Driver supports the following environment variables:
@@ -214,6 +230,14 @@ Appium Windows Driver supports the following environment variables:
 Variable Name | Description
 --- | ---
 APPIUM_WAD_PATH | A full path to `WinAppDriver.exe`. If you need to provide a custom path to WinAppDriver executable then set the corresponding env variable value via CMD or PowerShell: `setx APPIUM_WAD_PATH "D:\New Folder\Windows Application Driver\WinAppDriver.exe"`. The default location of the executable is assumed to be `%PROGRAMFILES%\Windows Application Driver\WinAppDriver.exe`.
+
+## Troubleshooting
+
+### Various WinAppDriver calls don't work as expected or throw weird errors
+
+Unfortunately we cannot do much about it from the Appium Windows Drive side. It is just a thin wrapper over Microsoft's [WinAppDriver](https://github.com/microsoft/WinAppDriver) closed-source REST server binary, which solely performs all the heavy lifting. This driver does handle some API calls on its own, for example PowerShell scripts execution, but the overall amount of such calls is quite limited.
+
+Eventually your best bet would be to report the issue to [WAD issues tracker](https://github.com/microsoft/WinAppDriver/issues) and hope there is some workaround for it as Microsoft has not been regularly maintaining the driver. If it turns out the issue is just a driver regression, and it was working properly in another WAD version, then you could always replace WAD binary supplied with Appium Windows Driver by default with a custom one. Simply fetch it from [Releases page](https://github.com/microsoft/WinAppDriver/releases) and install it locally. Ideally it should transparently replace the previously installed WAD and no further actions are expected. If that did not happen though, consider providing `APPIUM_WAD_PATH` environment variable pointing to the recently installed WAD binary path as described in [Environment Variables](#environment-variables) section.
 
 ## Development
 
