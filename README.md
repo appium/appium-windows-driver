@@ -222,6 +222,25 @@ It is possible to switch between opened app windows using WebDriver [Windows API
 After the current app window is closed it is required to use the above API to switch to another active window if there is any. `windows: closeApp` call does not perform the switch automatically.
 An error is thrown if the app under test is not running.
 
+### windows: click
+
+This is a shortcut for a single mouse click gesture.
+
+> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
+
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+elementId | string | no | Hexadecimal identifier of the element to click on. If this parameter is missing then given coordinates will be parsed as absolute ones. Otherwise they are parsed as relative to the top left corner of this element. | 123e4567-e89b-12d3-a456-426614174000
+x | number | no | Integer horizontal coordinate of the click point. Both x and y coordinates must be provided or none of them if elementId is present. In such case the gesture will be performed at the center point of the given element. | 100
+y | number | no | Integer vertical coordinate of the click point. Both x and y coordinates must be provided or none of them if elementId is present. In such case the gesture will be performed at the center point of the given element. | 100
+button | string | no | Name ofthe mouse button to be clicked. An exception is thrown if an unknown button name
+is provided. Supported button names are: left, middle, right, back, forward. The default value is `left` | right 
+keyModifierFlags | number | no | Bitmask for possible keys to depress while the click is being performed. Supported keys and their masks are: `Shift: 1 << 1`, `Ctrl: 1 << 2`, `Alt: 1 << 3`, `Win: 1 << 4`. For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of `1 << 2 | 1 << 3` | 1 << 1
+durationMs | number | no | The number of milliseconds to wait between pressing and releasing the mouse button. By default no delay is applied, which simulates a regular click. | 500
+
 
 ## Environment Variables
 
