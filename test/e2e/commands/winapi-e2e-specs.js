@@ -9,10 +9,6 @@ chai.use(chaiAsPromised);
 
 describe('winapi', function () {
   before(function () {
-    // https://github.com/node-ffi-napi/node-ffi-napi/issues/244
-    if (parseInt(process.version.split('.')[0], 10) > 16) {
-      return this.skip();
-    }
     commands.log = log;
   });
   after(function () {
@@ -24,7 +20,7 @@ describe('winapi', function () {
       await commands.windowsClick({
         x: 100,
         y: 100,
-        keyModifierFlags: 1 << 1 | 1 << 2,
+        modifierKeys: ['shift', 'ctrl'],
       });
     });
 
@@ -64,7 +60,15 @@ describe('winapi', function () {
         },
         // wrong button name
         {
+          x: 10,
+          y: 10,
           button: 'yolo',
+        },
+        // wrong modifier key name
+        {
+          x: 10,
+          y: 10,
+          modifierKeys: 'yolo',
         },
       ];
 
