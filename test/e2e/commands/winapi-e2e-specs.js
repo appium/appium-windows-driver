@@ -147,6 +147,7 @@ describe('winapi', function () {
         endY: 400,
         modifierKeys: ['ctrl', 'shift'],
       });
+
     });
   });
 
