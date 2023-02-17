@@ -241,6 +241,24 @@ is provided. Supported button names are: left, middle, right, back, forward. The
 modifierKeys | string[] or string | no | List of possible keys or a single key name to depress while the click is being performed. Supported key names are: Shift, Ctrl, Alt, Win. For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of ['ctrl', 'alt'] | 'win'
 durationMs | number | no | The number of milliseconds to wait between pressing and releasing the mouse button. By default no delay is applied, which simulates a regular click. | 500
 
+### windows: scroll
+
+This is a shortcut for a mouse wheel scroll gesture.
+
+> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
+
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+elementId | string | no | Same as in [windows: click](#windows-click) | 123e4567-e89b-12d3-a456-426614174000
+x | number | no | Same as in [windows: click](#windows-click) | 100
+y | number | no | Same as in [windows: click](#windows-click) | 100
+deltaX | number | no | Integer horizontal scroll delta. Either this value or deltaY must be provided, but not both. | -100
+deltaY | number | no | Integer vertical scroll delta. Either this value or deltaX must be provided, but not both. | 100
+modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | 'win'
+
 
 ## Environment Variables
 
