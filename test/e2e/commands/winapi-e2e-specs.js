@@ -32,6 +32,14 @@ describe('winapi', function () {
       });
     });
 
+    it('performs double click', async function () {
+      await commands.windowsClick({
+        x: 100,
+        y: 100,
+        times: 2,
+      });
+    });
+
     it('performs context click', async function () {
       await commands.windowsClick({
         x: 100,
