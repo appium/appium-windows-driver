@@ -236,9 +236,9 @@ Name | Type | Required | Description | Example
 elementId | string | no | Hexadecimal identifier of the element to click on. If this parameter is missing then given coordinates will be parsed as absolute ones. Otherwise they are parsed as relative to the top left corner of this element. | 123e4567-e89b-12d3-a456-426614174000
 x | number | no | Integer horizontal coordinate of the click point. Both x and y coordinates must be provided or none of them if elementId is present. In such case the gesture will be performed at the center point of the given element. | 100
 y | number | no | Integer vertical coordinate of the click point. Both x and y coordinates must be provided or none of them if elementId is present. In such case the gesture will be performed at the center point of the given element. | 100
-button | string | no | Name ofthe mouse button to be clicked. An exception is thrown if an unknown button name
+button | string | no | Name of the mouse button to be clicked. An exception is thrown if an unknown button name
 is provided. Supported button names are: left, middle, right, back, forward. The default value is `left` | right 
-modifierKeys | string[] or string | no | List of possible keys or a single key name to depress while the click is being performed. Supported key names are: Shift, Ctrl, Alt, Win. For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of ['ctrl', 'alt'] | 'win'
+modifierKeys | string[] or string | no | List of possible keys or a single key name to depress while the click is being performed. Supported key names are: Shift, Ctrl, Alt, Win. For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of ['ctrl', 'alt'] | win
 durationMs | number | no | The number of milliseconds to wait between pressing and releasing the mouse button. By default no delay is applied, which simulates a regular click. | 500
 
 ### windows: scroll
@@ -255,9 +255,9 @@ Name | Type | Required | Description | Example
 elementId | string | no | Same as in [windows: click](#windows-click) | 123e4567-e89b-12d3-a456-426614174000
 x | number | no | Same as in [windows: click](#windows-click) | 100
 y | number | no | Same as in [windows: click](#windows-click) | 100
-deltaX | number | no | Integer horizontal scroll delta. Either this value or deltaY must be provided, but not both. | -100
-deltaY | number | no | Integer vertical scroll delta. Either this value or deltaX must be provided, but not both. | 100
-modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | 'win'
+deltaX | number | no | The amount of horizontal wheel movement. A positive value indicates that the wheel was rotated to the right; a negative value indicates that the wheel was rotated to the left. Either this value or deltaY must be provided, but not both. | -100
+deltaY | number | no | The amount of vertical wheel movement. A positive value indicates that the wheel was rotated forward, away from the user; a negative value indicates that the wheel was rotated backward, toward the user. Either this value or deltaX must be provided, but not both. | 100
+modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | win
 
 
 ## Environment Variables
