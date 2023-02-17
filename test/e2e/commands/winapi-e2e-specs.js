@@ -130,4 +130,16 @@ describe('winapi', function () {
     });
   });
 
+  describe('mouseClickAndDrag', function () {
+    it('performs drag gesture with Ctrl+Shift depressed', async function () {
+      await commands.windowsClickAndDrag({
+        startX: 600,
+        startY: 300,
+        endX: 500,
+        endY: 400,
+        modifierKeys: ['ctrl', 'shift'],
+      });
+    });
+  });
+
 });
