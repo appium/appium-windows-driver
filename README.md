@@ -277,6 +277,27 @@ endY | number | no | Same as in [windows: click](#windows-click) | 100
 modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | win
 durationMs | number | no | The number of milliseconds to wait between pressing the left mouse button and moving the cursor to the ending drag point. 500ms by default. | 700
 
+### windows: keys
+
+This is a shortcut for a customized keyboard input.
+
+> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+actions | KeyAction[] or KeyAction | yes | One or more [KeyAction](#keyaction) dictionaries | ```json [{"virtualKeyCode": 0x10, "down": true}, {'text': "appium likes you"}, {"virtualKeyCode": 0x10, "down": false}]```
+
+##### KeyAction
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+pause | number | no | Allows to set a delay in milliseconds between key input series. Either this property or `text` or `virtualKeyCode` must be provided. | 100
+text | string | no | Non-empty string of Unicode text to type (surrogate characters like smileys are not supported). Either this property or `pause` or `virtualKeyCode` must be provided. | Привіт Світ!
+virtualKeyCode | number | no | Valid virtual key code. The list of supported key codes is available at [Virtual-Key Codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes) page. Either this property or `pause` or `text` must be provided. | 0x10
+down | boolean | no | This property only makes sense in combination with `virtualKeyCode`. If set to `true` then the corresponding key will be depressed, `false` - released. By default the key is just pressed once. ! Do not forget to release depressed keys in your automated tests. | true
+
 
 ## Environment Variables
 

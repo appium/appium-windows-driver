@@ -147,7 +147,45 @@ describe('winapi', function () {
         endY: 400,
         modifierKeys: ['ctrl', 'shift'],
       });
+    });
+  });
 
+  describe('keys', function () {
+    it('performs complex key input', async function () {
+      await commands.windowsKeys({
+        actions: [
+          {virtualKeyCode: 0x10, down: true},
+          {pause: 100},
+          {text: 'шевченко'},
+          {text: '和製漢字'},
+          {pause: 100},
+          {virtualKeyCode: 0x10, down: false},
+        ]
+      });
+    });
+
+    it('fails if wrong input is provided', async function () {
+      const errDatas = [
+        // Wrong properties
+        {
+          pause: 10,
+          text: 'sdfd',
+        },
+        {},
+        // empty text
+        {
+          text: '',
+        },
+        // down is not boolean
+        {
+          virtualKeyCode: 0x10,
+          down: 'false'
+        },
+      ];
+
+      for (const errData of errDatas) {
+        await commands.windowsKeys(errData).should.be.rejected;
+      }
     });
   });
 
