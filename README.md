@@ -21,6 +21,7 @@ Beside of standard Appium requirements Appium Windows Driver adds the following 
 - Appium Windows Driver only supports Windows 10 as the host.
 - [Developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) must be enabled
 - Appium downloads and installs WinAppDriver package automatically upon executing its installation scripts, although, the actual binary version could be out of date. In such case you could download and install the most recent version of WinAppDriver manually from the [GitHub releases](https://github.com/microsoft/WinAppDriver/releases) page.
+- _Optionally_, if you need some Windows extensions that use native WinAPI calls, like [windows: click](#windows-click) one to work, you need to have the latest version of Visual Studio including the "Desktop development with C++" workload installed.
 
 Appium Windows Driver supports the following capabilities:
 
@@ -235,7 +236,7 @@ Name | Type | Required | Description | Example
 elementId | string | no | Hexadecimal identifier of the element to click on. If this parameter is missing then given coordinates will be parsed as absolute ones. Otherwise they are parsed as relative to the top left corner of this element. | 123e4567-e89b-12d3-a456-426614174000
 x | number | no | Integer horizontal coordinate of the click point. Both x and y coordinates must be provided or none of them if elementId is present. In such case the gesture will be performed at the center point of the given element. | 100
 y | number | no | Integer vertical coordinate of the click point. Both x and y coordinates must be provided or none of them if elementId is present. In such case the gesture will be performed at the center point of the given element. | 100
-button | string | no | Name of the mouse button to be clicked. An exception is thrown if an unknown button name is provided. Supported button names are: left, middle, right, back, forward. The default value is `left` | right 
+button | string | no | Name of the mouse button to be clicked. An exception is thrown if an unknown button name is provided. Supported button names are: left, middle, right, back, forward. The default value is `left` | right
 modifierKeys | string[] or string | no | List of possible keys or a single key name to depress while the click is being performed. Supported key names are: Shift, Ctrl, Alt, Win. For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of ['ctrl', 'alt'] | win
 durationMs | number | no | The number of milliseconds to wait between pressing and releasing the mouse button. By default no delay is applied, which simulates a regular click. | 500
 times | number | no | How many times the click must be performed. One by default. | 2

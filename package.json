@@ -57,13 +57,9 @@
     "bluebird": "^3.5.1",
     "es6-error": "^4.1.1",
     "fancy-log": "^2.0.0",
-    "ffi-napi": "^4.0.3",
     "lodash": "^4.6.1",
     "portscanner": "2.2.0",
     "source-map-support": "^0.5.5",
-    "ref-napi": "^3.0.3",
-    "ref-struct-napi": "^1.1.1",
-    "ref-union-napi": "^1.0.2",
     "teen_process": "^2.0.1"
   },
   "scripts": {
@@ -84,6 +80,12 @@
   ],
   "peerDependencies": {
     "appium": "^2.0.0-beta.40"
+  },
+  "optionalDependencies": {
+    "ffi-napi": "^4.0.3",
+    "ref-napi": "^3.0.3",
+    "ref-struct-napi": "^1.1.1",
+    "ref-union-napi": "^1.0.2"
   },
   "devDependencies": {
     "@appium/eslint-config-appium": "^6.0.0",
