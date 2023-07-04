@@ -150,6 +150,18 @@ describe('winapi', function () {
     });
   });
 
+  describe('windowsHover', function () {
+    it('performs hover gesture with Ctrl+Shift depressed', async function () {
+      await commands.windowsHover({
+        startX: 600,
+        startY: 300,
+        endX: 500,
+        endY: 400,
+        modifierKeys: ['ctrl', 'shift'],
+      });
+    });
+  });
+
   describe('keys', function () {
     it('performs complex key input', async function () {
       await commands.windowsKeys({
