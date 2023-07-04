@@ -278,6 +278,25 @@ endY | number | no | Same as in [windows: click](#windows-click) | 100
 modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | win
 durationMs | number | no | The number of milliseconds to wait between pressing the left mouse button and moving the cursor to the ending drag point. 500ms by default. | 700
 
+### windows: hover
+
+This is a shortcut for a hover gesture.
+
+> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+startElementId | string | no | Same as in [windows: click](#windows-click) | 123e4567-e89b-12d3-a456-426614174000
+startX | number | no | Same as in [windows: click](#windows-click) | 100
+startY | number | no | Same as in [windows: click](#windows-click) | 100
+endElementId | string | no | Same as in [windows: click](#windows-click) | 123e4567-e89b-12d3-a456-426614174000
+endX | number | no | Same as in [windows: click](#windows-click) | 100
+endY | number | no | Same as in [windows: click](#windows-click) | 100
+modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | win
+durationMs | number | no | The number of milliseconds between moving the cursor from the starting to the ending hover point. 500ms by default. | 700
+
 ### windows: keys
 
 This is a shortcut for a customized keyboard input.
