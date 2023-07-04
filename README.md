@@ -227,8 +227,6 @@ An error is thrown if the app under test is not running.
 
 This is a shortcut for a single mouse click gesture.
 
-> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
-
 #### Arguments
 
 Name | Type | Required | Description | Example
@@ -246,8 +244,6 @@ interClickDelayMs | number | no | Duration of the pause between each click gestu
 
 This is a shortcut for a mouse wheel scroll gesture.
 
-> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
-
 #### Arguments
 
 Name | Type | Required | Description | Example
@@ -262,8 +258,6 @@ modifierKeys | string[] or string | no | Same as in [windows: click](#windows-cl
 ### windows: clickAndDrag
 
 This is a shortcut for a drag and drop gesture.
-
-> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
 
 #### Arguments
 
@@ -282,8 +276,6 @@ durationMs | number | no | The number of milliseconds to wait between pressing t
 
 This is a shortcut for a hover gesture.
 
-> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
-
 #### Arguments
 
 Name | Type | Required | Description | Example
@@ -300,8 +292,6 @@ durationMs | number | no | The number of milliseconds between moving the cursor 
 ### windows: keys
 
 This is a shortcut for a customized keyboard input.
-
-> :warning: **If your Node.js version is 17 and newer**:  As of January 2023 the [node-ffi-napi](https://github.com/node-ffi-napi), which we use to call native Windows APIs has a [bug](https://github.com/node-ffi-napi/node-ffi-napi/issues/244), which prevents it to work properly with Node.js version above 16. The only workaround until a fix is applied is to downgrade Node.js.
 
 #### Arguments
 

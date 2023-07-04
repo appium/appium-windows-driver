@@ -82,10 +82,7 @@
     "appium": "^2.0.0-beta.40"
   },
   "optionalDependencies": {
-    "ffi-napi": "^4.0.3",
-    "ref-napi": "^3.0.3",
-    "ref-struct-napi": "^1.1.1",
-    "ref-union-napi": "^1.0.2"
+    "koffi": "^2.5.0"
   },
   "devDependencies": {
     "@appium/eslint-config-appium": "^6.0.0",
