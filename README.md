@@ -307,6 +307,31 @@ text | string | no | Non-empty string of Unicode text to type (surrogate charact
 virtualKeyCode | number | no | Valid virtual key code. The list of supported key codes is available at [Virtual-Key Codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes) page. Either this property or `pause` or `text` must be provided. | 0x10
 down | boolean | no | This property only makes sense in combination with `virtualKeyCode`. If set to `true` then the corresponding key will be depressed, `false` - released. By default the key is just pressed once. ! Do not forget to release depressed keys in your automated tests. | true
 
+### windows: setClipboard
+
+Sets Windows clipboard content to the given text or a PNG image.
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+b64Content | string | yes | Base64-encoded content of the clipboard to be set | `QXBwaXVt`
+contentType | 'text' or 'image' | no | Set to 'text' in order to set the given text to the clipboard (the default value). Set to 'image' if `b64Content` contains a base64-encoded payload of a PNG image. | image
+
+### windows: getClipboard
+
+Retrieves Windows clipboard content.
+
+#### Arguments
+
+Name | Type | Required | Description | Example
+--- | --- | --- | --- | ---
+contentType | 'text' or 'image' | no | Set to 'text' in order to set the given text to the clipboard (the default value). Set to 'image' to retrieve a base64-encoded payload of a PNG image. | image
+
+#### Returns
+
+Base-64 encoded content of the Windows clipboard.
+
 
 ## Environment Variables
 
