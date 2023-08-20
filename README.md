@@ -316,7 +316,7 @@ Sets Windows clipboard content to the given text or a PNG image.
 Name | Type | Required | Description | Example
 --- | --- | --- | --- | ---
 b64Content | string | yes | Base64-encoded content of the clipboard to be set | `QXBwaXVt`
-contentType | 'text' or 'image' | no | Set to 'text' in order to set the given text to the clipboard (the default value). Set to 'image' if `b64Content` contains a base64-encoded payload of a PNG image. | image
+contentType | 'plaintext' or 'image' | no | Set to 'plaintext' in order to set the given text to the clipboard (the default value). Set to 'image' if `b64Content` contains a base64-encoded payload of a PNG image. | image
 
 ### windows: getClipboard
 
@@ -326,7 +326,7 @@ Retrieves Windows clipboard content.
 
 Name | Type | Required | Description | Example
 --- | --- | --- | --- | ---
-contentType | 'text' or 'image' | no | Set to 'text' in order to set the given text to the clipboard (the default value). Set to 'image' to retrieve a base64-encoded payload of a PNG image. | image
+contentType | 'plaintext' or 'image' | no | Set to 'plaintext' in order to set the given text to the clipboard (the default value). Set to 'image' to retrieve a base64-encoded payload of a PNG image. | image
 
 #### Returns
 
