@@ -49,7 +49,10 @@
     "lib",
     "build/index.js",
     "build/install-npm.js",
-    "build/lib"
+    "build/lib",
+    "CHANGELOG.md",
+    "LICENSE",
+    "npm-shrinkwrap.json"
   ],
   "dependencies": {
     "asyncbox": "^2.3.1",
