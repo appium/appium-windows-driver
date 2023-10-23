@@ -42,6 +42,9 @@ ms:experimental-webdriver | Enables experimental features and optimizations. See
 appium:systemPort | The port number to execute Appium Windows Driver server listener on, for example `5556`. The port must not be occupied. The default starting port number for a new Appium Windows Driver session is `4724`. If this port is already busy then the next free port will be automatically selected.
 appium:prerun | An object containing either `script` or `command` key. The value of each key must be a valid PowerShell script or command to be executed prior to the WinAppDriver session startup. See [Power Shell commands execution](#power-shell-commands-execution) for more details. Example: `{script: 'Get-Process outlook -ErrorAction SilentlyContinue'}`
 appium:postrun | An object containing either `script` or `command` key. The value of each key must be a valid PowerShell script or command to be executed after WinAppDriver session is stopped. See [Power Shell commands execution](#power-shell-commands-execution) for more details.
+appium:newCommandTimeout | How long (in seconds) the driver should wait for a new command from the client before assuming the client has stopped sending requests. After the timeout, the session is going to be deleted. `60` seconds by default. Setting it to zero disables the timer.
+
+
 
 ## Example
 
