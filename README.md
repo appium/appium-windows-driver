@@ -316,7 +316,7 @@ endElementId | string | no | Same as in [windows: click](#windows-click) | 123e4
 endX | number | no | Same as in [windows: click](#windows-click) | 100
 endY | number | no | Same as in [windows: click](#windows-click) | 100
 modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | win
-durationMs | number | no | The number of milliseconds to wait between pressing the left mouse button and moving the cursor to the ending drag point. 500ms by default. | 700
+durationMs | number | no | The number of milliseconds to wait between pressing the left mouse button and moving the cursor to the ending drag point. 5000ms by default. | 7000
 
 ### windows: hover
 
