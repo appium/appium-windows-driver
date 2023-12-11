@@ -288,7 +288,9 @@ interClickDelayMs | number | no | Duration of the pause between each click gestu
 
 ### windows: scroll
 
-This is a shortcut for a mouse wheel scroll gesture.
+This is a shortcut for a mouse wheel scroll gesture. The API is a thin wrapper over the [SendInput](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendinput#:~:text=The%20SendInput%20function%20inserts%20the,or%20other%20calls%20to%20SendInput.)
+WinApi call. It emulates the mouse cursor movement and/or horizontal/vertical rotation of the mouse wheel.
+Thus make sure the target control is ready to receive mouse wheel events (e.g. is focused) before invoking it.
 
 #### Arguments
 
@@ -297,8 +299,8 @@ Name | Type | Required | Description | Example
 elementId | string | no | Same as in [windows: click](#windows-click) | 123e4567-e89b-12d3-a456-426614174000
 x | number | no | Same as in [windows: click](#windows-click) | 100
 y | number | no | Same as in [windows: click](#windows-click) | 100
-deltaX | number | no | The amount of horizontal wheel movement. A positive value indicates that the wheel was rotated to the right; a negative value indicates that the wheel was rotated to the left. Either this value or deltaY must be provided, but not both. | -100
-deltaY | number | no | The amount of vertical wheel movement. A positive value indicates that the wheel was rotated forward, away from the user; a negative value indicates that the wheel was rotated backward, toward the user. Either this value or deltaX must be provided, but not both. | 100
+deltaX | number | no | The amount of horizontal wheel movement measured in wheel clicks. A positive value indicates that the wheel was rotated to the right; a negative value indicates that the wheel was rotated to the left. Either this value or deltaY must be provided, but not both. | -5
+deltaY | number | no | The amount of vertical wheel movement measured in wheel clicks. A positive value indicates that the wheel was rotated forward, away from the user; a negative value indicates that the wheel was rotated backward, toward the user. Either this value or deltaX must be provided, but not both. | 5
 modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | win
 
 ### windows: clickAndDrag
