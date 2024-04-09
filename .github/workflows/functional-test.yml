@@ -25,7 +25,7 @@ jobs:
         node-version: lts/*
         check-latest: true
     - run: |
-        npm install -g appium@next
+        npm install -g appium
         npm install
       name: Install dev dependencies
     - run: |
