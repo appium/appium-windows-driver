@@ -116,7 +116,7 @@
     "pre-commit": "^1.2.2",
     "rimraf": "^5.0.0",
     "semantic-release": "^23.0.0",
-    "sinon": "^17.0.0",
+    "sinon": "^18.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.2",
     "webdriverio": "^8.0.2"
