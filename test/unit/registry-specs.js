@@ -1,9 +1,14 @@
 import { parseRegQueryOutput } from '../../lib/registry';
-import chai from 'chai';
-
-chai.should();
 
 describe('registry', function () {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+
+    should = chai.should();
+  });
+
   it('should parse reg query output', function () {
     const output = `
 HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AddressBook

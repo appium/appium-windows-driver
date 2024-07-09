@@ -1,16 +1,19 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { commands } from '../../../lib/commands/gestures';
 import log from '../../../lib/logger';
 
 
-chai.should();
-chai.use(chaiAsPromised);
-
 describe('winapi', function () {
-  before(function () {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    chai.use(chaiAsPromised.default);
     commands.log = log;
   });
+
   after(function () {
     delete commands.log;
   });

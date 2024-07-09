@@ -1,14 +1,8 @@
 import { remote as wdio } from 'webdriverio';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import path from 'path';
 import { tempDir, fs } from 'appium/support';
 import { isAdmin } from '../../../lib/installer';
 import { TEST_HOST, TEST_PORT } from '../constants';
-
-
-chai.should();
-chai.use(chaiAsPromised);
 
 
 const TEST_CAPS = {
@@ -27,6 +21,15 @@ const WDIO_OPTS = {
 describe('file movement', function () {
   let driver;
   let remotePath;
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    chai.use(chaiAsPromised.default);
+  });
 
   beforeEach(async function () {
     if (process.env.CI || !await isAdmin()) {

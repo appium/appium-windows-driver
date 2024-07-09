@@ -1,15 +1,19 @@
 import { setupWAD } from '../../lib/installer';
 import { system } from 'appium/support';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 
-chai.should();
-chai.use(chaiAsPromised);
 
 describe('downloading WAD', function () {
   let isWindowsStub;
-  before(function () {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    chai.use(chaiAsPromised.default);
+
     isWindowsStub = sinon.stub(system, 'isWindows').returns(false);
   });
   after(function () {

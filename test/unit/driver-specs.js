@@ -1,19 +1,22 @@
 // transpile:mocha
 
 import WindowsDriver from '../../lib/driver';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import B from 'bluebird';
 import { system } from 'appium/support';
 
 
-chai.should();
-chai.use(chaiAsPromised);
-
 describe('driver.js', function () {
   let isWindowsStub;
-  before(function () {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    chai.use(chaiAsPromised.default);
+
     isWindowsStub = sinon.stub(system, 'isWindows').returns(true);
   });
   after(function () {

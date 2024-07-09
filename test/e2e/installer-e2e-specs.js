@@ -1,12 +1,17 @@
 import { setupWAD, downloadWAD, isAdmin } from '../../lib/installer';
 import { fs } from 'appium/support';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 
-chai.should();
-chai.use(chaiAsPromised);
 
 describe('installer', function () {
+  let chai;
+
+  before(async function () {
+    chai = await import('chai');
+    const chaiAsPromised = await import('chai-as-promised');
+
+    should = chai.should();
+    chai.use(chaiAsPromised.default);
+  });
 
   it('should download the distributable', async function () {
     const tmpPath = await downloadWAD();
