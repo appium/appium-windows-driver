@@ -2,7 +2,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const log = require('fancy-log');
+const {logger} = require('appium/support');
+
+const log = logger.getLogger('WADInstaller');
 
 async function installWadServer () {
   if (process.platform !== 'win32') {
