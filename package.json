@@ -96,6 +96,6 @@
     "sinon": "^18.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.4.2",
-    "webdriverio": "^8.0.2"
+    "webdriverio": "^9.0.1"
   }
 }
