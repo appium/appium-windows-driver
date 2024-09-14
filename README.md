@@ -24,7 +24,7 @@ Beside of standard Appium requirements Appium Windows Driver adds the following 
 
 - Appium Windows Driver only supports Windows 10 as the host.
 - [Developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) must be enabled
-- Appium downloads and installs WinAppDriver package automatically upon executing its installation scripts, although, the actual binary version could be out of date. In such case you could download and install the most recent version of WinAppDriver manually from the [GitHub releases](https://github.com/microsoft/WinAppDriver/releases) page.
+- Since version 3.0.0 this driver **does not** automatically install WinAppDriver server anymore. You should perform the server installation via the [install-wad](#install-wad) driver script instead. Driver versions below 3.0.0 download and install a bundled WinAppDriver package version automatically upon executing its installation via the Appium command line interface. Although, in such case the actual server binary version could be out of date. You could download and install the most recent version of WinAppDriver server manually from the [GitHub releases](https://github.com/microsoft/WinAppDriver/releases) page.
 
 Appium Windows Driver supports the following capabilities:
 
@@ -43,6 +43,15 @@ appium:systemPort | The port number to execute Appium Windows Driver server list
 appium:prerun | An object containing either `script` or `command` key. The value of each key must be a valid PowerShell script or command to be executed prior to the WinAppDriver session startup. See [Power Shell commands execution](#power-shell-commands-execution) for more details. Example: `{script: 'Get-Process outlook -ErrorAction SilentlyContinue'}`
 appium:postrun | An object containing either `script` or `command` key. The value of each key must be a valid PowerShell script or command to be executed after WinAppDriver session is stopped. See [Power Shell commands execution](#power-shell-commands-execution) for more details.
 appium:newCommandTimeout | How long (in seconds) the driver should wait for a new command from the client before assuming the client has stopped sending requests. After the timeout, the session is going to be deleted. `60` seconds by default. Setting it to zero disables the timer.
+
+## Driver Scripts
+
+### install-wad
+
+This script is used to install the given or latest stable version of WinAppDriver server from
+the [GitHub releases](https://github.com/microsoft/WinAppDriver/releases) page.
+Run `appium driver run windows install-wad <optional_wda_version>`, where `optional_wda_version`
+must be either valid WAD version number or should not be present to use the latest stable version.
 
 ## Example
 

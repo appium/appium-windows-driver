@@ -1,5 +1,4 @@
-import { setupWAD, downloadWAD, isAdmin } from '../../lib/installer';
-import { fs } from 'appium/support';
+import { setupWAD, isAdmin } from '../../lib/installer';
 
 
 describe('installer', function () {
@@ -11,11 +10,6 @@ describe('installer', function () {
 
     should = chai.should();
     chai.use(chaiAsPromised.default);
-  });
-
-  it('should download the distributable', async function () {
-    const tmpPath = await downloadWAD();
-    (await fs.exists(tmpPath)).should.be.true;
   });
 
   it('should fail if not admin', async function () {
