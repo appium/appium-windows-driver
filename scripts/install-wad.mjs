@@ -14,6 +14,11 @@ const API_TIMEOUT_MS = 45 * 1000;
 const STABLE_VERSION = 'stable';
 const EXT_MSI = '.msi';
 const EXT_EXE = '.exe';
+const ARCH_MAPPING = Object.freeze({
+  ia32: 'x86',
+  x64: 'x64',
+  arm64: 'arm64',
+});
 
 /**
  *
@@ -126,7 +131,7 @@ function selectAsset(release) {
   }
   // Since v 1.2.99 installers for multiple OS architectures are provided
   for (const asset of release.assets) {
-    if (_.includes(asset.name, `win-${process.arch}.`)) {
+    if (_.includes(asset.name, `win-${ARCH_MAPPING[process.arch]}.`)) {
       return asset;
     }
   }
