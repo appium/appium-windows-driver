@@ -50,8 +50,8 @@ appium:newCommandTimeout | How long (in seconds) the driver should wait for a ne
 
 This script is used to install the given or latest stable version of WinAppDriver server from
 the [GitHub releases](https://github.com/microsoft/WinAppDriver/releases) page.
-Run `appium driver run windows install-wad <optional_wda_version>`, where `optional_wda_version`
-must be either valid WAD version number or should not be present to use the latest stable version.
+Run `appium driver run windows install-wad <optional_wad_version>`, where `optional_wad_version`
+must be either valid WAD version number or should not be present (the latest stable version is used then).
 
 ## Example
 
