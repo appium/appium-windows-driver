@@ -27,7 +27,7 @@ function parseNextPageUrl(headers) {
   for (const part of headers.link.split(';')) {
     const [rel, pageUrl] = part.split(',').map(_.trim);
     if (rel === 'rel="next"' && pageUrl) {
-      return pageUrl.replace(/^<|>$/, '');
+      return pageUrl.replace(/^<|>$/g, '');
     }
   }
   return null;
