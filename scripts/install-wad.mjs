@@ -1,40 +1,18 @@
 import axios from 'axios';
 import semver from 'semver';
 import _ from 'lodash';
-import { logger, net, tempDir, fs, util } from '@appium/support';
 import path from 'node:path';
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
-import B from 'bluebird';
+import { tmpdir } from 'node:os';
+import { log } from '../build/lib/logger.js';
+import { shellExec, downloadToFile } from '../build/lib/utils.js';
+import fs from 'node:fs/promises';
 
-const log = logger.getLogger('WAD Installer');
 const OWNER = 'microsoft';
 const REPO = 'winappdriver';
 const API_ROOT = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const timeoutMs = 15 * 1000;
-const ASSET_NAME = 'WindowsApplicationDriver.msi';
 const STABLE_VERSION = 'stable';
-const execAsync = promisify(exec);
-
-/**
- * This API triggers UAC when necessary
- * unlike the 'spawn' call used by teen_process's exec.
- * See https://github.com/nodejs/node-v0.x-archive/issues/6797
- *
- * @param {string} cmd
- * @param {string[]} args
- * @param {import('node:child_process').ExecOptions & {timeoutMs?: number}} opts
- * @returns {Promise<{stdout: string; stderr: string;}>}
- * @throws {import('node:child_process').ExecException}
- */
-async function shellExec(cmd, args = [], opts = {}) {
-  const {
-    timeoutMs = 60 * 1000 * 5
-  } = opts;
-  const fullCmd = util.quote([cmd, ...args]);
-  return await B.resolve(execAsync(fullCmd, opts))
-    .timeout(timeoutMs, `The command '${fullCmd}' timed out after ${timeoutMs}ms`);
-}
+const EXT_MSI = '.msi';
 
 /**
  *
@@ -79,7 +57,7 @@ async function listReleases() {
     const version = semver.coerce(releaseInfo.tag_name?.replace(/^v/, ''));
     const downloadUrl = releaseInfo.assets?.[0]?.browser_download_url;
     const assetName = releaseInfo.assets?.[0]?.name;
-    if (!version || !downloadUrl || !_.endsWith(assetName, '.msi')) {
+    if (!version || !downloadUrl || !_.endsWith(assetName, EXT_MSI)) {
       continue;
     }
     result.push({
@@ -133,16 +111,20 @@ async function installWad(version) {
   if (!releases.length) {
     throw new Error(`Cannot retrieve any valid WinAppDriver releases from GitHub`);
   }
-  log.debug(`Retrieved ${util.pluralize('WinAppDriver GitHub release', releases.length, true)}`);
+  log.debug(`Retrieved ${releases.length} WinAppDriver GitHub releases`);
   const release = selectRelease(releases, version);
-  log.info(`Will download and install WinAppDriver (${JSON.stringify(release)})`);
-  const tmpRoot = await tempDir.openDir();
-  const installerPath = path.join(tmpRoot, ASSET_NAME);
+  const installerPath = path.join(
+    tmpdir(),
+    `wad_setup_${(Math.random() + 1).toString(36).substring(7)}${EXT_MSI}`
+  );
+  log.info(`Will download and install WinAppDriver v${release.version} from ${release.downloadUrl}`);
   try {
-    await net.downloadFile(release.downloadUrl, installerPath);
+    await downloadToFile(release.downloadUrl, installerPath);
     await shellExec(installerPath, ['/install', '/quiet', '/norestart']);
   } finally {
-    await fs.rimraf(tmpRoot);
+    try {
+      await fs.unlink(installerPath);
+    } catch (ign) {}
   }
 }
 
