@@ -10,7 +10,7 @@ import fs from 'node:fs/promises';
 const OWNER = 'microsoft';
 const REPO = 'winappdriver';
 const API_ROOT = `https://api.github.com/repos/${OWNER}/${REPO}`;
-const DOWNLOAD_TIMEOUT_MS = 45 * 1000;
+const API_TIMEOUT_MS = 45 * 1000;
 const STABLE_VERSION = 'stable';
 const EXT_MSI = '.msi';
 const EXT_EXE = '.exe';
@@ -45,7 +45,7 @@ async function listReleases() {
   let currentUrl = `${API_ROOT}/releases`;
   do {
     const {data, headers} = await axios.get(currentUrl, {
-      timeout: DOWNLOAD_TIMEOUT_MS
+      timeout: API_TIMEOUT_MS
     });
     allReleases.push(...data);
     currentUrl = parseNextPageUrl(headers);
