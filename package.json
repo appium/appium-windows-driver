@@ -43,14 +43,14 @@
   },
   "files": [
     "index.js",
-    "install-npm.js",
     "lib",
     "build/index.js",
     "build/install-npm.js",
     "build/lib",
     "CHANGELOG.md",
     "LICENSE",
-    "npm-shrinkwrap.json"
+    "npm-shrinkwrap.json",
+    "scripts"
   ],
   "dependencies": {
     "asyncbox": "^3.0.0",
