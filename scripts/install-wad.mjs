@@ -106,18 +106,18 @@ function selectRelease(releases, version) {
  * @returns {Promise<void>}
  */
 async function installWad(version) {
-  log.debug(`Retrieving WinAppDriver releases from ${API_ROOT}`);
+  log.debug(`Retrieving releases from ${API_ROOT}`);
   const releases = await listReleases();
   if (!releases.length) {
     throw new Error(`Cannot retrieve any valid WinAppDriver releases from GitHub`);
   }
-  log.debug(`Retrieved ${releases.length} WinAppDriver GitHub releases`);
+  log.debug(`Retrieved ${releases.length} GitHub releases`);
   const release = selectRelease(releases, version);
   const installerPath = path.join(
     tmpdir(),
     `wad_setup_${(Math.random() + 1).toString(36).substring(7)}${EXT_MSI}`
   );
-  log.info(`Will download and install WinAppDriver v${release.version} from ${release.downloadUrl}`);
+  log.info(`Will download and install v${release.version} from ${release.downloadUrl}`);
   try {
     await downloadToFile(release.downloadUrl, installerPath);
     await shellExec(installerPath, ['/install', '/quiet', '/norestart']);
