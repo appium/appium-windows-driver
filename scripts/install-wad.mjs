@@ -13,6 +13,7 @@ const API_ROOT = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const DOWNLOAD_TIMEOUT_MS = 45 * 1000;
 const STABLE_VERSION = 'stable';
 const EXT_MSI = '.msi';
+const EXT_EXE = '.exe';
 
 /**
  *
@@ -55,16 +56,27 @@ async function listReleases() {
     const isDraft = !!releaseInfo.draft;
     const isPrerelease = !!releaseInfo.prerelease;
     const version = semver.coerce(releaseInfo.tag_name?.replace(/^v/, ''));
-    const downloadUrl = releaseInfo.assets?.[0]?.browser_download_url;
-    const assetName = releaseInfo.assets?.[0]?.name;
-    if (!version || !downloadUrl || !_.endsWith(assetName, EXT_MSI)) {
+    if (!version) {
       continue;
+    }
+    /** @type {ReleaseAsset[]} */
+    const releaseAssets = [];
+    for (const asset of (releaseInfo.assets ?? [])) {
+      const assetName = asset?.name;
+      const downloadUrl = asset?.browser_download_url;
+      if (!(_.endsWith(assetName, EXT_MSI) || _.endsWith(assetName, EXT_EXE)) || !downloadUrl) {
+        continue;
+      }
+      releaseAssets.push({
+        name: assetName,
+        url: downloadUrl,
+      });
     }
     result.push({
       version,
       isDraft,
       isPrerelease,
-      downloadUrl,
+      assets: releaseAssets,
     });
   }
   return result;
@@ -102,10 +114,37 @@ function selectRelease(releases, version) {
 
 /**
  *
+ * @param {ReleaseInfo} release
+ * @returns {ReleaseAsset}
+ */
+function selectAsset(release) {
+  if (_.isEmpty(release.assets)) {
+    throw new Error(`WinAppDriver v${release.version} does not contain any matching releases`);
+  }
+  if (release.assets.length === 1) {
+    return release.assets[0];
+  }
+  // Since v 1.2.99 installers for multiple OS architectures are provided
+  for (const asset of release.assets) {
+    if (_.includes(asset.name, `win-${process.arch}.`)) {
+      return asset;
+    }
+  }
+  throw new Error(
+    `WinAppDriver v${release.version} does not contain any release matching the ` +
+    `current OS architecture ${process.arch}`
+  );
+}
+
+/**
+ *
  * @param {string} version
  * @returns {Promise<void>}
  */
 async function installWad(version) {
+  if (process.platform !== 'win32') {
+    throw new Error('WinAppDriver is only supported on Windows');
+  }
   log.debug(`Retrieving releases from ${API_ROOT}`);
   const releases = await listReleases();
   if (!releases.length) {
@@ -113,13 +152,15 @@ async function installWad(version) {
   }
   log.debug(`Retrieved ${releases.length} GitHub releases`);
   const release = selectRelease(releases, version);
+  const asset = selectAsset(release);
+  const parsedName = path.parse(asset.name);
   const installerPath = path.join(
     tmpdir(),
-    `wad_setup_${(Math.random() + 1).toString(36).substring(7)}${EXT_MSI}`
+    `${parsedName.name}_${(Math.random() + 1).toString(36).substring(7)}${parsedName.ext}`
   );
-  log.info(`Will download and install v${release.version} from ${release.downloadUrl}`);
+  log.info(`Will download and install v${release.version} from ${asset.url}`);
   try {
-    await downloadToFile(release.downloadUrl, installerPath);
+    await downloadToFile(asset.url, installerPath);
     await shellExec(installerPath, ['/install', '/quiet', '/norestart']);
   } finally {
     try {
@@ -131,9 +172,15 @@ async function installWad(version) {
 (async () => await installWad(process.argv[2] ?? STABLE_VERSION))();
 
 /**
+ * @typedef {Object} ReleaseAsset
+ * @property {string} name
+ * @property {string} url
+ */
+
+/**
  * @typedef {Object} ReleaseInfo
  * @property {import('semver').SemVer} version
  * @property {boolean} isDraft
  * @property {boolean} isPrerelease
- * @property {string} downloadUrl
+ * @property {ReleaseAsset[]} assets
  */
