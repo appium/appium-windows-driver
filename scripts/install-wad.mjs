@@ -137,7 +137,7 @@ function selectAsset(release) {
   }
   throw new Error(
     `WinAppDriver v${release.version} does not contain any release matching the ` +
-    `current OS architecture ${process.arch}`
+    `current OS architecture ${process.arch}. Available packages: ${release.assets.map(({name}) => name)}`
   );
 }
 
