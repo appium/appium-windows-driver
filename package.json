@@ -77,7 +77,7 @@
     "koffi": "^2.8.1"
   },
   "devDependencies": {
-    "@appium/eslint-config-appium-ts": "^0.x",
+    "@appium/eslint-config-appium-ts": "^1.x",
     "@appium/tsconfig": "^0.x",
     "@appium/types": "^0.x",
     "@semantic-release/changelog": "^6.0.1",
