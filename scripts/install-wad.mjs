@@ -1,5 +1,5 @@
 import axios from 'axios';
-import semver from 'semver';
+import * as semver from 'semver';
 import _ from 'lodash';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
@@ -170,7 +170,7 @@ async function installWad(version) {
   } finally {
     try {
       await fs.unlink(installerPath);
-    } catch (ign) {}
+    } catch {}
   }
 }
 

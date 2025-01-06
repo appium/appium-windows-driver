@@ -1,5 +1,5 @@
 import { commands } from '../../../lib/commands/gestures';
-import log from '../../../lib/logger';
+import { log } from '../../../lib/logger';
 
 
 describe('winapi', function () {
@@ -9,7 +9,7 @@ describe('winapi', function () {
     chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    should = chai.should();
+    chai.should();
     chai.use(chaiAsPromised.default);
     commands.log = log;
   });

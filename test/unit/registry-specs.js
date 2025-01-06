@@ -6,7 +6,7 @@ describe('registry', function () {
   before(async function () {
     chai = await import('chai');
 
-    should = chai.should();
+    chai.should();
   });
 
   it('should parse reg query output', function () {

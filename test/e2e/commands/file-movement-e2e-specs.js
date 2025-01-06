@@ -27,7 +27,7 @@ describe('file movement', function () {
     chai = await import('chai');
     const chaiAsPromised = await import('chai-as-promised');
 
-    should = chai.should();
+    chai.should();
     chai.use(chaiAsPromised.default);
   });
 
