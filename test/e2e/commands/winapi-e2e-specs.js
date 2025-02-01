@@ -3,6 +3,7 @@ import { remote as wdio } from 'webdriverio';
 
 describe('winapi', function () {
   let chai;
+  /** @type {import('webdriverio').Browser} */
   let driver;
 
   before(async function () {
@@ -27,35 +28,35 @@ describe('winapi', function () {
 
   describe('mouseClick', function () {
     it('performs single click with Shift+Ctrl', async function () {
-      await driver.execute('windows: click', [{
+      await driver.execute('windows: click', {
         x: 100,
         y: 100,
         modifierKeys: ['shift', 'ctrl'],
-      }]);
+      });
     });
 
     it('performs long click', async function () {
-      await driver.execute('windows: click', [{
+      await driver.execute('windows: click', {
         x: 100,
         y: 100,
         durationMs: 500,
-      }]);
+      });
     });
 
     it('performs double click', async function () {
-      await driver.execute('windows: click', [{
+      await driver.execute('windows: click', {
         x: 100,
         y: 100,
         times: 2,
-      }]);
+      });
     });
 
     it('performs context click', async function () {
-      await driver.execute('windows: click', [{
+      await driver.execute('windows: click', {
         x: 100,
         y: 100,
         button: 'right',
-      }]);
+      });
     });
 
     it('fails if wrong input is provided', async function () {
@@ -91,35 +92,35 @@ describe('winapi', function () {
       ];
 
       for (const errData of errDatas) {
-        await driver.execute('windows: click', [errData]).should.be.rejected;
+        await driver.execute('windows: click', errData).should.be.rejected;
       }
     });
   });
 
   describe('mouseScroll', function () {
     it('performs vertical scroll gesture with Ctrl+Alt depressed', async function () {
-      await driver.execute('windows: scroll', [{
+      await driver.execute('windows: scroll', {
         x: 600,
         y: 300,
         deltaY: 200,
         modifierKeys: ['ctrl', 'alt'],
-      }]);
+      });
     });
 
     it('performs horizontal scroll gesture', async function () {
-      await driver.execute('windows: scroll', [{
+      await driver.execute('windows: scroll', {
         x: 600,
         y: 300,
         deltaX: -200,
-      }]);
+      });
     });
 
     it('does nothing if zero delta is provided', async function () {
-      await driver.execute('windows: scroll', [{
+      await driver.execute('windows: scroll', {
         x: 100,
         y: 100,
         deltaY: 0,
-      }]);
+      });
     });
 
     it('fails if wrong input is provided', async function () {
@@ -143,38 +144,38 @@ describe('winapi', function () {
       ];
 
       for (const errData of errDatas) {
-        await driver.execute('windows: scroll', [errData]).should.be.rejected;
+        await driver.execute('windows: scroll', errData).should.be.rejected;
       }
     });
   });
 
   describe('mouseClickAndDrag', function () {
     it('performs drag gesture with Ctrl+Shift depressed', async function () {
-      await driver.execute('windows: clickAndDrag', [{
+      await driver.execute('windows: clickAndDrag', {
         startX: 600,
         startY: 300,
         endX: 500,
         endY: 400,
         modifierKeys: ['ctrl', 'shift'],
-      }]);
+      });
     });
   });
 
   describe('windowsHover', function () {
     it('performs hover gesture with Ctrl+Shift depressed', async function () {
-      await driver.execute('windows: clickAndDrag', [{
+      await driver.execute('windows: clickAndDrag', {
         startX: 600,
         startY: 300,
         endX: 500,
         endY: 400,
         modifierKeys: ['ctrl', 'shift'],
-      }]);
+      });
     });
   });
 
   describe('keys', function () {
     it('performs complex key input', async function () {
-      await driver.execute('windows: keys', [{
+      await driver.execute('windows: keys', {
         actions: [
           {virtualKeyCode: 0x10, down: true},
           {pause: 100},
@@ -183,7 +184,7 @@ describe('winapi', function () {
           {pause: 100},
           {virtualKeyCode: 0x10, down: false},
         ]
-      }]);
+      });
     });
 
     it('fails if wrong input is provided', async function () {
@@ -206,7 +207,7 @@ describe('winapi', function () {
       ];
 
       for (const errData of errDatas) {
-        await driver.execute('windows: keys', [errData]).should.be.rejected;
+        await driver.execute('windows: keys', errData).should.be.rejected;
       }
     });
   });

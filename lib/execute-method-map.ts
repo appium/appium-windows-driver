@@ -70,7 +70,7 @@ export const executeMethodMap = {
       ],
     },
   },
-  'windows: scoll': {
+  'windows: scroll': {
     command: 'windowsScroll',
     params: {
       optional: [
