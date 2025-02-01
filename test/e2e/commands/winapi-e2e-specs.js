@@ -1,4 +1,4 @@
-import { commands } from '../../../lib/commands/gestures';
+import * as commands from '../../../lib/commands/gestures';
 import { log } from '../../../lib/logger';
 
 
