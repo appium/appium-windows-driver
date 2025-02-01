@@ -207,7 +207,7 @@ describe('winapi', function () {
       ];
 
       for (const errData of errDatas) {
-        await driver.execute('windows: keys', errData).should.be.rejected;
+        await driver.execute('windows: keys', {actions: [errData]}).should.be.rejected;
       }
     });
   });
