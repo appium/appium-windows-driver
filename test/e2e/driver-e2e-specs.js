@@ -1,20 +1,6 @@
 import { remote as wdio } from 'webdriverio';
 import { isAdmin } from '../../lib/installer';
-import { TEST_HOST, TEST_PORT } from './constants';
-
-
-const TEST_CAPS = {
-  platformName: 'Windows',
-  'appium:automationName': 'windows',
-  'appium:app': 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
-};
-
-const WDIO_OPTS = {
-  hostname: TEST_HOST,
-  port: TEST_PORT,
-  connectionRetryCount: 0,
-  capabilities: TEST_CAPS
-};
+import { buildWdIoOptions } from './helpers';
 
 describe('Driver', function () {
   let driver;
@@ -33,7 +19,7 @@ describe('Driver', function () {
       return this.skip();
     }
 
-    driver = await wdio(WDIO_OPTS);
+    driver = await wdio(buildWdIoOptions('Microsoft.WindowsCalculator_8wekyb3d8bbwe!App'));
   });
 
   afterEach(async function () {

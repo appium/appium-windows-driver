@@ -2,21 +2,7 @@ import { remote as wdio } from 'webdriverio';
 import path from 'path';
 import { tempDir, fs } from 'appium/support';
 import { isAdmin } from '../../../lib/installer';
-import { TEST_HOST, TEST_PORT } from '../constants';
-
-
-const TEST_CAPS = {
-  platformName: 'Windows',
-  'appium:automationName': 'windows',
-  'appium:app': 'Root',
-};
-
-const WDIO_OPTS = {
-  hostname: TEST_HOST,
-  port: TEST_PORT,
-  connectionRetryCount: 0,
-  capabilities: TEST_CAPS
-};
+import { buildWdIoOptions } from '../helpers';
 
 describe('file movement', function () {
   let driver;
@@ -36,7 +22,7 @@ describe('file movement', function () {
       return this.skip();
     }
 
-    driver = await wdio(WDIO_OPTS);
+    driver = await wdio(buildWdIoOptions('Root'));
   });
 
   afterEach(async function () {
