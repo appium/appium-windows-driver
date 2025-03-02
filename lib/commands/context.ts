@@ -12,6 +12,8 @@ export async function getCurrentContext (): Promise<string> {
 
 export async function setContext (context: string): Promise<void> {
   if (context !== WINDOWS_CONTEXT) {
-    throw new errors.NoSuchContextError();
+    throw new errors.NoSuchContextError(
+      `The Windows Driver only supports '${WINDOWS_CONTEXT}' context.`
+    );
   }
 }

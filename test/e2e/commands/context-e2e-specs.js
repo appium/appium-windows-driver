@@ -33,7 +33,7 @@ describe('context', function () {
   });
 
   it('should throw an error if invalid context', async function () {
-    await driver.switchAppiumContext('INVALID_CONTEXT').should.rejectedWith(/no such context/i);
+    await driver.switchAppiumContext('INVALID_CONTEXT').should.rejected;
   });
 
 });
