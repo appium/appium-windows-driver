@@ -10,7 +10,7 @@ export async function getCurrentContext (): Promise<string> {
   return WINDOWS_CONTEXT;
 }
 
-export async function setContext (context: string) {
+export async function setContext (context: string): Promise<void> {
   if (context !== WINDOWS_CONTEXT) {
     throw new errors.NoSuchContextError();
   }
