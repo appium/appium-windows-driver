@@ -42,6 +42,19 @@ describe('driver.js', function () {
       driver.caps.cap.should.equal('foo');
     });
 
+    describe('context simulation', function () {
+      it('should support context commands', async function () {
+        let driver = new WindowsDriver({ app: 'myapp'}, false);
+        (await driver.getCurrentContext()).should.equal('NATIVE_APP');
+        (await driver.getContexts()).should.eql(['NATIVE_APP']);
+        await driver.setContext('NATIVE_APP');
+      });
+      it('should throw an error if invalid context', async function () {
+        let driver = new WindowsDriver({ app: 'myapp'}, false);
+        await driver.setContext('INVALID_CONTEXT').should.rejected;
+      });
+    });
+
     // TODO: Implement or delete
     //it('should set the default context', async function () {
     //  let driver = new SelendroidDriver({}, false);
