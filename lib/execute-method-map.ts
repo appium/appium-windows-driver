@@ -6,6 +6,7 @@ export const executeMethodMap = {
     params: {
       optional: [
         'timeLimit',
+        'videoFilter',
         'fps',
         'preset',
         'captureCursor',
