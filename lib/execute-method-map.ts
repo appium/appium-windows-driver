@@ -2,7 +2,7 @@ import { ExecuteMethodMap } from '@appium/types';
 
 export const executeMethodMap = {
   'windows: startRecordingScreen': {
-    command: 'startRecordingScreen',
+    command: 'windowsStartRecordingScreen',
     params: {
       optional: [
         'timeLimit',
@@ -17,7 +17,7 @@ export const executeMethodMap = {
     },
   },
   'windows: stopRecordingScreen': {
-    command: 'stopRecordingScreen',
+    command: 'windowsStopRecordingScreen',
     params: {
       optional: [
         'remotePath',
