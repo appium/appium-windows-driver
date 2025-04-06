@@ -44,6 +44,7 @@ appium:systemPort | The port number to execute Appium Windows Driver server list
 appium:prerun | An object containing either `script` or `command` key. The value of each key must be a valid PowerShell script or command to be executed prior to the WinAppDriver session startup. See [Power Shell commands execution](#power-shell-commands-execution) for more details. Example: `{script: 'Get-Process outlook -ErrorAction SilentlyContinue'}`
 appium:postrun | An object containing either `script` or `command` key. The value of each key must be a valid PowerShell script or command to be executed after WinAppDriver session is stopped. See [Power Shell commands execution](#power-shell-commands-execution) for more details.
 appium:newCommandTimeout | How long (in seconds) the driver should wait for a new command from the client before assuming the client has stopped sending requests. After the timeout, the session is going to be deleted. `60` seconds by default. Setting it to zero disables the timer.
+appium:wadUrl | Allows to provide a custom URL to the WAD server. The server must be already running when a new session starts. If this URL is provided explicitly then the driver won't try to either autodetect or start WinAppDriver automatically, and it is expected that the server lifecycle is managed externally.
 
 ## Driver Scripts
 

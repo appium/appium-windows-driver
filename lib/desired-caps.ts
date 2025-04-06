@@ -1,4 +1,4 @@
-const desiredCapConstraints = /** @type {const} */ ({
+export const desiredCapConstraints = {
   // https://github.com/microsoft/WinAppDriver/blob/master/Docs/AuthoringTestScripts.md#supported-capabilities
   platformName: {
     presence: true,
@@ -43,8 +43,10 @@ const desiredCapConstraints = /** @type {const} */ ({
   },
   postrun: {
     isObject: true
-  }
-});
+  },
+  wadUrl: {
+    isString: true
+  },
+} as const;
 
-export { desiredCapConstraints };
 export default desiredCapConstraints;
