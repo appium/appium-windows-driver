@@ -31,7 +31,7 @@ describe('log', function () {
   });
 
   it('should throw an error when an invalid type is given', async function () {
-    await driver.getLogs('INVALID_LOG_TYPE').should.rejected;
+    await driver.getLogs('INVALID_LOG_TYPE').should.be.rejected;
   });
 
   it('should get server logs', async function () {
