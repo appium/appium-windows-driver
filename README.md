@@ -8,14 +8,18 @@ Appium Windows Driver
 
 Appium Windows Driver is a test automation tool for Windows devices and acts as a proxy to Microsoft's [WinAppDriver server](https://github.com/microsoft/WinAppDriver). Appium Windows Driver supports testing Universal Windows Platform (UWP), Windows Forms (WinForms), Windows Presentation Foundation (WPF), and Classic Windows (Win32) apps on Windows 10 PCs. The server itself is maintained by Microsoft at https://github.com/microsoft/WinAppDriver. Check its [release notes](https://github.com/microsoft/WinAppDriver/releases) and the [vendor documentation](https://github.com/microsoft/WinAppDriver/tree/master/Docs) to get more details on the supported features and possible pitfalls.
 
-> **Note**
+> [!NOTE]
 >
 > Since version 2.0.0 Windows driver has dropped the support of Appium 1, and is only compatible to Appium 2. Use the `appium driver install --source=npm appium-windows-driver`
 > command to add it to your Appium 2 dist.
 
-> **Note**
+> [!WARNING]
 >
-> This project is [actively looking for maintainers with DotNet experience](https://discuss.appium.io/t/winappdriver-and-dotnet-client-development-and-maintenance/40240).
+> WinAppDriver server has not been maintained by Microsoft for years.
+> Consider trying [NovaWindows Driver](https://github.com/AutomateThePlanet/appium-novawindows-driver)
+> by [Automate The Planet](https://www.automatetheplanet.com/) as a modern drop-in replacement for Appium Windows Driver.
+> Check the [Reviving Windows App Automation NovaWindows Driver for Appium 2](https://www.youtube.com/watch?v=mieajcgUn-k)
+>  presentation video for more details.
 
 
 ## Usage
@@ -408,6 +412,10 @@ APPIUM_WAD_PATH | A full path to `WinAppDriver.exe`. If you need to provide a cu
 Unfortunately we cannot do much about it from the Appium Windows Drive side. It is just a thin wrapper over Microsoft's [WinAppDriver](https://github.com/microsoft/WinAppDriver) closed-source REST server binary, which solely performs all the heavy lifting. This driver does handle some API calls on its own, for example PowerShell scripts execution, but the overall amount of such calls is quite limited.
 
 Eventually your best bet would be to report the issue to [WAD issues tracker](https://github.com/microsoft/WinAppDriver/issues) and hope there is some workaround for it as Microsoft has not been regularly maintaining the driver. If it turns out the issue is just a driver regression, and it was working properly in another WAD version, then you could always replace WAD binary supplied with Appium Windows Driver by default with a custom one. Simply fetch it from [Releases page](https://github.com/microsoft/WinAppDriver/releases) and install it locally. Ideally it should transparently replace the previously installed WAD and no further actions are expected. If that did not happen though, consider providing `APPIUM_WAD_PATH` environment variable pointing to the recently installed WAD binary path as described in [Environment Variables](#environment-variables) section.
+
+You may also consider trying a compatible alternative for this driver:
+[NovaWindows Driver](https://github.com/AutomateThePlanet/appium-novawindows-driver),
+as mentioned at the beginning of this document.
 
 ## Development
 
