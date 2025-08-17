@@ -17,8 +17,8 @@
     "url": "https://github.com/appium/appium-windows-driver/issues"
   },
   "engines": {
-    "node": ">=14",
-    "npm": ">=8"
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0",
+    "npm": ">=10"
   },
   "prettier": {
     "bracketSpacing": false,
@@ -58,7 +58,7 @@
     "portscanner": "^2.2.0",
     "semver": "^7.6.3",
     "source-map-support": "^0.x",
-    "teen_process": "^2.0.1"
+    "teen_process": "^3.0.0"
   },
   "scripts": {
     "build": "tsc -b",
@@ -71,22 +71,21 @@
     "e2e-test": "mocha --exit --timeout 10m \"./test/e2e/**/*-specs.js\""
   },
   "peerDependencies": {
-    "appium": "^2.4.0"
+    "appium": "^3.0.0-rc.2"
   },
   "optionalDependencies": {
     "koffi": "^2.8.1"
   },
   "devDependencies": {
-    "@appium/eslint-config-appium-ts": "^1.x",
-    "@appium/tsconfig": "^0.x",
-    "@appium/types": "^0.x",
+    "@appium/eslint-config-appium-ts": "^2.0.0-rc.1",
+    "@appium/tsconfig": "^1.0.0-rc.1",
+    "@appium/types": "^1.0.0-rc.1",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/bluebird": "^3.5.38",
     "@types/lodash": "^4.14.196",
     "@types/mocha": "^10.0.1",
     "@types/node": "^24.0.0",
-    "@types/teen_process": "^2.0.2",
     "chai": "^5.1.1",
     "chai-as-promised": "^8.0.0",
     "conventional-changelog-conventionalcommits": "^9.0.0",
