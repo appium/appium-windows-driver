@@ -169,7 +169,7 @@ async function installWad(version) {
     if (_.toLower(parsedName.ext) === EXT_MSI) {
       await shellExec('msiexec.exe', ['/i', installerPath, '/quiet', '/norestart']);
     } else if (_.toLower(parsedName.ext) === EXT_EXE) {
-      await shellExec(installerPath, ['/quiet', '/norestart']);
+      await shellExec(installerPath, ['/install', '/quiet', '/norestart']);
     } else {
       throw new Error(`Unsupported WAD installer: ${asset.name}`);
     }
