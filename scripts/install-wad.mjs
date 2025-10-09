@@ -159,8 +159,9 @@ async function installWad(version) {
   const release = selectRelease(releases, version);
   const asset = selectAsset(release);
   const parsedName = path.parse(asset.name);
+  const realPath = await fs.realpath(tmpdir());
   const installerPath = path.join(
-    tmpdir(),
+    realPath,
     `${parsedName.name}_${(Math.random() + 1).toString(36).substring(7)}${parsedName.ext}`
   );
   log.info(`Will download and install v${release.version} from ${asset.url}`);
