@@ -4,7 +4,7 @@ import _ from 'lodash';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { log } from '../build/lib/logger.js';
-import { shellExec, downloadToFile } from '../build/lib/utils.js';
+import { runElevated, downloadToFile } from '../build/lib/utils.js';
 import fs from 'node:fs/promises';
 
 const OWNER = 'microsoft';
@@ -168,9 +168,9 @@ async function installWad(version) {
   try {
     await downloadToFile(asset.url, installerPath);
     if (_.toLower(parsedName.ext) === EXT_MSI) {
-      await shellExec('msiexec.exe', ['/i', installerPath, '/quiet', '/norestart']);
+      await runElevated('msiexec.exe', ['/i', installerPath, '/quiet', '/norestart']);
     } else if (_.toLower(parsedName.ext) === EXT_EXE) {
-      await shellExec(installerPath, ['/install', '/quiet', '/norestart']);
+      await runElevated(installerPath, ['/install', '/quiet', '/norestart']);
     } else {
       throw new Error(`Unsupported WAD installer: ${asset.name}`);
     }
