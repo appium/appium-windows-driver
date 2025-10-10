@@ -42,7 +42,7 @@ function parseNextPageUrl(headers) {
 /**
  * https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases
  *
- * @returns {Promise<ReleaseInfo[]}
+ * @returns {Promise<ReleaseInfo[]>}
  */
 async function listReleases() {
   /** @type {Record<string, any>[]} */
