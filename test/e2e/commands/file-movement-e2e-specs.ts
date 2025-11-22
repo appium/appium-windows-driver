@@ -1,21 +1,18 @@
 import { remote as wdio } from 'webdriverio';
+import type { Browser } from 'webdriverio';
 import path from 'path';
 import { tempDir, fs } from 'appium/support';
 import { isAdmin } from '../../../lib/installer';
 import { buildWdIoOptions } from '../helpers';
+import { expect } from 'chai';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised.default);
 
 describe('file movement', function () {
-  let driver;
-  let remotePath;
-  let chai;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-  });
+  let driver: Browser | null = null;
+  let remotePath: string | null = null;
 
   beforeEach(async function () {
     if (process.env.CI || !await isAdmin()) {
@@ -46,12 +43,12 @@ describe('file movement', function () {
     const base64Data = Buffer.from(stringData).toString('base64');
     remotePath = await tempDir.path({ prefix: 'appium', suffix: '.tmp' });
 
-    await driver.pushFile(remotePath, base64Data);
+    await driver!.pushFile(remotePath, base64Data);
 
     // get the file and its contents, to check
-    const remoteData64 = await driver.pullFile(remotePath);
+    const remoteData64 = await driver!.pullFile(remotePath);
     const remoteData = Buffer.from(remoteData64, 'base64').toString();
-    remoteData.should.equal(stringData);
+    expect(remoteData).to.equal(stringData);
   });
 
   it('should be able to delete a file', async function () {
@@ -59,14 +56,14 @@ describe('file movement', function () {
     const base64Data = Buffer.from(stringData).toString('base64');
     remotePath = await tempDir.path({ prefix: 'appium', suffix: '.tmp' });
 
-    await driver.pushFile(remotePath, base64Data);
+    await driver!.pushFile(remotePath, base64Data);
 
-    const remoteData64 = await driver.pullFile(remotePath);
+    const remoteData64 = await driver!.pullFile(remotePath);
     const remoteData = Buffer.from(remoteData64, 'base64').toString();
-    remoteData.should.equal(stringData);
+    expect(remoteData).to.equal(stringData);
 
-    await driver.execute('windows: deleteFile', { remotePath });
+    await driver!.execute('windows: deleteFile', { remotePath });
 
-    await driver.pullFile(remotePath).should.eventually.be.rejectedWith(/does not exist/);
+    await expect(driver!.pullFile(remotePath)).to.eventually.be.rejectedWith(/does not exist/);
   });
 });

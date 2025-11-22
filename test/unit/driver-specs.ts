@@ -4,19 +4,16 @@ import { WindowsDriver } from '../../lib/driver';
 import sinon from 'sinon';
 import B from 'bluebird';
 import { system } from 'appium/support';
+import { expect } from 'chai';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
 
+chai.use(chaiAsPromised.default);
 
 describe('driver.js', function () {
-  let isWindowsStub;
-  let chai;
+  let isWindowsStub: sinon.SinonStub;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-
     isWindowsStub = sinon.stub(system, 'isWindows').returns(true);
   });
   after(function () {
@@ -25,33 +22,33 @@ describe('driver.js', function () {
 
   describe('constructor', function () {
     it('calls BaseDriver constructor with opts', function () {
-      let driver = new WindowsDriver({ foo: 'bar' });
-      driver.should.exist;
-      driver.opts.foo.should.equal('bar');
+      const driver = new WindowsDriver({ foo: 'bar' } as any);
+      expect(driver).to.exist;
+      expect((driver.opts as any).foo).to.equal('bar');
     });
   });
 
   describe('createSession', function () {
     it('should set sessionId', async function () {
-      let driver = new WindowsDriver({ app: 'myapp'}, false);
+      const driver = new WindowsDriver({ app: 'myapp'}, false);
       sinon.mock(driver).expects('startWinAppDriverSession')
         .once()
         .returns(B.resolve());
       await driver.createSession(null, null, { alwaysMatch: { 'appium:cap': 'foo' }});
-      driver.sessionId.should.exist;
-      driver.caps.cap.should.equal('foo');
+      expect(driver.sessionId).to.exist;
+      expect((driver.caps as any).cap).to.equal('foo');
     });
 
     describe('context simulation', function () {
       it('should support context commands', async function () {
-        let driver = new WindowsDriver({ app: 'myapp'}, false);
-        (await driver.getCurrentContext()).should.equal('NATIVE_APP');
-        (await driver.getContexts()).should.eql(['NATIVE_APP']);
+        const driver = new WindowsDriver({ app: 'myapp'}, false);
+        expect(await driver.getCurrentContext()).to.equal('NATIVE_APP');
+        expect(await driver.getContexts()).to.eql(['NATIVE_APP']);
         await driver.setContext('NATIVE_APP');
       });
       it('should throw an error if invalid context', async function () {
-        let driver = new WindowsDriver({ app: 'myapp'}, false);
-        await driver.setContext('INVALID_CONTEXT').should.rejected;
+        const driver = new WindowsDriver({ app: 'myapp'}, false);
+        await expect(driver.setContext('INVALID_CONTEXT')).to.be.rejected;
       });
     });
 
@@ -68,46 +65,46 @@ describe('driver.js', function () {
   });
 
   describe('proxying', function () {
-    let driver;
+    let driver: WindowsDriver;
     before(function () {
       driver = new WindowsDriver({}, false);
       driver.sessionId = 'abc';
     });
     describe('#proxyActive', function () {
       it('should exist', function () {
-        driver.proxyActive.should.be.an.instanceof(Function);
+        expect(driver.proxyActive).to.be.an.instanceof(Function);
       });
       it('should return false by default', function () {
-        driver.proxyActive('abc').should.be.false;
+        expect(driver.proxyActive('abc')).to.be.false;
       });
       it('should throw an error if session id is wrong', function () {
-        (() => { driver.proxyActive('aaa'); }).should.throw;
+        expect(() => { driver.proxyActive('aaa'); }).to.throw;
       });
     });
 
     describe('#getProxyAvoidList', function () {
       it('should exist', function () {
-        driver.getProxyAvoidList.should.be.an.instanceof(Function);
+        expect(driver.getProxyAvoidList).to.be.an.instanceof(Function);
       });
       it('should return jwpProxyAvoid array', function () {
-        let avoidList = driver.getProxyAvoidList('abc');
-        avoidList.should.be.an.instanceof(Array);
-        avoidList.should.eql(driver.jwpProxyAvoid);
+        const avoidList = (driver.getProxyAvoidList as any)('abc');
+        expect(avoidList).to.be.an.instanceof(Array);
+        expect(avoidList).to.eql(driver.jwpProxyAvoid);
       });
       it('should throw an error if session id is wrong', function () {
-        (() => { driver.getProxyAvoidList('aaa'); }).should.throw;
+        expect(() => { (driver.getProxyAvoidList as any)('aaa'); }).to.throw;
       });
     });
 
     describe('#canProxy', function () {
       it('should exist', function () {
-        driver.canProxy.should.be.an.instanceof(Function);
+        expect(driver.canProxy).to.be.an.instanceof(Function);
       });
       it('should return true', function () {
-        driver.canProxy('abc').should.be.true;
+        expect((driver.canProxy as any)('abc')).to.be.true;
       });
       it('should throw an error if session id is wrong', function () {
-        (() => { driver.canProxy('aaa'); }).should.throw;
+        expect(() => { (driver.canProxy as any)('aaa'); }).to.throw;
       });
     });
   });

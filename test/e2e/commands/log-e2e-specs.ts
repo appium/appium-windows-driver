@@ -1,18 +1,16 @@
 import { buildWdIoOptions } from '../helpers';
 import { remote as wdio } from 'webdriverio';
+import type { Browser } from 'webdriverio';
+import { expect } from 'chai';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised.default);
 
 describe('log', function () {
-  let chai;
-  /** @type {import('webdriverio').Browser} */
-  let driver;
+  let driver: Browser | null = null;
 
   before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-
     driver = await wdio(buildWdIoOptions('Root'));
   });
 
@@ -27,14 +25,14 @@ describe('log', function () {
   });
 
   it('should get the list of available logs', async function () {
-    (await driver.getLogTypes()).should.eql(['server']);
+    expect(await driver!.getLogTypes()).to.eql(['server']);
   });
 
   it('should throw an error when an invalid type is given', async function () {
-    await driver.getLogs('INVALID_LOG_TYPE').should.be.rejected;
+    await expect(driver!.getLogs('INVALID_LOG_TYPE')).to.be.rejected;
   });
 
   it('should get server logs', async function () {
-    (await driver.getLogs('server')).should.be.an('array');
+    expect(await driver!.getLogs('server')).to.be.an('array');
   });
 });

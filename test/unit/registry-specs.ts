@@ -1,14 +1,7 @@
 import { parseRegQueryOutput } from '../../lib/registry';
+import { expect } from 'chai';
 
 describe('registry', function () {
-  let chai;
-
-  before(async function () {
-    chai = await import('chai');
-
-    chai.should();
-  });
-
   it('should parse reg query output', function () {
     const output = `
 HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AddressBook
@@ -94,10 +87,10 @@ HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29
 
     `;
     const result = parseRegQueryOutput(output);
-    Boolean(result.find(
+    expect(Boolean(result.find(
       ({root, key, type, value}) => root === 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29DA7679-80B6-452A-B264-349BAEE7CC0E}'
         && key === 'DisplayName' && type === 'REG_SZ' && value === 'Windows Application Driver'
-    )).should.be.true;
+    ))).to.be.true;
   });
   it('should return empty array if no matches found', function () {
     const output = `
@@ -106,6 +99,6 @@ HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Add
 HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DirectDrawEx
     `;
     const result = parseRegQueryOutput(output);
-    result.length.should.be.eql(0);
+    expect(result.length).to.eql(0);
   });
 });

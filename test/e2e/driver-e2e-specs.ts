@@ -1,18 +1,15 @@
 import { remote as wdio } from 'webdriverio';
+import type { Browser } from 'webdriverio';
 import { isAdmin } from '../../lib/installer';
 import { buildWdIoOptions } from './helpers';
+import { expect } from 'chai';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+
+chai.use(chaiAsPromised.default);
 
 describe('Driver', function () {
-  let driver;
-  let chai;
-
-  before(async function () {
-    chai = await import('chai');
-    const chaiAsPromised = await import('chai-as-promised');
-
-    chai.should();
-    chai.use(chaiAsPromised.default);
-  });
+  let driver: Browser | null = null;
 
   beforeEach(async function () {
     if (process.env.CI || !await isAdmin()) {
@@ -33,6 +30,6 @@ describe('Driver', function () {
   });
 
   it('should run a basic session using a real client', async function () {
-    await driver.source().should.eventually.be.not.empty;
+    await expect((driver as any).source()).to.eventually.be.not.empty;
   });
 });
