@@ -33,9 +33,7 @@ describe('driver', function () {
         .once()
         .returns(B.resolve());
       await driver.createSession(
-        { alwaysMatch: { 'appium:automationName': 'Windows', 'appium:app': 'myapp' }, firstMatch: [] },
-        undefined,
-        undefined
+        { alwaysMatch: { platformName: 'Windows', 'appium:automationName': 'Windows', 'appium:app': 'myapp' }, firstMatch: [{}] }
       );
       expect(driver.sessionId).to.exist;
       expect((driver.caps as any).app).to.equal('myapp');
