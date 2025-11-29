@@ -32,21 +32,24 @@ describe('driver', function () {
       sinon.mock(driver).expects('startWinAppDriverSession')
         .once()
         .returns(B.resolve());
-      // @ts-ignore
-      await driver.createSession(null as any, null as any, { alwaysMatch: { 'appium:cap': 'foo' }});
+      await driver.createSession(
+        { alwaysMatch: { 'appium:automationName': 'Windows', 'appium:app': 'myapp' }, firstMatch: [] },
+        undefined,
+        undefined
+      );
       expect(driver.sessionId).to.exist;
-      expect((driver.caps as any).cap).to.equal('foo');
+      expect((driver.caps as any).app).to.equal('myapp');
     });
 
     describe('context simulation', function () {
       it('should support context commands', async function () {
-        const driver = new WindowsDriver({ app: 'myapp'} as any, false);
+        const driver = new WindowsDriver({} as any, false);
         expect(await driver.getCurrentContext()).to.equal('NATIVE_APP');
         expect(await driver.getContexts()).to.eql(['NATIVE_APP']);
         await driver.setContext('NATIVE_APP');
       });
       it('should throw an error if invalid context', async function () {
-        const driver = new WindowsDriver({ app: 'myapp'} as any, false);
+        const driver = new WindowsDriver({} as any, false);
         await expect(driver.setContext('INVALID_CONTEXT')).to.be.rejected;
       });
     });
@@ -55,7 +58,7 @@ describe('driver', function () {
   describe('proxying', function () {
     let driver: WindowsDriver;
     before(function () {
-      driver = new WindowsDriver({} as any, false);
+      driver = new WindowsDriver({ address: '127.0.0.1', port: 4723 } as any, false);
       driver.sessionId = 'abc';
     });
     describe('#proxyActive', function () {

@@ -8,10 +8,6 @@ import { log } from './logger';
 
 const execAsync = promisify(exec);
 
-export interface RunElevatedOptions extends ExecOptions {
-  timeoutMs?: number;
-}
-
 /**
  * This API triggers UAC when necessary
  *
@@ -61,3 +57,6 @@ export async function downloadToFile(srcUrl: string, dstPath: string): Promise<v
   await net.downloadFile(srcUrl, dstPath);
 }
 
+export interface RunElevatedOptions extends ExecOptions {
+  timeoutMs?: number;
+}

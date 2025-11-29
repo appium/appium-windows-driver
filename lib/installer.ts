@@ -114,4 +114,3 @@ export async function isAdmin(): Promise<boolean> {
     return false;
   }
 }
-
