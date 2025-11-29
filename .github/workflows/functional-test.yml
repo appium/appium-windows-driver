@@ -19,7 +19,7 @@ jobs:
       _FORCE_LOGS: 1
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
     - uses: actions/setup-node@v3
       with:
         node-version: lts/*
