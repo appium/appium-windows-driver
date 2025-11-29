@@ -1,7 +1,9 @@
-import { ExecuteMethodMap } from '@appium/types';
+import type { ExecuteMethodMap } from '@appium/types';
+import type { WindowsDriver } from './driver';
 
 export const executeMethodMap = {
   'windows: startRecordingScreen': {
+    // @ts-ignore Type checked is confused
     command: 'windowsStartRecordingScreen',
     params: {
       optional: [
@@ -142,4 +144,4 @@ export const executeMethodMap = {
       ],
     },
   },
-} as const satisfies ExecuteMethodMap<any>;
+} as const satisfies ExecuteMethodMap<WindowsDriver>;

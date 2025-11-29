@@ -1,5 +1,3 @@
-// transpile:mocha
-
 import { WindowsDriver } from '../../lib/driver';
 import sinon from 'sinon';
 import B from 'bluebird';
@@ -10,7 +8,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised.default);
 
-describe('driver.js', function () {
+describe('driver', function () {
   let isWindowsStub: sinon.SinonStub;
 
   before(async function () {
@@ -30,44 +28,34 @@ describe('driver.js', function () {
 
   describe('createSession', function () {
     it('should set sessionId', async function () {
-      const driver = new WindowsDriver({ app: 'myapp'}, false);
+      const driver = new WindowsDriver({ app: 'myapp'} as any, false);
       sinon.mock(driver).expects('startWinAppDriverSession')
         .once()
         .returns(B.resolve());
-      await driver.createSession(null, null, { alwaysMatch: { 'appium:cap': 'foo' }});
+      // @ts-ignore
+      await driver.createSession(null as any, null as any, { alwaysMatch: { 'appium:cap': 'foo' }});
       expect(driver.sessionId).to.exist;
       expect((driver.caps as any).cap).to.equal('foo');
     });
 
     describe('context simulation', function () {
       it('should support context commands', async function () {
-        const driver = new WindowsDriver({ app: 'myapp'}, false);
+        const driver = new WindowsDriver({ app: 'myapp'} as any, false);
         expect(await driver.getCurrentContext()).to.equal('NATIVE_APP');
         expect(await driver.getContexts()).to.eql(['NATIVE_APP']);
         await driver.setContext('NATIVE_APP');
       });
       it('should throw an error if invalid context', async function () {
-        const driver = new WindowsDriver({ app: 'myapp'}, false);
+        const driver = new WindowsDriver({ app: 'myapp'} as any, false);
         await expect(driver.setContext('INVALID_CONTEXT')).to.be.rejected;
       });
     });
-
-    // TODO: Implement or delete
-    //it('should set the default context', async function () {
-    //  let driver = new SelendroidDriver({}, false);
-    //  sinon.mock(driver).expects('checkAppPresent')
-    //    .returns(Promise.resolve());
-    //  sinon.mock(driver).expects('startSelendroidSession')
-    //    .returns(Promise.resolve());
-    //  await driver.createSession({});
-    //  driver.curContext.should.equal('NATIVE_APP');
-    //});
   });
 
   describe('proxying', function () {
     let driver: WindowsDriver;
     before(function () {
-      driver = new WindowsDriver({}, false);
+      driver = new WindowsDriver({} as any, false);
       driver.sessionId = 'abc';
     });
     describe('#proxyActive', function () {
@@ -89,7 +77,8 @@ describe('driver.js', function () {
       it('should return jwpProxyAvoid array', function () {
         const avoidList = (driver.getProxyAvoidList as any)('abc');
         expect(avoidList).to.be.an.instanceof(Array);
-        expect(avoidList).to.eql(driver.jwpProxyAvoid);
+        // eslint-disable-next-line dot-notation
+        expect(avoidList).to.eql(driver['jwpProxyAvoid']);
       });
       it('should throw an error if session id is wrong', function () {
         expect(() => { (driver.getProxyAvoidList as any)('aaa'); }).to.throw;

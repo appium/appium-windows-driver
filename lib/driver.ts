@@ -1,7 +1,20 @@
 import _ from 'lodash';
+import type {
+  RouteMatcher,
+  HTTPMethod,
+  HTTPBody,
+  DefaultCreateSessionResult,
+  DriverData,
+  InitialOpts,
+  StringRecord,
+  ExternalDriver,
+  DriverOpts,
+  W3CDriverCaps,
+} from '@appium/types';
 import { BaseDriver } from 'appium/driver';
 import { system } from 'appium/support';
 import { WinAppDriver } from './winappdriver';
+import type { WindowsDriverCaps } from './winappdriver';
 import { desiredCapConstraints } from './desired-caps';
 import * as appManagementCommands from './commands/app-management';
 import * as clipboardCommands from './commands/clipboard';
@@ -19,8 +32,7 @@ import { POWER_SHELL_FEATURE } from './constants';
 import { newMethodMap } from './method-map';
 import { executeMethodMap } from './execute-method-map';
 
-/** @type {import('@appium/types').RouteMatcher[]} */
-const NO_PROXY = [
+const NO_PROXY: RouteMatcher[] = [
   ['GET', new RegExp('^/session/[^/]+/appium/(?!app/)[^/]+')],
   ['POST', new RegExp('^/session/[^/]+/appium/(?!app/)[^/]+')],
   ['POST', new RegExp('^/session/[^/]+/element/[^/]+/elements?$')],
@@ -48,28 +60,20 @@ const NO_PROXY = [
 ];
 
 // Appium instantiates this class
-/**
- * @implements {ExternalDriver<WindowsDriverConstraints, string>}
- * @extends {BaseDriver<WindowsDriverConstraints>}
- */
-export class WindowsDriver extends BaseDriver {
-  /** @type {boolean} */
-  isProxyActive;
-
-  /** @type {import('@appium/types').RouteMatcher[]} */
-  jwpProxyAvoid;
-
-  /** @type {WinAppDriver} */
-  winAppDriver;
-
-  /** @type {import('./commands/record-screen').ScreenRecorder | null} */
-  _screenRecorder;
+export class WindowsDriver
+  extends BaseDriver<WindowsDriverConstraints, StringRecord>
+  implements ExternalDriver<WindowsDriverConstraints, string, StringRecord>
+{
+  private isProxyActive: boolean;
+  private jwpProxyAvoid: RouteMatcher[];
+  private _winAppDriver: WinAppDriver | null;
+  _screenRecorder: recordScreenCommands.ScreenRecorder | null;
+  public proxyReqRes: (...args: any) => any;
 
   static newMethodMap = newMethodMap;
   static executeMethodMap = executeMethodMap;
 
-  constructor (opts = {}, shouldValidateCaps = true) {
-    // @ts-ignore TODO: Make opts typed
+  constructor(opts: InitialOpts, shouldValidateCaps = true) {
     super(opts, shouldValidateCaps);
     this.desiredCapConstraints = desiredCapConstraints;
     this.locatorStrategies = [
@@ -83,74 +87,67 @@ export class WindowsDriver extends BaseDriver {
     this.resetState();
   }
 
-  resetState () {
-    this.jwpProxyAvoid = NO_PROXY;
-    this.isProxyActive = false;
-    // @ts-ignore It's ok
-    this.winAppDriver = null;
-    this._screenRecorder = null;
+  get winAppDriver(): WinAppDriver {
+    if (!this._winAppDriver) {
+      throw new Error('WinAppDriver is not started');
+    }
+    return this._winAppDriver;
   }
 
-  // @ts-ignore TODO: Make args typed
-  async createSession (...args) {
+  override async createSession(
+    w3cCaps1: W3CWindowsDriverCaps,
+    w3cCaps2?: W3CWindowsDriverCaps,
+    w3cCaps3?: W3CWindowsDriverCaps,
+    driverData?: DriverData[]
+  ): Promise<DefaultCreateSessionResult<WindowsDriverConstraints>> {
     if (!system.isWindows()) {
       throw new Error('WinAppDriver tests only run on Windows');
     }
 
     try {
-      // @ts-ignore TODO: Make args typed
-      const [sessionId, caps] = await super.createSession(...args);
+      const [sessionId, caps] = await super.createSession(w3cCaps1, w3cCaps2, w3cCaps3, driverData);
+      this.caps = caps;
+      this.opts = this.opts as WindowsDriverOpts;
       if (caps.prerun) {
         this.log.info('Executing prerun PowerShell script');
-        if (!_.isString(caps.prerun.command) && !_.isString(caps.prerun.script)) {
+        const prerun = caps.prerun as PrerunCapability;
+        if (!_.isString(prerun.command) && !_.isString(prerun.script)) {
           throw new Error(`'prerun' capability value must either contain ` +
             `'script' or 'command' entry of string type`);
         }
         this.assertFeatureEnabled(POWER_SHELL_FEATURE);
-        const output = await this.execPowerShell(caps.prerun);
+        const output = await this.execPowerShell(prerun);
         if (output) {
           this.log.info(`Prerun script output: ${output}`);
         }
       }
       await this.startWinAppDriverSession();
       return [sessionId, caps];
-    } catch (e) {
+    } catch (e: any) {
       await this.deleteSession();
       throw e;
     }
   }
 
-  async startWinAppDriverSession () {
-    this.winAppDriver = new WinAppDriver(this.log, {
-      url: this.opts.wadUrl,
-      port: this.opts.systemPort,
-      reqBasePath: this.basePath,
-    });
-    await this.winAppDriver.start(this.caps);
-    this.proxyReqRes = this.winAppDriver.proxy?.proxyReqRes.bind(this.winAppDriver.proxy);
-    // now that everything has started successfully, turn on proxying so all
-    // subsequent session requests go straight to/from WinAppDriver
-    this.isProxyActive = true;
-  }
-
-  async deleteSession () {
+  override async deleteSession(): Promise<void> {
     this.log.debug('Deleting WinAppDriver session');
     await this._screenRecorder?.stop(true);
-    await this.winAppDriver?.stop();
+    await this._winAppDriver?.stop();
 
-    if (this.opts.postrun) {
-      if (!_.isString(this.opts.postrun.command) && !_.isString(this.opts.postrun.script)) {
+    const postrun = this.opts.postrun as PostrunCapability | undefined;
+    if (postrun) {
+      if (!_.isString(postrun.command) && !_.isString(postrun.script)) {
         this.log.error(`'postrun' capability value must either contain ` +
           `'script' or 'command' entry of string type`);
       } else {
         this.log.info('Executing postrun PowerShell script');
         try {
           this.assertFeatureEnabled(POWER_SHELL_FEATURE);
-          const output = await this.execPowerShell(this.opts.postrun);
+          const output = await this.execPowerShell(postrun);
           if (output) {
             this.log.info(`Postrun script output: ${output}`);
           }
-        } catch (e) {
+        } catch (e: any) {
           this.log.error(e.message);
         }
       }
@@ -162,25 +159,45 @@ export class WindowsDriver extends BaseDriver {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  proxyActive (sessionId) {
+  override proxyActive(sessionId: string): boolean {
     return this.isProxyActive;
   }
 
-  canProxy () {
+  override canProxy(): boolean {
     // we can always proxy to the WinAppDriver server
     return true;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getProxyAvoidList (sessionId) {
+  override getProxyAvoidList(sessionId: string): RouteMatcher[] {
     return this.jwpProxyAvoid;
   }
 
-  async proxyCommand (url, method, body) {
+  async proxyCommand(url: string, method: HTTPMethod, body: HTTPBody = null): Promise<any> {
     if (!this.winAppDriver?.proxy) {
       throw new Error('The proxy must be defined in order to send commands');
     }
-    return /** @type {any} */ (await this.winAppDriver.proxy.command(url, method, body));
+    return await this.winAppDriver.proxy.command(url, method, body);
+  }
+
+  async startWinAppDriverSession(): Promise<void> {
+    this._winAppDriver = new WinAppDriver(this.log, {
+      url: this.opts.wadUrl,
+      port: this.opts.systemPort,
+      reqBasePath: this.basePath,
+    });
+    await this.winAppDriver.start(this.caps as any as WindowsDriverCaps);
+    this.proxyReqRes = this.winAppDriver.proxy?.proxyReqRes.bind(this.winAppDriver.proxy);
+    // now that everything has started successfully, turn on proxying so all
+    // subsequent session requests go straight to/from WinAppDriver
+    this.isProxyActive = true;
+  }
+
+  private resetState(): void {
+    this.jwpProxyAvoid = NO_PROXY;
+    this.isProxyActive = false;
+    this._winAppDriver = null;
+    this._screenRecorder = null;
   }
 
   windowsLaunchApp = appManagementCommands.windowsLaunchApp;
@@ -197,7 +214,6 @@ export class WindowsDriver extends BaseDriver {
   windowsDeleteFile = fileCommands.windowsDeleteFile;
   windowsDeleteFolder = fileCommands.windowsDeleteFolder;
 
-  // @ts-ignore This is expected
   findElOrEls = findCommands.findElOrEls;
 
   getWindowSize = generalCommands.getWindowSize;
@@ -230,13 +246,16 @@ export class WindowsDriver extends BaseDriver {
 
 export default WindowsDriver;
 
-/**
- * @typedef {typeof desiredCapConstraints} WindowsDriverConstraints
- * @typedef {import('@appium/types').DriverOpts<WindowsDriverConstraints>} WindowsDriverOpts
- */
+interface PrerunCapability {
+  command?: string;
+  script?: string;
+}
 
-/**
- * @template {import('@appium/types').Constraints} C
- * @template [Ctx=string]
- * @typedef {import('@appium/types').ExternalDriver<C, Ctx>} ExternalDriver
- */
+interface PostrunCapability {
+  command?: string;
+  script?: string;
+}
+
+type WindowsDriverConstraints = typeof desiredCapConstraints;
+type WindowsDriverOpts = DriverOpts<WindowsDriverConstraints>;
+type W3CWindowsDriverCaps = W3CDriverCaps<WindowsDriverConstraints>;

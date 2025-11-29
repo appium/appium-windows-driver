@@ -3,7 +3,7 @@ import { fs, tempDir } from 'appium/support';
 import path from 'path';
 import { exec } from 'teen_process';
 import { log } from './logger';
-import { queryRegistry } from './registry';
+import { queryRegistry, type RegEntry } from './registry';
 import { runElevated } from './utils';
 
 const POSSIBLE_WAD_INSTALL_ROOTS = [
@@ -16,7 +16,7 @@ const UNINSTALL_REG_ROOT = 'HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\
 const REG_ENTRY_VALUE = 'Windows Application Driver';
 const REG_ENTRY_KEY = 'DisplayName';
 const REG_ENTRY_TYPE = 'REG_SZ';
-const INST_LOCATION_SCRIPT_BY_GUID = (guid) => `
+const INST_LOCATION_SCRIPT_BY_GUID = (guid: string): string => `
 Set installer = CreateObject("WindowsInstaller.Installer")
 Set session = installer.OpenProduct("${guid}")
 session.DoAction("CostInitialize")
@@ -25,11 +25,12 @@ WScript.Echo session.Property("INSTALLFOLDER")
 `.replace(/\n/g, '\r\n');
 
 /**
+ * Fetches the MSI installation location for a given installer GUID
  *
- * @param {string} installerGuid
- * @returns {Promise<string>} install location
+ * @param installerGuid - The MSI installer GUID
+ * @returns The installation location path
  */
-async function fetchMsiInstallLocation (installerGuid) {
+async function fetchMsiInstallLocation(installerGuid: string): Promise<string> {
   const tmpRoot = await tempDir.openDir();
   const scriptPath = path.join(tmpRoot, 'get_wad_inst_location.vbs');
   try {
@@ -43,7 +44,7 @@ async function fetchMsiInstallLocation (installerGuid) {
 
 class WADNotFoundError extends Error {}
 
-export const getWADExecutablePath = _.memoize(async function getWADInstallPath () {
+export const getWADExecutablePath = _.memoize(async function getWADInstallPath(): Promise<string> {
   const wadPath = process.env.APPIUM_WAD_PATH ?? '';
   if (await fs.exists(wadPath)) {
     log.debug(`Loaded WinAppDriver path from the APPIUM_WAD_PATH environment variable: ${wadPath}`);
@@ -53,9 +54,8 @@ export const getWADExecutablePath = _.memoize(async function getWADInstallPath (
   // TODO: WAD installer should write the full path to it into the system registry
   const pathCandidates = POSSIBLE_WAD_INSTALL_ROOTS
     // remove unset env variables
-    .filter(Boolean)
+    .filter((root): root is string => Boolean(root))
     // construct full path
-    // @ts-ignore The above filter does the job
     .map((root) => path.resolve(root, REG_ENTRY_VALUE, WAD_EXE_NAME));
   for (const result of pathCandidates) {
     if (await fs.exists(result)) {
@@ -66,12 +66,12 @@ export const getWADExecutablePath = _.memoize(async function getWADInstallPath (
   log.debug('Checking the system registry for the corresponding MSI entry');
   try {
     const uninstallEntries = await queryRegistry(UNINSTALL_REG_ROOT);
-    const wadEntry = uninstallEntries.find(({key, type, value}) =>
-      key === REG_ENTRY_KEY && value === REG_ENTRY_VALUE && type === REG_ENTRY_TYPE
+    const wadEntry = uninstallEntries.find((entry: RegEntry) =>
+      entry.key === REG_ENTRY_KEY && entry.value === REG_ENTRY_VALUE && entry.type === REG_ENTRY_TYPE
     );
     if (wadEntry) {
       log.debug(`Found MSI entry: ${JSON.stringify(wadEntry)}`);
-      const installerGuid = /** @type {string} */ (_.last(wadEntry.root.split('\\')));
+      const installerGuid = _.last(wadEntry.root.split('\\')) as string;
       // WAD MSI installer leaves InstallLocation registry value empty,
       // so we need to be hacky here
       const result = path.join(
@@ -86,7 +86,7 @@ export const getWADExecutablePath = _.memoize(async function getWADInstallPath (
     } else {
       log.debug('No WAD MSI entries have been found');
     }
-  } catch (e) {
+  } catch (e: any) {
     if (e.stderr) {
       log.debug(e.stderr);
     }
@@ -102,14 +102,16 @@ export const getWADExecutablePath = _.memoize(async function getWADInstallPath (
 });
 
 /**
+ * Checks if the current process is running with administrator privileges
  *
- * @returns {Promise<boolean>}
+ * @returns Promise that resolves to true if running as admin, false otherwise
  */
-export async function isAdmin () {
+export async function isAdmin(): Promise<boolean> {
   try {
     await exec('fsutil.exe', ['dirty', 'query', process.env.SystemDrive || 'C:']);
     return true;
   } catch {
     return false;
   }
-};
+}
+

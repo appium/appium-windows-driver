@@ -1,6 +1,6 @@
 // https://github.com/microsoft/WinAppDriver/blob/master/Docs/SupportedAPIs.md
 
-export const newMethodMap = /** @type {const} */ ({
+export const newMethodMap = {
   '/session/:sessionId/appium/start_recording_screen': {
     POST: {
       command: 'startRecordingScreen',
@@ -114,4 +114,4 @@ export const newMethodMap = /** @type {const} */ ({
   '/session/:sessionId/element/:elementId/equals/:otherId': {
     GET: {command: 'equalsElement'},
   },
-});
+} as const;

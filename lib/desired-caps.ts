@@ -1,3 +1,5 @@
+import type {Constraints} from '@appium/types';
+
 export const desiredCapConstraints = {
   // https://github.com/microsoft/WinAppDriver/blob/master/Docs/AuthoringTestScripts.md#supported-capabilities
   platformName: {
@@ -47,6 +49,4 @@ export const desiredCapConstraints = {
   wadUrl: {
     isString: true
   },
-} as const;
-
-export default desiredCapConstraints;
+} as const satisfies Constraints;
