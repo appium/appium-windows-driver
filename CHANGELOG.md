@@ -1,3 +1,9 @@
+## [5.1.3](https://github.com/appium/appium-windows-driver/compare/v5.1.2...v5.1.3) (2025-12-12)
+
+### Miscellaneous Chores
+
+* **deps:** remove source-map-support ([#340](https://github.com/appium/appium-windows-driver/issues/340)) ([4517403](https://github.com/appium/appium-windows-driver/commit/4517403aba9f2c6f9860d96181ceffbdce086cc6))
+
 ## [5.1.2](https://github.com/appium/appium-windows-driver/compare/v5.1.1...v5.1.2) (2025-12-11)
 
 ### Miscellaneous Chores
