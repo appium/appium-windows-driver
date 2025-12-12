@@ -57,7 +57,6 @@
     "lodash": "^4.6.1",
     "portscanner": "^2.2.0",
     "semver": "^7.6.3",
-    "source-map-support": "^0.x",
     "teen_process": "^3.0.0"
   },
   "scripts": {
