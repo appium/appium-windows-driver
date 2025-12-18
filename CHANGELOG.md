@@ -1,3 +1,9 @@
+## [5.1.4](https://github.com/appium/appium-windows-driver/compare/v5.1.3...v5.1.4) (2025-12-18)
+
+### Miscellaneous Chores
+
+* **deps:** bump asyncbox from 3.0.0 to 4.0.1 ([#341](https://github.com/appium/appium-windows-driver/issues/341)) ([adcdd44](https://github.com/appium/appium-windows-driver/commit/adcdd4473ff18ee21d7b74ecd73260bb3bf2da16))
+
 ## [5.1.3](https://github.com/appium/appium-windows-driver/compare/v5.1.2...v5.1.3) (2025-12-12)
 
 ### Miscellaneous Chores
