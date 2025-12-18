@@ -51,7 +51,7 @@
     "scripts"
   ],
   "dependencies": {
-    "asyncbox": "^3.0.0",
+    "asyncbox": "^4.0.1",
     "axios": "^1.7.7",
     "bluebird": "^3.5.1",
     "lodash": "^4.6.1",
