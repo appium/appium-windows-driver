@@ -1,3 +1,9 @@
+## [5.1.5](https://github.com/appium/appium-windows-driver/compare/v5.1.4...v5.1.5) (2025-12-22)
+
+### Miscellaneous Chores
+
+* bump teen_process ([#342](https://github.com/appium/appium-windows-driver/issues/342)) ([83c7620](https://github.com/appium/appium-windows-driver/commit/83c76207fa7efb81fad6e5e996d5fde75fe0bbd5))
+
 ## [5.1.4](https://github.com/appium/appium-windows-driver/compare/v5.1.3...v5.1.4) (2025-12-18)
 
 ### Miscellaneous Chores
