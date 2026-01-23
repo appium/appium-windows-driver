@@ -1,3 +1,9 @@
+## [5.1.6](https://github.com/appium/appium-windows-driver/compare/v5.1.5...v5.1.6) (2026-01-23)
+
+### Miscellaneous Chores
+
+* Migrate index to typescript ([#345](https://github.com/appium/appium-windows-driver/issues/345)) ([69aa1e3](https://github.com/appium/appium-windows-driver/commit/69aa1e35de2ac61b5d98e300a28e3d6a24fea230))
+
 ## [5.1.5](https://github.com/appium/appium-windows-driver/compare/v5.1.4...v5.1.5) (2025-12-22)
 
 ### Miscellaneous Chores
