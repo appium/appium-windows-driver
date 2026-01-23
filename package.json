@@ -25,7 +25,8 @@
     "printWidth": 100,
     "singleQuote": true
   },
-  "main": "./build/index.js",
+  "main": "./build/lib/index.js",
+  "types": "./build/lib/index.d.ts",
   "bin": {},
   "directories": {
     "lib": "lib"
@@ -42,9 +43,9 @@
     "mainClass": "WindowsDriver"
   },
   "files": [
-    "index.js",
     "lib",
     "build",
+    "!build/test",
     "CHANGELOG.md",
     "LICENSE",
     "npm-shrinkwrap.json",
