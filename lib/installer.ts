@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { fs, tempDir } from 'appium/support';
-import path from 'path';
+import path from 'node:path';
 import { exec } from 'teen_process';
 import { log } from './logger';
 import { queryRegistry, type RegEntry } from './registry';

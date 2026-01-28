@@ -6,7 +6,7 @@ import { JWProxy, errors } from 'appium/driver';
 import { SubProcess } from 'teen_process';
 import { getWADExecutablePath } from './installer';
 import { waitForCondition } from 'asyncbox';
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
 import { util } from 'appium/support';
 import { findAPortNotInUse, checkPortStatus } from 'portscanner';
 import { desiredCapConstraints } from './desired-caps';
@@ -364,5 +364,5 @@ export type WindowsDriverCaps = {
   createSessionTimeout?: number;
   prerun?: {command?: string; script?: string};
   postrun?: {command?: string; script?: string};
-}
+};
 
