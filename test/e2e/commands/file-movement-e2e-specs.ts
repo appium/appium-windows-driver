@@ -1,6 +1,6 @@
 import { remote as wdio } from 'webdriverio';
 import type { Browser } from 'webdriverio';
-import path from 'path';
+import path from 'node:path';
 import { tempDir, fs } from 'appium/support';
 import { isAdmin } from '../../../lib/installer';
 import { buildWdIoOptions } from '../helpers';
