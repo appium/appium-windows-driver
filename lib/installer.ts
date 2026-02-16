@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import { fs, tempDir } from 'appium/support';
+import {fs, tempDir} from 'appium/support';
 import path from 'node:path';
-import { exec } from 'teen_process';
-import { log } from './logger';
-import { queryRegistry, type RegEntry } from './registry';
-import { runElevated } from './utils';
+import {exec} from 'teen_process';
+import {log} from './logger';
+import {queryRegistry, type RegEntry} from './registry';
+import {runElevated} from './utils';
 
 const POSSIBLE_WAD_INSTALL_ROOTS = [
   process.env['ProgramFiles(x86)'],
@@ -16,7 +16,8 @@ const UNINSTALL_REG_ROOT = 'HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\
 const REG_ENTRY_VALUE = 'Windows Application Driver';
 const REG_ENTRY_KEY = 'DisplayName';
 const REG_ENTRY_TYPE = 'REG_SZ';
-const INST_LOCATION_SCRIPT_BY_GUID = (guid: string): string => `
+const INST_LOCATION_SCRIPT_BY_GUID = (guid: string): string =>
+  `
 Set installer = CreateObject("WindowsInstaller.Installer")
 Set session = installer.OpenProduct("${guid}")
 session.DoAction("CostInitialize")
@@ -66,18 +67,18 @@ export const getWADExecutablePath = _.memoize(async function getWADInstallPath()
   log.debug('Checking the system registry for the corresponding MSI entry');
   try {
     const uninstallEntries = await queryRegistry(UNINSTALL_REG_ROOT);
-    const wadEntry = uninstallEntries.find((entry: RegEntry) =>
-      entry.key === REG_ENTRY_KEY && entry.value === REG_ENTRY_VALUE && entry.type === REG_ENTRY_TYPE
+    const wadEntry = uninstallEntries.find(
+      (entry: RegEntry) =>
+        entry.key === REG_ENTRY_KEY &&
+        entry.value === REG_ENTRY_VALUE &&
+        entry.type === REG_ENTRY_TYPE,
     );
     if (wadEntry) {
       log.debug(`Found MSI entry: ${JSON.stringify(wadEntry)}`);
       const installerGuid = _.last(wadEntry.root.split('\\')) as string;
       // WAD MSI installer leaves InstallLocation registry value empty,
       // so we need to be hacky here
-      const result = path.join(
-        await fetchMsiInstallLocation(installerGuid),
-        WAD_EXE_NAME
-      );
+      const result = path.join(await fetchMsiInstallLocation(installerGuid), WAD_EXE_NAME);
       log.debug(`Checking if WAD exists at '${result}'`);
       if (await fs.exists(result)) {
         return result;
@@ -92,12 +93,13 @@ export const getWADExecutablePath = _.memoize(async function getWADInstallPath()
     }
     log.debug(e.stack);
   }
-  throw new WADNotFoundError(`${WAD_EXE_NAME} has not been found in any of these ` +
-    `locations: ${pathCandidates}. Use the following driver script to install it: ` +
-    `'appium driver run windows install-wad <optional_wad_version>'. ` +
-    `Check https://github.com/microsoft/WinAppDriver/releases to list ` +
-    `available server versions or drop the '<optional_wad_version>' argument to ` +
-    `install the latest stable one.`
+  throw new WADNotFoundError(
+    `${WAD_EXE_NAME} has not been found in any of these ` +
+      `locations: ${pathCandidates}. Use the following driver script to install it: ` +
+      `'appium driver run windows install-wad <optional_wad_version>'. ` +
+      `Check https://github.com/microsoft/WinAppDriver/releases to list ` +
+      `available server versions or drop the '<optional_wad_version>' argument to ` +
+      `install the latest stable one.`,
   );
 });
 

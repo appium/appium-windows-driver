@@ -1,8 +1,8 @@
-import { WindowsDriver } from '../../lib/driver';
+import {WindowsDriver} from '../../lib/driver';
 import sinon from 'sinon';
 import B from 'bluebird';
-import { system } from 'appium/support';
-import { expect } from 'chai';
+import {system} from 'appium/support';
+import {expect} from 'chai';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 
@@ -20,7 +20,7 @@ describe('driver', function () {
 
   describe('constructor', function () {
     it('calls BaseDriver constructor with opts', function () {
-      const driver = new WindowsDriver({ foo: 'bar' } as any);
+      const driver = new WindowsDriver({foo: 'bar'} as any);
       expect(driver).to.exist;
       expect((driver.opts as any).foo).to.equal('bar');
     });
@@ -28,13 +28,16 @@ describe('driver', function () {
 
   describe('createSession', function () {
     it('should set sessionId', async function () {
-      const driver = new WindowsDriver({ app: 'myapp'} as any, false);
-      sinon.mock(driver).expects('startWinAppDriverSession')
-        .once()
-        .returns(B.resolve());
-      await driver.createSession(
-        { alwaysMatch: { platformName: 'Windows', 'appium:automationName': 'Windows', 'appium:app': 'myapp' }, firstMatch: [{}] }
-      );
+      const driver = new WindowsDriver({app: 'myapp'} as any, false);
+      sinon.mock(driver).expects('startWinAppDriverSession').once().returns(B.resolve());
+      await driver.createSession({
+        alwaysMatch: {
+          platformName: 'Windows',
+          'appium:automationName': 'Windows',
+          'appium:app': 'myapp',
+        },
+        firstMatch: [{}],
+      });
       expect(driver.sessionId).to.exist;
       expect((driver.caps as any).app).to.equal('myapp');
     });
@@ -56,7 +59,7 @@ describe('driver', function () {
   describe('proxying', function () {
     let driver: WindowsDriver;
     before(function () {
-      driver = new WindowsDriver({ address: '127.0.0.1', port: 4723 } as any, false);
+      driver = new WindowsDriver({address: '127.0.0.1', port: 4723} as any, false);
       driver.sessionId = 'abc';
     });
     describe('#proxyActive', function () {
@@ -67,7 +70,9 @@ describe('driver', function () {
         expect(driver.proxyActive('abc')).to.be.false;
       });
       it('should throw an error if session id is wrong', function () {
-        expect(() => { driver.proxyActive('aaa'); }).to.throw;
+        expect(() => {
+          driver.proxyActive('aaa');
+        }).to.throw;
       });
     });
 
@@ -82,7 +87,9 @@ describe('driver', function () {
         expect(avoidList).to.eql(driver['jwpProxyAvoid']);
       });
       it('should throw an error if session id is wrong', function () {
-        expect(() => { (driver.getProxyAvoidList as any)('aaa'); }).to.throw;
+        expect(() => {
+          (driver.getProxyAvoidList as any)('aaa');
+        }).to.throw;
       });
     });
 
@@ -94,7 +101,9 @@ describe('driver', function () {
         expect((driver.canProxy as any)('abc')).to.be.true;
       });
       it('should throw an error if session id is wrong', function () {
-        expect(() => { (driver.canProxy as any)('aaa'); }).to.throw;
+        expect(() => {
+          (driver.canProxy as any)('aaa');
+        }).to.throw;
       });
     });
   });

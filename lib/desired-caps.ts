@@ -5,48 +5,48 @@ export const desiredCapConstraints = {
   platformName: {
     presence: true,
     isString: true,
-    inclusionCaseInsensitive: ['Windows']
+    inclusionCaseInsensitive: ['Windows'],
   },
   browserName: {
-    isString: true
+    isString: true,
   },
   platformVersion: {
-    isString: true
+    isString: true,
   },
   app: {
-    isString: true
+    isString: true,
   },
   appArguments: {
-    isString: true
+    isString: true,
   },
   appTopLevelWindow: {
-    isString: true
+    isString: true,
   },
   appWorkingDir: {
-    isString: true
+    isString: true,
   },
   createSessionTimeout: {
-    isNumber: true
+    isNumber: true,
   },
   'ms:waitForAppLaunch': {
-    isNumber: true // in seconds
+    isNumber: true, // in seconds
   },
   'ms:forcequit': {
-    isBoolean: true
+    isBoolean: true,
   },
   'ms:experimental-webdriver': {
-    isBoolean: true
+    isBoolean: true,
   },
   systemPort: {
-    isNumber: true
+    isNumber: true,
   },
   prerun: {
-    isObject: true
+    isObject: true,
   },
   postrun: {
-    isObject: true
+    isObject: true,
   },
   wadUrl: {
-    isString: true
+    isString: true,
   },
 } as const satisfies Constraints;

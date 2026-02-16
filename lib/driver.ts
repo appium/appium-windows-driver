@@ -11,11 +11,11 @@ import type {
   DriverOpts,
   W3CDriverCaps,
 } from '@appium/types';
-import { BaseDriver } from 'appium/driver';
-import { system } from 'appium/support';
-import { WinAppDriver } from './winappdriver';
-import type { WindowsDriverCaps } from './winappdriver';
-import { desiredCapConstraints } from './desired-caps';
+import {BaseDriver} from 'appium/driver';
+import {system} from 'appium/support';
+import {WinAppDriver} from './winappdriver';
+import type {WindowsDriverCaps} from './winappdriver';
+import {desiredCapConstraints} from './desired-caps';
 import * as appManagementCommands from './commands/app-management';
 import * as clipboardCommands from './commands/clipboard';
 import * as executeCommands from './commands/execute';
@@ -28,9 +28,9 @@ import * as recordScreenCommands from './commands/record-screen';
 import * as touchCommands from './commands/touch';
 import * as contextCommands from './commands/context';
 import * as logCommands from './commands/log';
-import { POWER_SHELL_FEATURE } from './constants';
-import { newMethodMap } from './method-map';
-import { executeMethodMap } from './execute-method-map';
+import {POWER_SHELL_FEATURE} from './constants';
+import {newMethodMap} from './method-map';
+import {executeMethodMap} from './execute-method-map';
 
 const NO_PROXY: RouteMatcher[] = [
   ['GET', new RegExp('^/session/[^/]+/appium/(?!app/)[^/]+')],
@@ -76,14 +76,7 @@ export class WindowsDriver
   constructor(opts: InitialOpts, shouldValidateCaps = true) {
     super(opts, shouldValidateCaps);
     this.desiredCapConstraints = desiredCapConstraints;
-    this.locatorStrategies = [
-      'xpath',
-      'id',
-      'name',
-      'tag name',
-      'class name',
-      'accessibility id',
-    ];
+    this.locatorStrategies = ['xpath', 'id', 'name', 'tag name', 'class name', 'accessibility id'];
     this.resetState();
   }
 
@@ -98,7 +91,7 @@ export class WindowsDriver
     w3cCaps1: W3CWindowsDriverCaps,
     w3cCaps2?: W3CWindowsDriverCaps,
     w3cCaps3?: W3CWindowsDriverCaps,
-    driverData?: DriverData[]
+    driverData?: DriverData[],
   ): Promise<DefaultCreateSessionResult<WindowsDriverConstraints>> {
     if (!system.isWindows()) {
       throw new Error('WinAppDriver tests only run on Windows');
@@ -112,8 +105,10 @@ export class WindowsDriver
         this.log.info('Executing prerun PowerShell script');
         const prerun = caps.prerun as PrerunCapability;
         if (!_.isString(prerun.command) && !_.isString(prerun.script)) {
-          throw new Error(`'prerun' capability value must either contain ` +
-            `'script' or 'command' entry of string type`);
+          throw new Error(
+            `'prerun' capability value must either contain ` +
+              `'script' or 'command' entry of string type`,
+          );
         }
         this.assertFeatureEnabled(POWER_SHELL_FEATURE);
         const output = await this.execPowerShell(prerun);
@@ -137,8 +132,10 @@ export class WindowsDriver
     const postrun = this.opts.postrun as PostrunCapability | undefined;
     if (postrun) {
       if (!_.isString(postrun.command) && !_.isString(postrun.script)) {
-        this.log.error(`'postrun' capability value must either contain ` +
-          `'script' or 'command' entry of string type`);
+        this.log.error(
+          `'postrun' capability value must either contain ` +
+            `'script' or 'command' entry of string type`,
+        );
       } else {
         this.log.info('Executing postrun PowerShell script');
         try {

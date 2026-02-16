@@ -1,15 +1,15 @@
 import _ from 'lodash';
 import os from 'node:os';
 import path from 'node:path';
-import type { AppiumLogger, ProxyOptions, HTTPMethod, HTTPBody } from '@appium/types';
-import { JWProxy, errors } from 'appium/driver';
-import { SubProcess } from 'teen_process';
-import { getWADExecutablePath } from './installer';
-import { waitForCondition } from 'asyncbox';
-import { execSync } from 'node:child_process';
-import { util } from 'appium/support';
-import { findAPortNotInUse, checkPortStatus } from 'portscanner';
-import { desiredCapConstraints } from './desired-caps';
+import type {AppiumLogger, ProxyOptions, HTTPMethod, HTTPBody} from '@appium/types';
+import {JWProxy, errors} from 'appium/driver';
+import {SubProcess} from 'teen_process';
+import {getWADExecutablePath} from './installer';
+import {waitForCondition} from 'asyncbox';
+import {execSync} from 'node:child_process';
+import {util} from 'appium/support';
+import {findAPortNotInUse, checkPortStatus} from 'portscanner';
+import {desiredCapConstraints} from './desired-caps';
 
 const DEFAULT_BASE_PATH = '/wd/hub';
 const DEFAULT_HOST = '127.0.0.1';
@@ -22,7 +22,8 @@ const PORT_ALLOCATION_GUARD = util.getLockFileGuard(path.resolve(os.tmpdir(), 'w
   timeout: 5,
   tryRecovery: true,
 });
-const TROUBLESHOOTING_LINK = 'https://github.com/appium/appium-windows-driver?tab=readme-ov-file#troubleshooting';
+const TROUBLESHOOTING_LINK =
+  'https://github.com/appium/appium-windows-driver?tab=readme-ov-file#troubleshooting';
 
 class WADProxy extends JWProxy {
   didProcessExit?: boolean;
@@ -39,11 +40,16 @@ class WADProxy extends JWProxy {
     }
   }
 
-  override async proxyCommand(url: string, method: HTTPMethod, body: HTTPBody = null): Promise<any> {
+  override async proxyCommand(
+    url: string,
+    method: HTTPMethod,
+    body: HTTPBody = null,
+  ): Promise<any> {
     if (this.didProcessExit) {
       throw new errors.InvalidContextError(
         `'${method} ${url}' cannot be proxied to WinAppDriver server because ` +
-        'its process is not running (probably crashed). Check the Appium log for more details');
+          'its process is not running (probably crashed). Check the Appium log for more details',
+      );
     }
     return await super.proxyCommand(url, method, body);
   }
@@ -67,7 +73,7 @@ class WADProcess {
   }
 
   get isRunning(): boolean {
-    return !!(this.proc?.isRunning);
+    return !!this.proc?.isRunning;
   }
 
   async start(): Promise<void> {
@@ -83,8 +89,9 @@ class WADProcess {
         } catch {
           throw this.log.errorWithException(
             `Could not find any free port in range ${startPort}..${endPort}. ` +
-            `Please check your system firewall settings or set 'systemPort' capability ` +
-            `to the desired port number`);
+              `Please check your system firewall settings or set 'systemPort' capability ` +
+              `to the desired port number`,
+          );
         }
       });
     }
@@ -96,7 +103,7 @@ class WADProcess {
     }
 
     this.proc = new SubProcess(this.executablePath, args, {
-      encoding: 'ucs2'
+      encoding: 'ucs2',
     });
     this.proc.on('output', (stdout, stderr) => {
       const line = _.trim(stderr || stdout);
@@ -116,8 +123,10 @@ class WADProcess {
       try {
         await this.proc?.stop();
       } catch (e: any) {
-        this.log.warn(`WinAppDriver process with PID ${this.proc?.pid} cannot be stopped. ` +
-          `Original error: ${e.message}`);
+        this.log.warn(
+          `WinAppDriver process with PID ${this.proc?.pid} cannot be stopped. ` +
+            `Original error: ${e.message}`,
+        );
       }
     }
   }
@@ -177,8 +186,10 @@ export class WinAppDriver {
       try {
         await this.proxy.command('', 'DELETE');
       } catch (err: any) {
-        this.log.warn(`Did not get confirmation WinAppDriver deleteSession worked; ` +
-          `Error was: ${err.message}`);
+        this.log.warn(
+          `Did not get confirmation WinAppDriver deleteSession worked; ` +
+            `Error was: ${err.message}`,
+        );
       }
     }
 
@@ -222,40 +233,41 @@ export class WinAppDriver {
 
     let lastError: Error | undefined;
     try {
-      await waitForCondition(async () => {
-        try {
-          if (this.proxy) {
-            await this.proxy.command('/status', 'GET');
-            return true;
+      await waitForCondition(
+        async () => {
+          try {
+            if (this.proxy) {
+              await this.proxy.command('/status', 'GET');
+              return true;
+            }
+          } catch (err: any) {
+            if (this.proxy?.didProcessExit) {
+              throw new Error(err.message);
+            }
+            lastError = err;
+            return false;
           }
-        } catch (err: any) {
-          if (this.proxy?.didProcessExit) {
-            throw new Error(err.message);
-          }
-          lastError = err;
-          return false;
-        }
-      }, {
-        waitMs: STARTUP_TIMEOUT_MS,
-        intervalMs: 1000,
-      });
+        },
+        {
+          waitMs: STARTUP_TIMEOUT_MS,
+          intervalMs: 1000,
+        },
+      );
     } catch (e: any) {
       if (!lastError || this.proxy.didProcessExit) {
         throw e;
       }
 
       const serverUrl = this.proxy.getUrlForProxy('/status');
-      let errorMessage = (
+      let errorMessage =
         `WinAppDriver server '${executablePath}' is not listening at ${serverUrl} ` +
-        `after ${STARTUP_TIMEOUT_MS}ms timeout. Make sure it could be started manually.`
-      );
+        `after ${STARTUP_TIMEOUT_MS}ms timeout. Make sure it could be started manually.`;
       if (await this.proxy.isListening()) {
-        errorMessage = (
+        errorMessage =
           `WinAppDriver server '${executablePath}' is listening at ${serverUrl}, ` +
           `but fails to respond with a proper status. It is an issue with the server itself. ` +
           `Consider checking the troubleshooting guide at ${TROUBLESHOOTING_LINK}. ` +
-          `Original error: ${(lastError ?? e).message}`
-        );
+          `Original error: ${(lastError ?? e).message}`;
       }
       throw new Error(errorMessage);
     }
@@ -274,7 +286,7 @@ export class WinAppDriver {
       parsedUrl = new URL(url);
     } catch (e: any) {
       throw new Error(
-        `Cannot parse the provided WinAppDriver URL '${url}'. Original error: ${e.message}`
+        `Cannot parse the provided WinAppDriver URL '${url}'. Original error: ${e.message}`,
       );
     }
     const proxyOpts: ProxyOptions = {
@@ -292,26 +304,22 @@ export class WinAppDriver {
     try {
       await this.proxy.command('/status', 'GET');
     } catch (e: any) {
-      let errorMessage = (
+      let errorMessage =
         `WinAppDriver server is not listening at ${url}. ` +
-        `Make sure it is running and the provided wadUrl is correct`
-      );
+        `Make sure it is running and the provided wadUrl is correct`;
       if (await this.proxy.isListening()) {
-        errorMessage = (
+        errorMessage =
           `WinAppDriver server is listening at ${url}, but fails to respond with a proper status. ` +
           `It is an issue with the server itself. ` +
           `Consider checking the troubleshooting guide at ${TROUBLESHOOTING_LINK}. ` +
-          `Original error: ${e.message}`
-        );
+          `Original error: ${e.message}`;
       }
       throw new Error(errorMessage);
     }
   }
 
   private async _startSession(caps: WindowsDriverCaps): Promise<void> {
-    const {
-      createSessionTimeout = DEFAULT_CREATE_SESSION_TIMEOUT_MS
-    } = caps;
+    const {createSessionTimeout = DEFAULT_CREATE_SESSION_TIMEOUT_MS} = caps;
     this.log.debug(`Starting WinAppDriver session. Will timeout in '${createSessionTimeout}' ms.`);
     let retryIteration = 0;
     let lastError: Error | undefined;
@@ -324,7 +332,9 @@ export class WinAppDriver {
         return true;
       } catch (error: any) {
         lastError = error;
-        this.log.warn(`Could not start WinAppDriver session error = '${error.message}', attempt = ${retryIteration}`);
+        this.log.warn(
+          `Could not start WinAppDriver session error = '${error.message}', attempt = ${retryIteration}`,
+        );
         return false;
       }
     };
@@ -332,12 +342,12 @@ export class WinAppDriver {
     try {
       await waitForCondition(condFn, {
         waitMs: createSessionTimeout,
-        intervalMs: 500
+        intervalMs: 500,
       });
     } catch (timeoutError: any) {
       this.log.debug(`timeoutError was ${timeoutError.message}`);
       if (lastError) {
-        throw (lastError);
+        throw lastError;
       }
       throw new Error(`Could not start WinAppDriver session within ${createSessionTimeout} ms.`);
     }
@@ -365,4 +375,3 @@ export type WindowsDriverCaps = {
   prerun?: {command?: string; script?: string};
   postrun?: {command?: string; script?: string};
 };
-

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { runElevated } from './utils';
+import {runElevated} from './utils';
 
 const REG = 'reg.exe';
 const ENTRY_PATTERN = /^\s+(\w+)\s+([A-Z_]+)\s*(.*)/;

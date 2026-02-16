@@ -1,7 +1,7 @@
-import { buildWdIoOptions } from '../helpers';
-import { remote as wdio } from 'webdriverio';
-import type { Browser } from 'webdriverio';
-import { expect } from 'chai';
+import {buildWdIoOptions} from '../helpers';
+import {remote as wdio} from 'webdriverio';
+import type {Browser} from 'webdriverio';
+import {expect} from 'chai';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 
@@ -33,5 +33,4 @@ describe('context', function () {
   it('should throw an error if invalid context', async function () {
     await expect(driver!.switchAppiumContext('INVALID_CONTEXT')).to.be.rejected;
   });
-
 });

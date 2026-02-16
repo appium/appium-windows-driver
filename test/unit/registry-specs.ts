@@ -1,5 +1,5 @@
-import { parseRegQueryOutput } from '../../lib/registry';
-import { expect } from 'chai';
+import {parseRegQueryOutput} from '../../lib/registry';
+import {expect} from 'chai';
 
 describe('registry', function () {
   it('should parse reg query output', function () {
@@ -87,10 +87,18 @@ HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29
 
     `;
     const result = parseRegQueryOutput(output);
-    expect(Boolean(result.find(
-      ({root, key, type, value}) => root === 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29DA7679-80B6-452A-B264-349BAEE7CC0E}'
-        && key === 'DisplayName' && type === 'REG_SZ' && value === 'Windows Application Driver'
-    ))).to.be.true;
+    expect(
+      Boolean(
+        result.find(
+          ({root, key, type, value}) =>
+            root ===
+              'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29DA7679-80B6-452A-B264-349BAEE7CC0E}' &&
+            key === 'DisplayName' &&
+            type === 'REG_SZ' &&
+            value === 'Windows Application Driver',
+        ),
+      ),
+    ).to.be.true;
   });
   it('should return empty array if no matches found', function () {
     const output = `

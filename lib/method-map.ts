@@ -4,14 +4,14 @@ export const newMethodMap = {
   '/session/:sessionId/appium/start_recording_screen': {
     POST: {
       command: 'startRecordingScreen',
-      payloadParams: { optional: ['options'] }
-    }
+      payloadParams: {optional: ['options']},
+    },
   },
   '/session/:sessionId/appium/stop_recording_screen': {
     POST: {
       command: 'stopRecordingScreen',
-      payloadParams: { optional: ['options'] }
-    }
+      payloadParams: {optional: ['options']},
+    },
   },
   '/session/:sessionId/appium/device/push_file': {
     POST: {command: 'pushFile', payloadParams: {required: ['path', 'data']}},
@@ -55,49 +55,42 @@ export const newMethodMap = {
     POST: {command: 'doubleClick'},
   },
   '/session/:sessionId/touch/click': {
-    POST: { command: 'click', payloadParams: { required: ['element'] } }
+    POST: {command: 'click', payloadParams: {required: ['element']}},
   },
   '/session/:sessionId/touch/down': {
-    POST: { command: 'touchDown', payloadParams: { required: ['x', 'y'] } }
+    POST: {command: 'touchDown', payloadParams: {required: ['x', 'y']}},
   },
   '/session/:sessionId/touch/up': {
-    POST: { command: 'touchUp', payloadParams: { required: ['x', 'y'] } }
+    POST: {command: 'touchUp', payloadParams: {required: ['x', 'y']}},
   },
   '/session/:sessionId/touch/move': {
-    POST: { command: 'touchMove', payloadParams: { required: ['x', 'y'] } }
+    POST: {command: 'touchMove', payloadParams: {required: ['x', 'y']}},
   },
   '/session/:sessionId/touch/longclick': {
     POST: {
       command: 'touchLongClick',
-      payloadParams: { required: ['elements'] }
-    }
+      payloadParams: {required: ['elements']},
+    },
   },
   '/session/:sessionId/touch/flick': {
     POST: {
       command: 'flick',
       payloadParams: {
-        optional: [
-          'element',
-          'xspeed',
-          'yspeed',
-          'xoffset',
-          'yoffset',
-          'speed'
-        ]
-      }
-    }
+        optional: ['element', 'xspeed', 'yspeed', 'xoffset', 'yoffset', 'speed'],
+      },
+    },
   },
   '/session/:sessionId/touch/perform': {
     POST: {
       command: 'performTouch',
-      payloadParams: { wrap: 'actions', required: ['actions'] }
-    }
+      payloadParams: {wrap: 'actions', required: ['actions']},
+    },
   },
   '/session/:sessionId/touch/multi/perform': {
     POST: {
       command: 'performMultiAction',
-      payloadParams: { required: ['actions'], optional: ['elementId'] }
-    }
+      payloadParams: {required: ['actions'], optional: ['elementId']},
+    },
   },
   '/session/:sessionId/keys': {
     POST: {command: 'keys', payloadParams: {required: ['value']}},

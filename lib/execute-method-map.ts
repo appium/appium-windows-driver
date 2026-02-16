@@ -1,5 +1,5 @@
-import type { ExecuteMethodMap } from '@appium/types';
-import type { WindowsDriver } from './driver';
+import type {ExecuteMethodMap} from '@appium/types';
+import type {WindowsDriver} from './driver';
 
 export const executeMethodMap = {
   'windows: startRecordingScreen': {
@@ -21,15 +21,7 @@ export const executeMethodMap = {
   'windows: stopRecordingScreen': {
     command: 'windowsStopRecordingScreen',
     params: {
-      optional: [
-        'remotePath',
-        'user',
-        'pass',
-        'method',
-        'headers',
-        'fileFieldName',
-        'formFields',
-      ],
+      optional: ['remotePath', 'user', 'pass', 'method', 'headers', 'fileFieldName', 'formFields'],
     },
   },
 
@@ -43,20 +35,15 @@ export const executeMethodMap = {
   'windows: deleteFolder': {
     command: 'windowsDeleteFolder',
     params: {
-      required: [
-        'remotePath',
-      ],
+      required: ['remotePath'],
     },
   },
   'windows: deleteFile': {
     command: 'windowsDeleteFile',
     params: {
-      required: [
-        'remotePath',
-      ],
+      required: ['remotePath'],
     },
   },
-
 
   'windows: click': {
     command: 'windowsClick',
@@ -76,14 +63,7 @@ export const executeMethodMap = {
   'windows: scroll': {
     command: 'windowsScroll',
     params: {
-      optional: [
-        'elementId',
-        'x',
-        'y',
-        'deltaX',
-        'deltaY',
-        'modifierKeys',
-      ],
+      optional: ['elementId', 'x', 'y', 'deltaX', 'deltaY', 'modifierKeys'],
     },
   },
   'windows: clickAndDrag': {
@@ -119,29 +99,21 @@ export const executeMethodMap = {
   'windows: keys': {
     command: 'windowsKeys',
     params: {
-      required: [
-        'actions',
-      ],
+      required: ['actions'],
     },
   },
 
   'windows: setClipboard': {
     command: 'windowsSetClipboard',
     params: {
-      required: [
-        'b64Content',
-      ],
-      optional: [
-        'contentType',
-      ],
+      required: ['b64Content'],
+      optional: ['contentType'],
     },
   },
   'windows: getClipboard': {
     command: 'windowsGetClipboard',
     params: {
-      optional: [
-        'contentType',
-      ],
+      optional: ['contentType'],
     },
   },
 } as const satisfies ExecuteMethodMap<WindowsDriver>;

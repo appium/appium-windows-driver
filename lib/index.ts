@@ -1,4 +1,4 @@
-import { WindowsDriver } from './driver';
+import {WindowsDriver} from './driver';
 
-export { WindowsDriver };
+export {WindowsDriver};
 export default WindowsDriver;

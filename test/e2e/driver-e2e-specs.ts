@@ -1,8 +1,8 @@
-import { remote as wdio } from 'webdriverio';
-import type { Browser } from 'webdriverio';
-import { isAdmin } from '../../lib/installer';
-import { buildWdIoOptions } from './helpers';
-import { expect } from 'chai';
+import {remote as wdio} from 'webdriverio';
+import type {Browser} from 'webdriverio';
+import {isAdmin} from '../../lib/installer';
+import {buildWdIoOptions} from './helpers';
+import {expect} from 'chai';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 
@@ -12,7 +12,7 @@ describe('Driver', function () {
   let driver: Browser | null = null;
 
   beforeEach(async function () {
-    if (process.env.CI || !await isAdmin()) {
+    if (process.env.CI || !(await isAdmin())) {
       return this.skip();
     }
 

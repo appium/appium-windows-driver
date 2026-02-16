@@ -1,4 +1,4 @@
-import type { remote } from 'webdriverio';
+import type {remote} from 'webdriverio';
 
 export const TEST_PORT = parseInt(process.env.APPIUM_TEST_SERVER_PORT || '4788', 10);
 export const TEST_HOST = process.env.APPIUM_TEST_SERVER_HOST || '127.0.0.1';
@@ -17,7 +17,6 @@ export function buildWdIoOptions(app: string): Parameters<typeof remote>[0] {
       platformName: 'Windows',
       'appium:automationName': 'windows',
       'appium:app': app,
-    }
+    },
   };
 }
-

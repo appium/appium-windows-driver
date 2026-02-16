@@ -1,7 +1,7 @@
-import { buildWdIoOptions } from '../helpers';
-import { remote as wdio } from 'webdriverio';
-import type { Browser } from 'webdriverio';
-import { expect } from 'chai';
+import {buildWdIoOptions} from '../helpers';
+import {remote as wdio} from 'webdriverio';
+import type {Browser} from 'webdriverio';
+import {expect} from 'chai';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 
@@ -181,7 +181,7 @@ describe('winapi', function () {
           {text: '和製漢字'},
           {pause: 100},
           {virtualKeyCode: 0x10, down: false},
-        ]
+        ],
       });
     });
 
@@ -200,7 +200,7 @@ describe('winapi', function () {
         // down is not boolean
         {
           virtualKeyCode: 0x10,
-          down: 'false'
+          down: 'false',
         },
       ];
 
@@ -209,5 +209,4 @@ describe('winapi', function () {
       }
     });
   });
-
 });

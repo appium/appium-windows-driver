@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import { net } from 'appium/support';
-import { promisify } from 'node:util';
-import { exec } from 'node:child_process';
-import type { ExecOptions } from 'node:child_process';
+import {net} from 'appium/support';
+import {promisify} from 'node:util';
+import {exec} from 'node:child_process';
+import type {ExecOptions} from 'node:child_process';
 import B from 'bluebird';
-import { log } from './logger';
+import {log} from './logger';
 
 const execAsync = promisify(exec);
 
@@ -23,11 +23,9 @@ const execAsync = promisify(exec);
 export async function runElevated(
   cmd: string,
   args: string[] = [],
-  opts: RunElevatedOptions = {}
+  opts: RunElevatedOptions = {},
 ): Promise<{stdout: string; stderr: string}> {
-  const {
-    timeoutMs = 60 * 1000 * 5
-  } = opts;
+  const {timeoutMs = 60 * 1000 * 5} = opts;
 
   const escapePSSingleQuoted = (str: string): string => `'${String(str).replace(/'/g, "''")}'`;
   const psFilePath = escapePSSingleQuoted(cmd);
@@ -38,8 +36,10 @@ export async function runElevated(
   // We avoid additional interpolation here by using only single-quoted literals inside the PS command.
   const fullCmd = `powershell -NoProfile -Command "${psCommand}"`;
   log.debug(`Executing command: ${fullCmd}`);
-  const { stdout, stderr } = await B.resolve(execAsync(fullCmd, opts))
-    .timeout(timeoutMs, `The command '${fullCmd}' timed out after ${timeoutMs}ms`);
+  const {stdout, stderr} = await B.resolve(execAsync(fullCmd, opts)).timeout(
+    timeoutMs,
+    `The command '${fullCmd}' timed out after ${timeoutMs}ms`,
+  );
   return {
     stdout: _.isString(stdout) ? stdout : stdout.toString(),
     stderr: _.isString(stderr) ? stderr : stderr.toString(),
