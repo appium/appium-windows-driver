@@ -44,8 +44,7 @@
   },
   "files": [
     "lib",
-    "build",
-    "!build/test",
+    "build/lib",
     "CHANGELOG.md",
     "LICENSE",
     "npm-shrinkwrap.json",
