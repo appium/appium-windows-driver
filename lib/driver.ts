@@ -64,8 +64,6 @@ interface PrerunCapability {
   script?: string;
 }
 
-export default WindowsDriver;
-
 interface PostrunCapability {
   command?: string;
   script?: string;
@@ -80,14 +78,58 @@ export class WindowsDriver
   extends BaseDriver<WindowsDriverConstraints, StringRecord>
   implements ExternalDriver<WindowsDriverConstraints, string, StringRecord>
 {
-  private isProxyActive: boolean;
-  private jwpProxyAvoid: RouteMatcher[];
-  private _winAppDriver: WinAppDriver | null;
+  static newMethodMap = newMethodMap;
+  static executeMethodMap = executeMethodMap;
+
   _screenRecorder: recordScreenCommands.ScreenRecorder | null;
   public proxyReqRes: (...args: any) => any;
 
-  static newMethodMap = newMethodMap;
-  static executeMethodMap = executeMethodMap;
+  windowsLaunchApp = appManagementCommands.windowsLaunchApp;
+  windowsCloseApp = appManagementCommands.windowsCloseApp;
+
+  windowsSetClipboard = clipboardCommands.windowsSetClipboard;
+  windowsGetClipboard = clipboardCommands.windowsGetClipboard;
+
+  execute = executeCommands.execute;
+
+  pushFile = fileCommands.pushFile;
+  pullFile = fileCommands.pullFile;
+  pullFolder = fileCommands.pullFolder;
+  windowsDeleteFile = fileCommands.windowsDeleteFile;
+  windowsDeleteFolder = fileCommands.windowsDeleteFolder;
+
+  findElOrEls = findCommands.findElOrEls;
+
+  getWindowSize = generalCommands.getWindowSize;
+  getWindowRect = generalCommands.getWindowRect;
+  setWindowRect = generalCommands.setWindowRect;
+  getScreenshot = generalCommands.getScreenshot;
+  getElementRect = generalCommands.getElementRect;
+
+  windowsClick = gestureCommands.windowsClick;
+  windowsScroll = gestureCommands.windowsScroll;
+  windowsClickAndDrag = gestureCommands.windowsClickAndDrag;
+  windowsHover = gestureCommands.windowsHover;
+  windowsKeys = gestureCommands.windowsKeys;
+
+  execPowerShell = powershellCommands.execPowerShell;
+
+  windowsStartRecordingScreen = recordScreenCommands.windowsStartRecordingScreen;
+  windowsStopRecordingScreen = recordScreenCommands.windowsStopRecordingScreen;
+  startRecordingScreen = recordScreenCommands.startRecordingScreen;
+  stopRecordingScreen = recordScreenCommands.stopRecordingScreen;
+
+  performActions = touchCommands.performActions;
+
+  getContexts = contextCommands.getContexts;
+  getCurrentContext = contextCommands.getCurrentContext;
+  setContext = contextCommands.setContext;
+
+  supportedLogTypes = logCommands.supportedLogTypes;
+
+  private isProxyActive: boolean;
+  private jwpProxyAvoid: RouteMatcher[];
+  private _winAppDriver: WinAppDriver | null;
 
   constructor(opts: InitialOpts, shouldValidateCaps = true) {
     super(opts, shouldValidateCaps);
@@ -212,47 +254,6 @@ export class WindowsDriver
     this._winAppDriver = null;
     this._screenRecorder = null;
   }
-
-  windowsLaunchApp = appManagementCommands.windowsLaunchApp;
-  windowsCloseApp = appManagementCommands.windowsCloseApp;
-
-  windowsSetClipboard = clipboardCommands.windowsSetClipboard;
-  windowsGetClipboard = clipboardCommands.windowsGetClipboard;
-
-  execute = executeCommands.execute;
-
-  pushFile = fileCommands.pushFile;
-  pullFile = fileCommands.pullFile;
-  pullFolder = fileCommands.pullFolder;
-  windowsDeleteFile = fileCommands.windowsDeleteFile;
-  windowsDeleteFolder = fileCommands.windowsDeleteFolder;
-
-  findElOrEls = findCommands.findElOrEls;
-
-  getWindowSize = generalCommands.getWindowSize;
-  getWindowRect = generalCommands.getWindowRect;
-  setWindowRect = generalCommands.setWindowRect;
-  getScreenshot = generalCommands.getScreenshot;
-  getElementRect = generalCommands.getElementRect;
-
-  windowsClick = gestureCommands.windowsClick;
-  windowsScroll = gestureCommands.windowsScroll;
-  windowsClickAndDrag = gestureCommands.windowsClickAndDrag;
-  windowsHover = gestureCommands.windowsHover;
-  windowsKeys = gestureCommands.windowsKeys;
-
-  execPowerShell = powershellCommands.execPowerShell;
-
-  windowsStartRecordingScreen = recordScreenCommands.windowsStartRecordingScreen;
-  windowsStopRecordingScreen = recordScreenCommands.windowsStopRecordingScreen;
-  startRecordingScreen = recordScreenCommands.startRecordingScreen;
-  stopRecordingScreen = recordScreenCommands.stopRecordingScreen;
-
-  performActions = touchCommands.performActions;
-
-  getContexts = contextCommands.getContexts;
-  getCurrentContext = contextCommands.getCurrentContext;
-  setContext = contextCommands.setContext;
-
-  supportedLogTypes = logCommands.supportedLogTypes;
 }
+
+export default WindowsDriver;

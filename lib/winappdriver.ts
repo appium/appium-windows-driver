@@ -56,11 +56,11 @@ class WADProxy extends JWProxy {
 }
 
 class WADProcess {
-  private readonly log: AppiumLogger;
   readonly base: string;
   port?: number;
-  private readonly executablePath: string;
   proc: SubProcess | null;
+  private readonly log: AppiumLogger;
+  private readonly executablePath: string;
   private readonly isForceQuitEnabled: boolean;
 
   constructor(log: AppiumLogger, opts: WADProcessOptions) {
