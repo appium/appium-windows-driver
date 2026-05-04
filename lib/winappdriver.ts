@@ -144,6 +144,28 @@ process.once('exit', () => {
   } catch {}
 });
 
+export interface WADProcessOptions {
+  base: string;
+  port?: number;
+  executablePath: string;
+  isForceQuitEnabled: boolean;
+}
+
+export interface WinAppDriverOptions {
+  port?: number;
+  reqBasePath?: string;
+  url?: string;
+}
+
+export type WindowsDriverCaps = {
+  [K in keyof typeof desiredCapConstraints]?: any;
+} & {
+  'ms:forcequit'?: boolean;
+  createSessionTimeout?: number;
+  prerun?: {command?: string; script?: string};
+  postrun?: {command?: string; script?: string};
+};
+
 export class WinAppDriver {
   private readonly log: AppiumLogger;
   private readonly opts: WinAppDriverOptions;
@@ -353,25 +375,3 @@ export class WinAppDriver {
     }
   }
 }
-
-export interface WADProcessOptions {
-  base: string;
-  port?: number;
-  executablePath: string;
-  isForceQuitEnabled: boolean;
-}
-
-export interface WinAppDriverOptions {
-  port?: number;
-  reqBasePath?: string;
-  url?: string;
-}
-
-export type WindowsDriverCaps = {
-  [K in keyof typeof desiredCapConstraints]?: any;
-} & {
-  'ms:forcequit'?: boolean;
-  createSessionTimeout?: number;
-  prerun?: {command?: string; script?: string};
-  postrun?: {command?: string; script?: string};
-};

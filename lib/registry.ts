@@ -4,6 +4,18 @@ import {runElevated} from './utils';
 const REG = 'reg.exe';
 const ENTRY_PATTERN = /^\s+(\w+)\s+([A-Z_]+)\s*(.*)/;
 
+export interface RegEntry {
+  /** Full path to the registry branch, for example
+   * HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DirectDrawEx */
+  root: string;
+  /** The registry key name */
+  key: string;
+  /** One of possible registry value types, for example REG_DWORD or REG_SZ */
+  type: string;
+  /** The actual value. Could be empty */
+  value: string;
+}
+
 /**
  * Parses the output of the reg query command into a list of RegEntry instances
  *
@@ -65,16 +77,4 @@ function parseRegEntries(root: string | undefined, block: string[]): RegEntry[] 
     }
     return acc;
   }, []);
-}
-
-export interface RegEntry {
-  /** Full path to the registry branch, for example
-   * HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DirectDrawEx */
-  root: string;
-  /** The registry key name */
-  key: string;
-  /** One of possible registry value types, for example REG_DWORD or REG_SZ */
-  type: string;
-  /** The actual value. Could be empty */
-  value: string;
 }

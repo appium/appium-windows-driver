@@ -25,6 +25,8 @@ session.DoAction("CostFinalize")
 WScript.Echo session.Property("INSTALLFOLDER")
 `.replace(/\n/g, '\r\n');
 
+class WADNotFoundError extends Error {}
+
 /**
  * Fetches the MSI installation location for a given installer GUID
  *
@@ -42,8 +44,6 @@ async function fetchMsiInstallLocation(installerGuid: string): Promise<string> {
     await fs.rimraf(tmpRoot);
   }
 }
-
-class WADNotFoundError extends Error {}
 
 export const getWADExecutablePath = _.memoize(async function getWADInstallPath(): Promise<string> {
   const wadPath = process.env.APPIUM_WAD_PATH ?? '';

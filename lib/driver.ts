@@ -59,6 +59,22 @@ const NO_PROXY: RouteMatcher[] = [
   // end workaround
 ];
 
+interface PrerunCapability {
+  command?: string;
+  script?: string;
+}
+
+export default WindowsDriver;
+
+interface PostrunCapability {
+  command?: string;
+  script?: string;
+}
+
+type WindowsDriverConstraints = typeof desiredCapConstraints;
+
+type WindowsDriverOpts = DriverOpts<WindowsDriverConstraints>;
+type W3CWindowsDriverCaps = W3CDriverCaps<WindowsDriverConstraints>;
 // Appium instantiates this class
 export class WindowsDriver
   extends BaseDriver<WindowsDriverConstraints, StringRecord>
@@ -240,19 +256,3 @@ export class WindowsDriver
 
   supportedLogTypes = logCommands.supportedLogTypes;
 }
-
-export default WindowsDriver;
-
-interface PrerunCapability {
-  command?: string;
-  script?: string;
-}
-
-interface PostrunCapability {
-  command?: string;
-  script?: string;
-}
-
-type WindowsDriverConstraints = typeof desiredCapConstraints;
-type WindowsDriverOpts = DriverOpts<WindowsDriverConstraints>;
-type W3CWindowsDriverCaps = W3CDriverCaps<WindowsDriverConstraints>;

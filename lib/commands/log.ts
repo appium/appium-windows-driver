@@ -16,6 +16,12 @@ export const supportedLogTypes: LogDefRecord = {
   },
 };
 
+interface LogEntry {
+  timestamp: number;
+  level: string;
+  message: string;
+}
+
 function nativeLogEntryToSeleniumEntry(x: StringRecord): LogEntry {
   const msg = _.isEmpty(x.prefix) ? x.message : `[${x.prefix}] ${x.message}`;
   return toLogEntry(_.replace(msg, COLOR_CODE_PATTERN, ''), x.timestamp ?? Date.now());
@@ -27,10 +33,4 @@ function toLogEntry(
   level: string = DEFAULT_LOG_LEVEL,
 ): LogEntry {
   return {timestamp, level, message};
-}
-
-interface LogEntry {
-  timestamp: number;
-  level: string;
-  message: string;
 }
