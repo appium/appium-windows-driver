@@ -268,9 +268,11 @@ async function getSystemMetrics(nIndex: number): Promise<number> {
   return await getUser32().GetSystemMetrics(nIndex);
 }
 
-const isLeftMouseButtonSwapped = _.memoize(async function isLeftMouseButtonSwapped(): Promise<boolean> {
-  return Boolean(await getSystemMetrics(SM_SWAPBUTTON));
-});
+const isLeftMouseButtonSwapped = _.memoize(
+  async function isLeftMouseButtonSwapped(): Promise<boolean> {
+    return Boolean(await getSystemMetrics(SM_SWAPBUTTON));
+  },
+);
 
 /** Builds a mouse button SendInput structure (click, press, or release). */
 export async function toMouseButtonInput({

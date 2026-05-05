@@ -137,10 +137,7 @@ function isKeyDown(action: string): boolean {
   }
 }
 
-function toModifierInputs(
-  modifierKeys: string | string[],
-  action: string,
-): KeyInput[] {
+function toModifierInputs(modifierKeys: string | string[], action: string): KeyInput[] {
   const events: Array<{virtualKeyCode: number; action: string}> = [];
   const usedKeys = new Set();
   for (const keyName of _.isArray(modifierKeys) ? modifierKeys : [modifierKeys]) {
@@ -208,9 +205,13 @@ export async function windowsClick(
 ): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
-  const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
-  const [absoluteX, absoluteY] = await toAbsoluteCoordinates.bind(this)(elementId, x, y) as [number, number];
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
+    modifierKeys,
+  ) as [KeyInput[], KeyInput[]];
+  const [absoluteX, absoluteY] = (await toAbsoluteCoordinates.bind(this)(elementId, x, y)) as [
+    number,
+    number,
+  ];
   let clickDownInput: MouseInput;
   let clickUpInput: MouseInput;
   let clickInput: MouseInput;
@@ -285,9 +286,13 @@ export async function windowsScroll(
 ): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
-  const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
-  const [absoluteX, absoluteY] = await toAbsoluteCoordinates.bind(this)(elementId, x, y) as [number, number];
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
+    modifierKeys,
+  ) as [KeyInput[], KeyInput[]];
+  const [absoluteX, absoluteY] = (await toAbsoluteCoordinates.bind(this)(elementId, x, y)) as [
+    number,
+    number,
+  ];
   let moveInput: MouseInput;
   let scrollInput: MouseInput | null;
   try {
@@ -359,11 +364,19 @@ export async function windowsClickAndDrag(
   await ensureDpiAwareness.bind(this)();
 
   const screenSize = await getVirtualScreenSize();
-  const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
+    modifierKeys,
+  ) as [KeyInput[], KeyInput[]];
   const [[startAbsoluteX, startAbsoluteY], [endAbsoluteX, endAbsoluteY]] = await B.all([
-    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting drag point') as Promise<[number, number]>,
-    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending drag point') as Promise<[number, number]>,
+    toAbsoluteCoordinates.bind(this)(
+      startElementId,
+      startX,
+      startY,
+      'Starting drag point',
+    ) as Promise<[number, number]>,
+    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending drag point') as Promise<
+      [number, number]
+    >,
   ]);
   let clickDownInput: MouseInput;
   let clickUpInput: MouseInput;
@@ -442,11 +455,19 @@ export async function windowsHover(
   await ensureDpiAwareness.bind(this)();
 
   const screenSize = await getVirtualScreenSize();
-  const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
+    modifierKeys,
+  ) as [KeyInput[], KeyInput[]];
   const [[startAbsoluteX, startAbsoluteY], [endAbsoluteX, endAbsoluteY]] = await B.all([
-    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting hover point') as Promise<[number, number]>,
-    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending hover point') as Promise<[number, number]>,
+    toAbsoluteCoordinates.bind(this)(
+      startElementId,
+      startX,
+      startY,
+      'Starting hover point',
+    ) as Promise<[number, number]>,
+    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending hover point') as Promise<
+      [number, number]
+    >,
   ]);
   const stepsCount = Math.max(Math.trunc(durationMs / EVENT_INJECTION_DELAY_MS), 1);
   const inputPromises: Array<B<MouseInput>> = [];
@@ -513,10 +534,7 @@ export async function windowsKeys(
   }
 }
 
-function parseKeyAction(
-  action: KeyAction,
-  index: number,
-): number | KeyInput[] {
+function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
   const hasPause = _.has(action, 'pause');
   const hasText = _.has(action, 'text');
   const hasVirtualKeyCode = _.has(action, 'virtualKeyCode');

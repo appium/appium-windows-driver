@@ -7,10 +7,7 @@ import type {ExecPowerShellOptions} from './powershell';
 const POWER_SHELL_SCRIPT = 'powerShell';
 const EXECUTE_SCRIPT_PREFIX = 'windows:';
 
-type ExecuteMethodArgs =
-  | readonly unknown[]
-  | readonly [StringRecord]
-  | Readonly<StringRecord>;
+type ExecuteMethodArgs = readonly unknown[] | readonly [StringRecord] | Readonly<StringRecord>;
 
 /** Handles `execute` / `executeScript` for PowerShell and `windows:` extension commands. */
 export async function execute(
