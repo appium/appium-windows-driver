@@ -1,8 +1,8 @@
-import _ from 'lodash';
 import path from 'node:path';
 import {errors} from 'appium/driver';
-import {fs, mkdirp, util, zip} from 'appium/support';
+import {fs, util, zip} from 'appium/support';
 import {MODIFY_FS_FEATURE} from '../constants';
+import type {WindowsDriver} from '../driver';
 
 // List of env variables, that can be expanded in path
 const KNOWN_ENV_VARS = [
@@ -19,14 +19,12 @@ const KNOWN_ENV_VARS = [
   'PUBLIC',
 ];
 
-/**
- *
- * @this {WindowsDriver}
- * @param {string} remotePath
- * @param {string} base64Data
- * @returns {Promise<void>}
- */
-export async function pushFile(remotePath, base64Data) {
+/** Writes a base64 file to an absolute path on the Windows host. */
+export async function pushFile(
+  this: WindowsDriver,
+  remotePath: string,
+  base64Data: string | readonly number[],
+): Promise<void> {
   this.assertFeatureEnabled(MODIFY_FS_FEATURE);
   if (remotePath.endsWith(path.sep)) {
     throw new errors.InvalidArgumentError(
@@ -35,37 +33,30 @@ export async function pushFile(remotePath, base64Data) {
     );
   }
 
-  if (_.isArray(base64Data)) {
+  let encoded: string;
+  if (typeof base64Data === 'string') {
+    encoded = base64Data;
+  } else {
     // some clients (ahem) java, send a byte array encoding utf8 characters
     // instead of a string, which would be infinitely better!
-    base64Data = Buffer.from(base64Data).toString('utf8');
+    encoded = Buffer.from([...base64Data]).toString('utf8');
   }
 
   const fullPath = resolveToAbsolutePath(remotePath);
-  await mkdirp(path.dirname(fullPath));
-  const content = Buffer.from(base64Data, 'base64');
+  await fs.mkdirp(path.dirname(fullPath));
+  const content = Buffer.from(encoded, 'base64');
   await fs.writeFile(fullPath, content);
 }
 
-/**
- *
- * @this {WindowsDriver}
- * @param {string} remotePath
- * @returns {Promise<string>}
- */
-export async function pullFile(remotePath) {
+/** Reads a remote file and returns its contents as base64. */
+export async function pullFile(this: WindowsDriver, remotePath: string): Promise<string> {
   const fullPath = resolveToAbsolutePath(remotePath);
   await checkFileExists(fullPath);
   return (await util.toInMemoryBase64(fullPath)).toString();
 }
 
-/**
- *
- * @this {WindowsDriver}
- * @param {string} remotePath
- * @returns {Promise<string>}
- */
-export async function pullFolder(remotePath) {
+/** Zips a remote folder and returns the archive as base64. */
+export async function pullFolder(this: WindowsDriver, remotePath: string): Promise<string> {
   const fullPath = resolveToAbsolutePath(remotePath);
   await checkFolderExists(fullPath);
   return (
@@ -76,18 +67,14 @@ export async function pullFolder(remotePath) {
 }
 
 /**
- * Remove the file from the file system
+ * Remove a file from the file system.
  *
- * @this {WindowsDriver}
- * @param {string} remotePath - The path to a file.
  * The path may contain environment variables that could be expanded on the server side.
  * Due to security reasons only variables listed below would be expanded: `APPDATA`,
  * `LOCALAPPDATA`, `PROGRAMFILES`, `PROGRAMFILES(X86)`, `PROGRAMDATA`, `ALLUSERSPROFILE`,
  * `TEMP`, `TMP`, `HOMEPATH`, `USERPROFILE`, `PUBLIC`.
- * @throws {InvalidArgumentError} If the file to be deleted does not exist or
- * remote path is not an absolute path.
  */
-export async function windowsDeleteFile(remotePath) {
+export async function windowsDeleteFile(this: WindowsDriver, remotePath: string): Promise<void> {
   this.assertFeatureEnabled(MODIFY_FS_FEATURE);
   const fullPath = resolveToAbsolutePath(remotePath);
   await checkFileExists(fullPath);
@@ -95,33 +82,24 @@ export async function windowsDeleteFile(remotePath) {
 }
 
 /**
- * Remove the folder from the file system
+ * Remove a folder from the file system.
  *
- * @this {WindowsDriver}
- * @param {string} remotePath - The path to a folder.
  * The path may contain environment variables that could be expanded on the server side.
  * Due to security reasons only variables listed below would be expanded: `APPDATA`,
  * `LOCALAPPDATA`, `PROGRAMFILES`, `PROGRAMFILES(X86)`, `PROGRAMDATA`, `ALLUSERSPROFILE`,
  * `TEMP`, `TMP`, `HOMEPATH`, `USERPROFILE`, `PUBLIC`.
- * @throws {InvalidArgumentError} If the folder to be deleted does not exist or
- * remote path is not an absolute path.
  */
-export async function windowsDeleteFolder(remotePath) {
+export async function windowsDeleteFolder(this: WindowsDriver, remotePath: string): Promise<void> {
   this.assertFeatureEnabled(MODIFY_FS_FEATURE);
   const fullPath = resolveToAbsolutePath(remotePath);
   await checkFolderExists(fullPath);
   await fs.rimraf(fullPath);
 }
 
-/**
- *
- * @param {string} remotePath
- * @returns {string}
- */
-function resolveToAbsolutePath(remotePath) {
-  const resolvedPath = remotePath.replace(/%([^%]+)%/g, (_, key) =>
+function resolveToAbsolutePath(remotePath: string): string {
+  const resolvedPath = remotePath.replace(/%([^%]+)%/g, (_, key: string) =>
     KNOWN_ENV_VARS.includes(key.toUpperCase())
-      ? /** @type {string} */ (process.env[key.toUpperCase()])
+      ? (process.env[key.toUpperCase()] as string)
       : `%${key}%`,
   );
 
@@ -133,12 +111,7 @@ function resolveToAbsolutePath(remotePath) {
   return resolvedPath;
 }
 
-/**
- *
- * @param {string} remotePath
- * @returns {Promise<void>}
- */
-async function checkFileExists(remotePath) {
+async function checkFileExists(remotePath: string): Promise<void> {
   if (!(await fs.exists(remotePath))) {
     throw new errors.InvalidArgumentError(`The remote file '${remotePath}' does not exist.`);
   }
@@ -151,12 +124,7 @@ async function checkFileExists(remotePath) {
   }
 }
 
-/**
- *
- * @param {string} remotePath
- * @returns {Promise<void>}
- */
-async function checkFolderExists(remotePath) {
+async function checkFolderExists(remotePath: string): Promise<void> {
   if (!(await fs.exists(remotePath))) {
     throw new errors.InvalidArgumentError(`The remote folder '${remotePath}' does not exist.`);
   }
@@ -168,7 +136,3 @@ async function checkFolderExists(remotePath) {
     );
   }
 }
-
-/**
- * @typedef {import('../driver').WindowsDriver} WindowsDriver
- */

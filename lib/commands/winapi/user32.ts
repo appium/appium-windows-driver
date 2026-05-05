@@ -3,20 +3,51 @@ import B from 'bluebird';
 import {createInvalidArgumentError} from './errors';
 import {util} from 'appium/support';
 import nodeUtil from 'node:util';
+import type {Size} from '@appium/types';
 
-let /** @type {import('koffi')|undefined} */ ffi;
+let ffi: typeof import('koffi') | undefined;
 try {
   ffi = require('koffi');
 } catch {}
-let /** @type {import('koffi').struct|undefined} */ StructType;
+let StructType: typeof import('koffi').struct | undefined;
 try {
   StructType = ffi?.struct;
 } catch {}
-let /** @type {any|undefined} */ UnionType;
+let UnionType: typeof import('koffi').union | undefined;
 try {
-  // @ts-ignore This is a typedef bug in koffi lib
   UnionType = ffi?.union;
 } catch {}
+
+export type User32 = {
+  SendInput: (cInputs: number, pInputs: unknown, cbSize: number) => Promise<number>;
+  GetSystemMetrics: (nIndex: number) => Promise<number>;
+  SetProcessDpiAwarenessContext: (value: number) => Promise<number>;
+};
+export type KeyInput = {
+  type: number;
+  union: {
+    ki: {
+      wVk: number;
+      time: number;
+      dwExtraInfo: number;
+      wScan: number;
+      dwFlags: number;
+    };
+  };
+};
+export type MouseInput = {
+  type: number;
+  union: {
+    mi: {
+      time: number;
+      dwExtraInfo: number;
+      dwFlags: number;
+      dx: number;
+      dy: number;
+      mouseData: number;
+    };
+  };
+};
 
 const NATIVE_LIBS_LOAD_ERROR =
   `Native Windows API calls cannot be invoked. ` +
@@ -24,20 +55,22 @@ const NATIVE_LIBS_LOAD_ERROR =
   `including the "Desktop development with C++" workload. ` +
   `Afterwards reinstall the Windows driver.`;
 
-function requireNativeType(typ) {
-  return _.isNil(typ)
-    ? () => () => {
-        throw new Error(NATIVE_LIBS_LOAD_ERROR);
-      }
-    : typ;
+function requireNativeType<T>(typ: T | undefined): T {
+  if (_.isNil(typ)) {
+    const throwingFactory = () => () => {
+      throw new Error(NATIVE_LIBS_LOAD_ERROR);
+    };
+    return throwingFactory as unknown as T;
+  }
+  return typ;
 }
 
-const getUser32 = _.memoize(function getUser32() {
+const getUser32 = _.memoize(function getUser32(): User32 {
   if (!ffi) {
     throw new Error(NATIVE_LIBS_LOAD_ERROR);
   }
   const user32 = ffi.load('user32.dll');
-  return {
+  const raw = {
     SendInput: nodeUtil.promisify(
       user32.func(
         'unsigned int __stdcall SendInput(unsigned int cInputs, INPUT *pInputs, int cbSize)',
@@ -50,6 +83,7 @@ const getUser32 = _.memoize(function getUser32() {
       user32.func('int __stdcall SetProcessDpiAwarenessContext(int value)').async,
     ),
   };
+  return raw as User32;
 });
 
 // https://koffi.dev/unions#win32-example
@@ -177,9 +211,21 @@ const WHEEL_DELTA = 120;
 // const DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = 18;
 const DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = 34;
 
-/** Builds an INPUT structure for keyboard injection via SendInput.
- * @param {Record<string, any>} [params] - Key input fields merged into the `ki` union. */
-export function createKeyInput(params = {}) {
+export interface MouseButtonOptions {
+  button: (typeof MOUSE_BUTTON)[keyof typeof MOUSE_BUTTON];
+  action: (typeof MOUSE_BUTTON_ACTION)[keyof typeof MOUSE_BUTTON_ACTION];
+}
+
+type KeybdInputFields = Partial<{
+  wVk: number;
+  wScan: number;
+  dwFlags: number;
+  time: number;
+  dwExtraInfo: number;
+}>;
+
+/** Builds an INPUT structure for keyboard injection via SendInput. */
+export function createKeyInput(params: KeybdInputFields = {}): KeyInput {
   return {
     type: INPUT_KEYBOARD,
     union: {
@@ -198,16 +244,11 @@ export function createKeyInput(params = {}) {
 // Mostly ported from
 // https://chromium.googlesource.com/chromium/src/+/refs/heads/main/remoting/host/input_injector_win.cc
 
-/**
- * Sends the provided input structures to SendInput WinAPI
- *
- * @param {object|object[]} inputs single INPUT structure or
- * an array of input structures. Consider combining keyboard inputs only.
- * @throws {Error} If any of the given inputs has not been successfully executed.
- */
-export async function handleInputs(inputs) {
+/** Sends input structure(s) to the SendInput WinAPI (prefer batching keyboard inputs). */
+export async function handleInputs(inputs: object | object[]): Promise<number> {
   const inputsArr = _.isArray(inputs) ? inputs : [inputs];
-  const uSent = await getUser32().SendInput(inputsArr.length, inputsArr, ffi?.sizeof(INPUT));
+  const cbSize = ffi ? ffi.sizeof(INPUT) : 0;
+  const uSent = await getUser32().SendInput(inputsArr.length, inputsArr, cbSize);
   if (uSent !== inputsArr.length) {
     throw new Error(
       `SendInput API call failed. ${util.pluralize('input', uSent, true)} succeeded out of ${inputsArr.length}`,
@@ -216,35 +257,26 @@ export async function handleInputs(inputs) {
   return uSent;
 }
 
-/** @type {() => Promise<boolean>} */
-export const ensureDpiAwareness = _.memoize(async function ensureDpiAwareness() {
+/** Ensures DPI awareness for the current process. */
+export const ensureDpiAwareness = _.memoize(async function ensureDpiAwareness(): Promise<boolean> {
   return Boolean(
     await getUser32().SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2),
   );
 });
 
-/**
- *
- * @param {number} nIndex
- * @returns {Promise<number>}
- */
-async function getSystemMetrics(nIndex) {
+async function getSystemMetrics(nIndex: number): Promise<number> {
   return await getUser32().GetSystemMetrics(nIndex);
 }
 
-const isLeftMouseButtonSwapped = _.memoize(async function isLeftMouseButtonSwapped() {
+const isLeftMouseButtonSwapped = _.memoize(async function isLeftMouseButtonSwapped(): Promise<boolean> {
   return Boolean(await getSystemMetrics(SM_SWAPBUTTON));
 });
 
-/**
- * Transforms given mouse button parameters into an appropriate
- * input structure
- *
- * @param {MouseButtonOptions} opts
- * @returns {Promise<INPUT>} The resulting input structure
- * @throws {Error} If the input data is invalid
- */
-export async function toMouseButtonInput({button, action}) {
+/** Builds a mouse button SendInput structure (click, press, or release). */
+export async function toMouseButtonInput({
+  button,
+  action,
+}: MouseButtonOptions): Promise<MouseInput> {
   // If the host is configured to swap left & right buttons, inject swapped
   // events to un-do that re-mapping.
   if (await isLeftMouseButtonSwapped()) {
@@ -255,9 +287,9 @@ export async function toMouseButtonInput({button, action}) {
     }
   }
 
-  let evtDown;
-  let evtUp;
-  let mouseData;
+  let evtDown: number;
+  let evtUp: number;
+  let mouseData: number | undefined;
   switch (_.toLower(button)) {
     case MOUSE_BUTTON.LEFT:
       [evtDown, evtUp] = [MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP];
@@ -282,7 +314,7 @@ export async function toMouseButtonInput({button, action}) {
       );
   }
 
-  let dwFlags;
+  let dwFlags: number;
   switch (_.toLower(action)) {
     case MOUSE_BUTTON_ACTION.UP:
       dwFlags = evtUp;
@@ -307,25 +339,15 @@ export async function toMouseButtonInput({button, action}) {
 }
 
 /**
- * @typedef {Object} MouseButtonOptions
- * @property {typeof MOUSE_BUTTON[keyof typeof MOUSE_BUTTON]} button The desired button name to click
- * @property {typeof MOUSE_BUTTON_ACTION[keyof typeof MOUSE_BUTTON_ACTION]} action The desired button action
- */
-
-/**
- * Transforms given mouse move parameters into an appropriate
- * input structure
+ * Transforms mouse move parameters into a SendInput structure.
  *
  * @see https://www.reddit.com/r/cpp_questions/comments/1eslzdv/difficulty_with_win32_mouse_position/
- * @param {number} x Horizontal absolute cursor position on the virtual desktop as an integer.
- * Most be provided if y is present
- * @param {number} y Vertical absolute cursor position on the virtual desktop as an integer.
- * Most be provided if x is present
- * @param {import('@appium/types').Size | null} [screenSize=null]
- * @returns {Promise<INPUT>} The resulting input structure
- * @throws {Error} If the input data is invalid
  */
-export async function toMouseMoveInput(x, y, screenSize = null) {
+export async function toMouseMoveInput(
+  x: number,
+  y: number,
+  screenSize: Size | null = null,
+): Promise<MouseInput> {
   if (!_.isInteger(x) || !_.isInteger(y)) {
     throw createInvalidArgumentError('Both move coordinates must be provided');
   }
@@ -335,8 +357,8 @@ export async function toMouseMoveInput(x, y, screenSize = null) {
     throw new Error('Cannot retrieve virtual screen dimensions via GetSystemMetrics WinAPI');
   }
   const {x: startX, y: startY} = await getVirtualScreenPosition();
-  const clampedX = clamp(/** @type {number} */ (x) - startX, 0, width);
-  const clampedY = clamp(/** @type {number} */ (y) - startY, 0, height);
+  const clampedX = clamp(x - startX, 0, width);
+  const clampedY = clamp(y - startY, 0, height);
   return createMouseInput({
     dx: (clampedX * MOUSE_MOVE_NORM) / (width - 1),
     dy: (clampedY * MOUSE_MOVE_NORM) / (height - 1),
@@ -344,19 +366,8 @@ export async function toMouseMoveInput(x, y, screenSize = null) {
   });
 }
 
-/**
- * Transforms given mouse wheel parameters into an appropriate
- * input structure
- *
- * @param {number} dx Horizontal scroll delta as an integer.
- * If provided then no vertical scroll delta must be set.
- * @param {number} dy Vertical scroll delta as an integer.
- * If provided then no horizontal scroll delta must be set.
- * @returns {INPUT | null} The resulting input structure or null
- * if no input has been generated.
- * @throws {Error} If the input data is invalid
- */
-export function toMouseWheelInput(dx, dy) {
+/** Builds a mouse wheel SendInput structure, or returns null when the delta is zero. */
+export function toMouseWheelInput(dx?: number, dy?: number): MouseInput | null {
   const hasHorizontalScroll = _.isInteger(dx);
   const hasVerticalScroll = _.isInteger(dy);
   if (!hasHorizontalScroll && !hasVerticalScroll) {
@@ -372,30 +383,24 @@ export function toMouseWheelInput(dx, dy) {
     // According to MSDN, MOUSEEVENTF_HWHELL and MOUSEEVENTF_WHEEL are both
     // required for a horizontal wheel event.
     return createMouseInput({
-      mouseData: dx * WHEEL_DELTA,
+      mouseData: (dx as number) * WHEEL_DELTA,
       dwFlags: MOUSEEVENTF_HWHEEL | MOUSEEVENTF_WHEEL,
     });
   }
   if (hasVerticalScroll && dy !== 0) {
     return createMouseInput({
-      mouseData: dy * WHEEL_DELTA,
+      mouseData: (dy as number) * WHEEL_DELTA,
       dwFlags: MOUSEEVENTF_WHEEL,
     });
   }
   return null;
 }
 
-/**
- * Transforms the given Unicode text into an array of inputs
- * ready to be used as parameters for SendInput API
- *
- * @param {string} text An arbitrary Unicode string
- * @returns {object[]} Array of key inputs
- */
-export function toUnicodeKeyInputs(text) {
+/** Expands Unicode text into key-down/key-up SendInput pairs (Unicode mode). */
+export function toUnicodeKeyInputs(text: string): KeyInput[] {
   const utf16Text = Buffer.from(text, 'ucs2');
   const charCodes = new Uint16Array(utf16Text.buffer, utf16Text.byteOffset, utf16Text.length / 2);
-  const result = [];
+  const result: ReturnType<typeof createKeyInput>[] = [];
   for (const [, charCode] of charCodes.entries()) {
     // The WM_CHAR event generated for carriage return is '\r', not '\n', and
     // some applications may check for VK_RETURN explicitly, so handle
@@ -414,29 +419,30 @@ export function toUnicodeKeyInputs(text) {
   return result;
 }
 
-/**
- * Fetches the size of the virtual screen
- *
- * @returns {Promise<import('@appium/types').Size>}
- */
-export async function getVirtualScreenSize() {
+/** Virtual monitor width/height from GetSystemMetrics. */
+export async function getVirtualScreenSize(): Promise<Size> {
   const [width, height] = await B.all(
     [SM_CXVIRTUALSCREEN, SM_CYVIRTUALSCREEN].map(getSystemMetrics),
   );
   return {width, height};
 }
 
-/**
- * Fetches the location of the virtual screen
- *
- * @returns {Promise<import('@appium/types').Position>}
- */
-export async function getVirtualScreenPosition() {
+/** Virtual monitor origin from GetSystemMetrics. */
+export async function getVirtualScreenPosition(): Promise<import('@appium/types').Position> {
   const [x, y] = await B.all([SM_XVIRTUALSCREEN, SM_YVIRTUALSCREEN].map(getSystemMetrics));
   return {x, y};
 }
 
-function createMouseInput(params = {}) {
+function createMouseInput(
+  params: Partial<{
+    dx: number;
+    dy: number;
+    mouseData: number;
+    dwFlags: number;
+    time: number;
+    dwExtraInfo: number;
+  }> = {},
+): MouseInput {
   return {
     type: INPUT_MOUSE,
     union: {
@@ -453,13 +459,6 @@ function createMouseInput(params = {}) {
   };
 }
 
-/**
- *
- * @param {number} num
- * @param {number} min
- * @param {number} max
- * @returns {number}
- */
-function clamp(num, min, max) {
+function clamp(num: number, min: number, max: number): number {
   return Math.min(Math.max(num, min), max);
 }

@@ -3,6 +3,7 @@ import {fs, tempDir} from 'appium/support';
 import {exec} from 'teen_process';
 import path from 'node:path';
 import B from 'bluebird';
+import type {WindowsDriver} from '../driver';
 
 const EXECUTION_POLICY = {
   REMOTE_SIGNED: 'RemoteSigned',
@@ -11,11 +12,12 @@ const EXECUTION_POLICY = {
 };
 const POWER_SHELL = 'powershell.exe';
 
-/**
- * @typedef {Object} ExecPowerShellOptions
- * @property {string} [script] A valid Power Shell script to execute
- * @property {string} [command] A valid Power Shell command to execute
- */
+export interface ExecPowerShellOptions {
+  /** A valid PowerShell script to execute */
+  script?: string;
+  /** A valid PowerShell command to execute */
+  command?: string;
+}
 
 /**
  * Executes the given Power Shell command or a whole script based on the
@@ -27,13 +29,13 @@ const POWER_SHELL = 'powershell.exe';
  * temporarily switch user execution policy if necessary and restore it afterwards.
  * This makes scripts slightly less performant, as single commands.
  *
- * @this {WindowsDriver}
- * @param {ExecPowerShellOptions} opts
- * @returns {Promise<string>} The actual stdout of the given command/script
- * @throws {Error} If the exit code of the given command/script is not zero.
- * The actual stderr output is set to the error message value.
+ * @returns The stdout of the given command or script
+ * @throws If the exit code of the given command or script is not zero (stderr is used as the message when present).
  */
-export async function execPowerShell(opts) {
+export async function execPowerShell(
+  this: WindowsDriver,
+  opts?: ExecPowerShellOptions,
+): Promise<string> {
   const {script, command} = opts ?? {};
   if (!script && !command) {
     throw this.log.errorWithException('Power Shell script/command must not be empty');
@@ -52,8 +54,7 @@ export async function execPowerShell(opts) {
       tmpScriptPath = path.resolve(tmpRoot, 'appium_script.ps1');
       await fs.writeFile(tmpScriptPath, script, 'utf8');
     }
-    /** @type {string[]} */
-    const psArgs = [];
+    const psArgs: string[] = [];
     if (command) {
       psArgs.push('-command', command);
     } else {
@@ -83,8 +84,9 @@ export async function execPowerShell(opts) {
     try {
       const {stdout} = await exec(POWER_SHELL, psArgs);
       return stdout;
-    } catch (e) {
-      throw new Error(e.stderr || e.message);
+    } catch (e: unknown) {
+      const err = e as {stderr?: string; message?: string};
+      throw new Error(err.stderr || err.message || String(e));
     }
   } finally {
     await B.all([
@@ -104,7 +106,3 @@ export async function execPowerShell(opts) {
     ]);
   }
 }
-
-/**
- * @typedef {import('../driver').WindowsDriver} WindowsDriver
- */

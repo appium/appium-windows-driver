@@ -13,15 +13,29 @@ import {
   toMouseWheelInput,
   getVirtualScreenSize,
   ensureDpiAwareness as _ensureDpiAwareness,
+  type MouseInput,
+  type KeyInput,
 } from './winapi/user32';
 import {errors} from 'appium/driver';
 import B from 'bluebird';
 import {util} from 'appium/support';
+import type {WindowsDriver} from '../driver';
 import {isInvalidArgumentError} from './winapi/errors';
 
 const EVENT_INJECTION_DELAY_MS = 5;
 
-function preprocessError(e) {
+type MouseButtonName = (typeof MOUSE_BUTTON)[keyof typeof MOUSE_BUTTON];
+
+/** One key action for {@link windowsKeys}; only one of `pause`, `text`, or `virtualKeyCode` should be set. */
+interface KeyAction {
+  pause?: number;
+  text?: string;
+  virtualKeyCode?: number;
+  /** With `virtualKeyCode`, set to depress (`true`) or release (`false`) instead of a full keypress. */
+  down?: boolean;
+}
+
+function preprocessError(e: unknown): unknown {
   if (!isInvalidArgumentError(e)) {
     return e;
   }
@@ -31,28 +45,35 @@ function preprocessError(e) {
   return err;
 }
 
-function modifierKeysToInputs(modifierKeys) {
+function modifierKeysToInputs(this: WindowsDriver, modifierKeys?: string | string[]) {
   if (_.isEmpty(modifierKeys)) {
-    return [[], []];
+    return [[], []] as [KeyInput[], KeyInput[]];
   }
 
-  const modifierKeyDownInputs = [];
-  const modifierKeyUpInputs = [];
-  let parsedDownInputs;
+  const modifierKeyDownInputs: KeyInput[] = [];
+  const modifierKeyUpInputs: KeyInput[] = [];
+  const keys = modifierKeys as string | string[];
+  let parsedDownInputs: KeyInput[];
   try {
-    parsedDownInputs = toModifierInputs(modifierKeys, KEY_ACTION.DOWN);
+    parsedDownInputs = toModifierInputs(keys, KEY_ACTION.DOWN);
   } catch (e) {
     throw preprocessError(e);
   }
   this.log.debug(`Parsed ${util.pluralize('modifier key input', parsedDownInputs.length, true)}`);
   modifierKeyDownInputs.push(...parsedDownInputs);
   // depressing keys in the reversed order
-  modifierKeyUpInputs.push(...toModifierInputs(modifierKeys, KEY_ACTION.UP));
+  modifierKeyUpInputs.push(...toModifierInputs(keys, KEY_ACTION.UP));
   _.reverse(modifierKeyUpInputs);
   return [modifierKeyDownInputs, modifierKeyUpInputs];
 }
 
-async function toAbsoluteCoordinates(elementId, x, y, msgPrefix = '') {
+async function toAbsoluteCoordinates(
+  this: WindowsDriver,
+  elementId?: string,
+  x?: number,
+  y?: number,
+  msgPrefix = '',
+): Promise<[number, number]> {
   const hasX = _.isInteger(x);
   const hasY = _.isInteger(y);
   if (msgPrefix) {
@@ -72,7 +93,7 @@ async function toAbsoluteCoordinates(elementId, x, y, msgPrefix = '') {
       );
     }
     this.log.debug(`${msgPrefix}Absolute coordinates: (${x}, ${y})`);
-    return [x, y];
+    return [x as number, y as number];
   }
 
   if ((hasX && !hasY) || (!hasX && hasY)) {
@@ -100,10 +121,10 @@ async function toAbsoluteCoordinates(elementId, x, y, msgPrefix = '') {
     absoluteY += top;
   }
   this.log.debug(`${msgPrefix}Absolute coordinates: (${absoluteX}, ${absoluteY})`);
-  return [absoluteX, absoluteY];
+  return [absoluteX as number, absoluteY as number];
 }
 
-function isKeyDown(action) {
+function isKeyDown(action: string): boolean {
   switch (_.toLower(action)) {
     case KEY_ACTION.UP:
       return false;
@@ -116,16 +137,11 @@ function isKeyDown(action) {
   }
 }
 
-/**
- * Transforms the provided key modifiers array into the sequence
- * of functional key inputs.
- *
- * @param {string[]|string} modifierKeys Array of key modifiers or a single key name
- * @param {'down' | 'up'} action Either 'down' to depress the key or 'up' to release it
- * @returns {any[]} Array of inputs or an empty array if no inputs were parsed.
- */
-function toModifierInputs(modifierKeys, action) {
-  const events = [];
+function toModifierInputs(
+  modifierKeys: string | string[],
+  action: string,
+): KeyInput[] {
+  const events: Array<{virtualKeyCode: number; action: string}> = [];
   const usedKeys = new Set();
   for (const keyName of _.isArray(modifierKeys) ? modifierKeys : [modifierKeys]) {
     const lowerKeyName = _.toLower(keyName);
@@ -155,50 +171,50 @@ const KEY_ACTION_PROPERTIES = ['pause', 'text', 'virtualKeyCode'];
 /**
  * Performs single click mouse gesture.
  *
- * @this {WindowsDriver}
- * @param {string} [elementId] Hexadecimal identifier of the element to click on.
+ * @param elementId Hexadecimal identifier of the element to click on.
  * If this parameter is missing then given coordinates will be parsed as absolute ones.
  * Otherwise they are parsed as relative to the top left corner of this element.
- * @param {number} [x] Integer horizontal coordinate of the click point. Both x and y coordinates
+ * @param x Integer horizontal coordinate of the click point. Both x and y coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {number} [y] Integer vertical coordinate of the click point. Both x and y coordinates
+ * @param y Integer vertical coordinate of the click point. Both x and y coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {'left' | 'middle' | 'right' | 'back' | 'forward'} [button=left] Name of
+ * @param button Name of
  * the mouse button to be clicked. An exception is thrown if an unknown button name
  * is provided.
- * @param {string[]|string} [modifierKeys] List of possible keys or a single key name to
+ * @param modifierKeys List of possible keys or a single key name to
  * depress while the click is being performed. Supported key names are: Shift, Ctrl, Alt, Win.
  * For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of
  * ['ctrl', 'alt']
- * @param {number} [durationMs] The number of milliseconds to wait between pressing
+ * @param durationMs The number of milliseconds to wait between pressing
  * and releasing the mouse button. By default no delay is applied, which simulates a
  * regular click.
- * @param {number} [times=1] How many times the click must be performed.
- * @param {number} [interClickDelayMs=100] Duration od the pause between each
+ * @param times How many times the click must be performed.
+ * @param interClickDelayMs Duration od the pause between each
  * click gesture. Only makes sense if `times` is greater than one.
- * @throws {Error} If given options are not acceptable or the gesture has failed.
+ * @throws If given options are not acceptable or the gesture has failed.
  */
 export async function windowsClick(
-  elementId,
-  x,
-  y,
-  button = MOUSE_BUTTON.LEFT,
-  modifierKeys,
-  durationMs,
+  this: WindowsDriver,
+  elementId?: string,
+  x?: number,
+  y?: number,
+  button: MouseButtonName = MOUSE_BUTTON.LEFT,
+  modifierKeys?: string | string[],
+  durationMs?: number,
   times = 1,
   interClickDelayMs = 100,
-) {
+): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
   const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys);
-  const [absoluteX, absoluteY] = await toAbsoluteCoordinates.bind(this)(elementId, x, y);
-  let clickDownInput;
-  let clickUpInput;
-  let clickInput;
-  let moveInput;
+    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
+  const [absoluteX, absoluteY] = await toAbsoluteCoordinates.bind(this)(elementId, x, y) as [number, number];
+  let clickDownInput: MouseInput;
+  let clickUpInput: MouseInput;
+  let clickInput: MouseInput;
+  let moveInput: MouseInput;
   try {
     [clickDownInput, clickUpInput, clickInput, moveInput] = await B.all([
       toMouseButtonInput({button, action: MOUSE_BUTTON_ACTION.DOWN}),
@@ -215,12 +231,12 @@ export async function windowsClick(
       await handleInputs(modifierKeyDownInputs);
     }
     await handleInputs(moveInput);
-    const hasDuration = _.isInteger(durationMs) && /** @type {number} */ (durationMs) > 0;
+    const hasDuration = _.isInteger(durationMs) && (durationMs as number) > 0;
     const hasInterClickDelay = _.isInteger(interClickDelayMs) && interClickDelayMs > 0;
     for (let i = 0; i < times; ++i) {
       if (hasDuration) {
         await handleInputs(clickDownInput);
-        await B.delay(/** @type {number} */ (durationMs));
+        await B.delay(durationMs as number);
         await handleInputs(clickUpInput);
       } else {
         await handleInputs(clickInput);
@@ -239,37 +255,44 @@ export async function windowsClick(
 /**
  * Performs horizontal or vertical scrolling with mouse wheel.
  *
- * @this {WindowsDriver}
- * @param {string} [elementId] Hexadecimal identifier of the element to scroll.
+ * @param elementId Hexadecimal identifier of the element to scroll.
  * If this parameter is missing then given coordinates will be parsed as absolute ones.
  * Otherwise they are parsed as relative to the top left corner of this element.
- * @param {number} [x] Integer horizontal coordinate of the scroll point. Both x and y coordinates
+ * @param x Integer horizontal coordinate of the scroll point. Both x and y coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {number} [y] Integer vertical coordinate of the scroll point. Both x and y coordinates
+ * @param y Integer vertical coordinate of the scroll point. Both x and y coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {number} [deltaX] Integer horizontal scroll delta. Either this value
+ * @param deltaX Integer horizontal scroll delta. Either this value
  * or deltaY must be provided, but not both.
- * @param {number} [deltaY] Integer vertical scroll delta. Either this value
+ * @param deltaY Integer vertical scroll delta. Either this value
  * or deltaX must be provided, but not both.
- * @param {string[]|string} [modifierKeys] List of possible keys or a single key name to
+ * @param modifierKeys List of possible keys or a single key name to
  * depress while the scroll is being performed. Supported key names are: Shift, Ctrl, Alt, Win.
  * For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of
  * ['ctrl', 'alt']
- * @throws {Error} If given options are not acceptable or the gesture has failed.
+ * @throws If given options are not acceptable or the gesture has failed.
  */
-export async function windowsScroll(elementId, x, y, deltaX, deltaY, modifierKeys) {
+export async function windowsScroll(
+  this: WindowsDriver,
+  elementId?: string,
+  x?: number,
+  y?: number,
+  deltaX?: number,
+  deltaY?: number,
+  modifierKeys?: string | string[],
+): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
   const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys);
-  const [absoluteX, absoluteY] = await toAbsoluteCoordinates.bind(this)(elementId, x, y);
-  let moveInput;
-  let scrollInput;
+    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
+  const [absoluteX, absoluteY] = await toAbsoluteCoordinates.bind(this)(elementId, x, y) as [number, number];
+  let moveInput: MouseInput;
+  let scrollInput: MouseInput | null;
   try {
     moveInput = await toMouseMoveInput(absoluteX, absoluteY);
-    scrollInput = toMouseWheelInput(/** @type {number} */ (deltaX), /** @type {number} */ (deltaY));
+    scrollInput = toMouseWheelInput(deltaX, deltaY);
   } catch (e) {
     throw preprocessError(e);
   }
@@ -296,56 +319,56 @@ export async function windowsScroll(elementId, x, y, deltaX, deltaY, modifierKey
 /**
  * Performs drag and drop mouse gesture.
  *
- * @this {WindowsDriver}
- * @param {string} [startElementId] Hexadecimal identifier of the element to start the drag from.
+ * @param startElementId Hexadecimal identifier of the element to start the drag from.
  * If this parameter is missing then given coordinates will be parsed as absolute ones.
  * Otherwise they are parsed as relative to the top left corner of this element.
- * @param {number} [startX] Integer horizontal coordinate of the drag start point. Both startX
+ * @param startX Integer horizontal coordinate of the drag start point. Both startX
  * and startY coordinates must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {number} [startY] Integer vertical coordinate of the drag start point. Both startX and
+ * @param startY Integer vertical coordinate of the drag start point. Both startX and
  * startY coordinates must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {string} [endElementId] Hexadecimal identifier of the element to end the drag on.
+ * @param endElementId Hexadecimal identifier of the element to end the drag on.
  * If this parameter is missing then given coordinates will be parsed as absolute ones.
  * Otherwise they are parsed as relative to the top left corner of this element.
- * @param {number} [endX] Integer horizontal coordinate of the drag end point. Both endX and endY coordinates
+ * @param endX Integer horizontal coordinate of the drag end point. Both endX and endY coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {number} [endY] Integer vertical coordinate of the drag end point. Both endX and endY coordinates
+ * @param endY Integer vertical coordinate of the drag end point. Both endX and endY coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {string[]|string} [modifierKeys] List of possible keys or a single key name to
+ * @param modifierKeys List of possible keys or a single key name to
  * depress while the drag is being performed. Supported key names are: Shift, Ctrl, Alt, Win.
  * For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of
  * ['ctrl', 'alt']
- * @param {number} [durationMs=5000] The number of milliseconds to wait between pressing
+ * @param durationMs The number of milliseconds to wait between pressing
  * the left mouse button and moving the cursor to the ending drag point.
- * @throws {Error} If given options are not acceptable or the gesture has failed.
+ * @throws If given options are not acceptable or the gesture has failed.
  */
 export async function windowsClickAndDrag(
-  startElementId,
-  startX,
-  startY,
-  endElementId,
-  endX,
-  endY,
-  modifierKeys,
+  this: WindowsDriver,
+  startElementId?: string,
+  startX?: number,
+  startY?: number,
+  endElementId?: string,
+  endX?: number,
+  endY?: number,
+  modifierKeys?: string | string[],
   durationMs = 5000,
-) {
+): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
   const screenSize = await getVirtualScreenSize();
   const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys);
+    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
   const [[startAbsoluteX, startAbsoluteY], [endAbsoluteX, endAbsoluteY]] = await B.all([
-    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting drag point'),
-    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending drag point'),
+    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting drag point') as Promise<[number, number]>,
+    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending drag point') as Promise<[number, number]>,
   ]);
-  let clickDownInput;
-  let clickUpInput;
-  let moveStartInput;
-  let moveEndInput;
+  let clickDownInput: MouseInput;
+  let clickUpInput: MouseInput;
+  let moveStartInput: MouseInput;
+  let moveEndInput: MouseInput;
   try {
     [moveStartInput, clickDownInput, moveEndInput, clickUpInput] = await B.all([
       toMouseMoveInput(startAbsoluteX, startAbsoluteY, screenSize),
@@ -379,55 +402,55 @@ export async function windowsClickAndDrag(
 /**
  * Performs hover mouse gesture.
  *
- * @this {WindowsDriver}
- * @param {string} [startElementId] Hexadecimal identifier of the element to start the hover from.
+ * @param startElementId Hexadecimal identifier of the element to start the hover from.
  * If this parameter is missing then given coordinates will be parsed as absolute ones.
  * Otherwise they are parsed as relative to the top left corner of this element.
- * @param {number} [startX] Integer horizontal coordinate of the hover start point. Both startX
+ * @param startX Integer horizontal coordinate of the hover start point. Both startX
  * and startY coordinates must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {number} [startY] Integer vertical coordinate of the hover start point. Both startX and
+ * @param startY Integer vertical coordinate of the hover start point. Both startX and
  * startY coordinates must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {string} [endElementId] Hexadecimal identifier of the element to end the hover on.
+ * @param endElementId Hexadecimal identifier of the element to end the hover on.
  * If this parameter is missing then given coordinates will be parsed as absolute ones.
  * Otherwise they are parsed as relative to the top left corner of this element.
- * @param {number} [endX] Integer horizontal coordinate of the hover end point. Both endX and endY coordinates
+ * @param endX Integer horizontal coordinate of the hover end point. Both endX and endY coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {number} [endY] Integer vertical coordinate of the hover end point. Both endX and endY coordinates
+ * @param endY Integer vertical coordinate of the hover end point. Both endX and endY coordinates
  * must be provided or none of them if elementId is present. In such case the gesture
  * will be performed at the center point of the given element.
- * @param {string[]|string} [modifierKeys] List of possible keys or a single key name to
+ * @param modifierKeys List of possible keys or a single key name to
  * depress while the hover is being performed. Supported key names are: Shift, Ctrl, Alt, Win.
  * For example, in order to keep Ctrl+Alt depressed while hovering, provide the value of
  * ['ctrl', 'alt']
- * @param {number} [durationMs=500] The number of milliseconds between
+ * @param durationMs The number of milliseconds between
  * moving the cursor from the starting to the ending hover point.
- * @throws {Error} If given options are not acceptable or the gesture has failed.
+ * @throws If given options are not acceptable or the gesture has failed.
  */
 export async function windowsHover(
-  startElementId,
-  startX,
-  startY,
-  endElementId,
-  endX,
-  endY,
-  modifierKeys,
+  this: WindowsDriver,
+  startElementId?: string,
+  startX?: number,
+  startY?: number,
+  endElementId?: string,
+  endX?: number,
+  endY?: number,
+  modifierKeys?: string | string[],
   durationMs = 500,
-) {
+): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
   const screenSize = await getVirtualScreenSize();
   const [modifierKeyDownInputs, modifierKeyUpInputs] =
-    modifierKeysToInputs.bind(this)(modifierKeys);
+    modifierKeysToInputs.bind(this)(modifierKeys) as [KeyInput[], KeyInput[]];
   const [[startAbsoluteX, startAbsoluteY], [endAbsoluteX, endAbsoluteY]] = await B.all([
-    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting hover point'),
-    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending hover point'),
+    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting hover point') as Promise<[number, number]>,
+    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending hover point') as Promise<[number, number]>,
   ]);
   const stepsCount = Math.max(Math.trunc(durationMs / EVENT_INJECTION_DELAY_MS), 1);
-  const inputPromises = [];
-  const inputPromisesChunk = [];
+  const inputPromises: Array<B<MouseInput>> = [];
+  const inputPromisesChunk: Array<B<MouseInput>> = [];
   const maxChunkSize = 10;
   for (let step = 0; step <= stepsCount; ++step) {
     const promise = B.resolve(
@@ -445,7 +468,7 @@ export async function windowsHover(
       _.remove(inputPromisesChunk, (p) => p.isFulfilled());
     }
   }
-  let inputs;
+  let inputs: MouseInput[];
   try {
     inputs = await B.all(inputPromises);
   } catch (e) {
@@ -472,11 +495,13 @@ export async function windowsHover(
 /**
  * Performs customized keyboard input.
  *
- * @this {WindowsDriver}
- * @param {KeyAction[] | KeyAction} actions One or more key actions.
- * @throws {Error} If given options are not acceptable or the gesture has failed.
+ * @param actions - One or more key actions.
+ * @throws If given options are not acceptable or the gesture has failed.
  */
-export async function windowsKeys(actions) {
+export async function windowsKeys(
+  this: WindowsDriver,
+  actions: KeyAction | KeyAction[],
+): Promise<void> {
   const parsedItems = parseKeyActions(_.isArray(actions) ? actions : [actions]);
   this.log.debug(`Parsed ${util.pluralize('key action', parsedItems.length, true)}`);
   for (const item of parsedItems) {
@@ -488,12 +513,10 @@ export async function windowsKeys(actions) {
   }
 }
 
-/**
- * @param {KeyAction} action
- * @param {number} index
- * @returns {any[] | number}
- */
-function parseKeyAction(action, index) {
+function parseKeyAction(
+  action: KeyAction,
+  index: number,
+): number | KeyInput[] {
   const hasPause = _.has(action, 'pause');
   const hasText = _.has(action, 'text');
   const hasVirtualKeyCode = _.has(action, 'virtualKeyCode');
@@ -512,7 +535,7 @@ function parseKeyAction(action, index) {
   const {pause, text, virtualKeyCode, down} = action;
 
   if (hasPause) {
-    const durationMs = pause;
+    const durationMs = pause as number;
     if (!_.isInteger(durationMs) || durationMs < 0) {
       throw new errors.InvalidArgumentError(
         `${actionPrefix}Pause value must be a valid positive integer number of milliseconds`,
@@ -558,37 +581,18 @@ function parseKeyAction(action, index) {
   ];
 }
 
-/**
- * @typedef {Object} KeyAction
- * @property {number} pause Allows to set a delay in milliseconds between key input series.
- * Either this property or `text` or `virtualKeyCode` must be provided.
- * @property {string} text Non-empty string of Unicode text to type.
- * Either this property or `pause` or `virtualKeyCode` must be provided.
- * @property {number} virtualKeyCode Valid virtual key code. The list of supported key codes
- * is available at https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
- * Either this property or `pause` or `text` must be provided.
- * @property {boolean?} down [undefined] This property only makes sense in combination with `virtualKeyCode`.
- * If set to `true` then the corresponding key will be depressed, `false` - released. By default
- * the key is just pressed once.
- * ! Do not forget to release depressed keys in your automated tests.
- */
-
-/**
- * @param {KeyAction[]} actions
- * @returns {any[]}
- */
-function parseKeyActions(actions) {
+function parseKeyActions(actions: KeyAction[]): Array<number | KeyInput[]> {
   if (_.isEmpty(actions)) {
     throw new errors.InvalidArgumentError('Key actions must not be empty');
   }
 
-  const combinedArray = [];
+  const combinedArray: Array<number | KeyInput[]> = [];
   const allActions = actions.map(parseKeyAction);
   for (let i = 0; i < allActions.length; ++i) {
     const item = allActions[i];
-    if (_.isArray(item) && combinedArray.length > 0 && _.isArray(_.last(combinedArray))) {
-      // @ts-ignore TS does not understand the validation above
-      _.last(combinedArray).push(...item);
+    const last = _.last(combinedArray);
+    if (_.isArray(item) && combinedArray.length > 0 && last !== undefined && _.isArray(last)) {
+      last.push(...item);
     } else {
       combinedArray.push(item);
     }
@@ -598,11 +602,7 @@ function parseKeyActions(actions) {
   return combinedArray;
 }
 
-/**
- * @this {WindowsDriver}
- * @returns {Promise<void>}
- */
-async function ensureDpiAwareness() {
+async function ensureDpiAwareness(this: WindowsDriver): Promise<void> {
   if (!(await _ensureDpiAwareness())) {
     this.log.info(
       `The call to SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) API has failed. ` +
@@ -610,7 +610,3 @@ async function ensureDpiAwareness() {
     );
   }
 }
-
-/**
- * @typedef {import('../driver').WindowsDriver} WindowsDriver
- */

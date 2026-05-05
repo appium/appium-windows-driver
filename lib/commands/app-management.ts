@@ -1,5 +1,7 @@
 // https://github.com/microsoft/WinAppDriver/blob/master/Docs/SupportedAPIs.md
 
+import type {WindowsDriver} from '../driver';
+
 /**
  * (Re)launch app under test in the same session using the same capabilities configuration.
  * Generally this API would create a new app window and point the current active session to it,
@@ -9,10 +11,8 @@
  * for more examples.
  * It is possible to open another window of the same app and then switch between
  * windows using https://www.selenium.dev/documentation/webdriver/interactions/windows/ API
- *
- * @this {WindowsDriver}
  */
-export async function windowsLaunchApp() {
+export async function windowsLaunchApp(this: WindowsDriver): Promise<unknown> {
   return await this.winAppDriver.sendCommand('/appium/app/launch', 'POST', {});
 }
 
@@ -25,13 +25,8 @@ export async function windowsLaunchApp() {
  * After the current app window is closed it is required to use the above API to switch to another
  * active window if there is any; this API does not perform the switch automatically.
  *
- * @this {WindowsDriver}
- * @throws {Error} if the app process is not running
+ * @throws If the app process is not running
  */
-export async function windowsCloseApp() {
+export async function windowsCloseApp(this: WindowsDriver): Promise<unknown> {
   return await this.winAppDriver.sendCommand('/appium/app/close', 'POST', {});
 }
-
-/**
- * @typedef {import('../driver').WindowsDriver} WindowsDriver
- */

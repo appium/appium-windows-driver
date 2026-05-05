@@ -1,29 +1,28 @@
 import {exec} from 'teen_process';
 import {errors} from 'appium/driver';
 import _ from 'lodash';
+import type {WindowsDriver} from '../driver';
+import type {TeenProcessExecResult} from 'teen_process';
 
-/**
- * @typedef {'plaintext' | 'image'} ContentTypeEnum
- */
-
-/**
- * @type { Record<ContentTypeEnum, ContentTypeEnum>}
- */
 const CONTENT_TYPE = Object.freeze({
   plaintext: 'plaintext',
   image: 'image',
 });
+type ContentTypeEnum = (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE];
 
 // https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-clipboard?view=powershell-7.3
 
 /**
  * Sets the Windows clipboard to the given string or PNG-image.
  *
- * @this {WindowsDriver}
- * @param {string} b64Content base64-encoded clipboard content to set
- * @param {ContentTypeEnum} [contentType='text'] The clipboard content type to set
+ * @param b64Content - Base64-encoded clipboard content to set
+ * @param contentType - Clipboard content type to set (default plain text)
  */
-export async function windowsSetClipboard(b64Content, contentType = CONTENT_TYPE.plaintext) {
+export async function windowsSetClipboard(
+  this: WindowsDriver,
+  b64Content: string,
+  contentType: ContentTypeEnum = CONTENT_TYPE.plaintext,
+): Promise<TeenProcessExecResult<string>> {
   if (b64Content && Buffer.from(b64Content, 'base64').toString('base64') !== b64Content) {
     throw new errors.InvalidArgumentError(
       `The 'b64Content' argument must be a valid base64-encoded string`,
@@ -54,14 +53,14 @@ export async function windowsSetClipboard(b64Content, contentType = CONTENT_TYPE
 // https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-clipboard?view=powershell-7.3
 
 /**
- * Returns the Windows clipboard content as base64-encoded string.
+ * Returns the Windows clipboard content as a base64-encoded string.
  *
- * @this {WindowsDriver}
- * @property {ContentTypeEnum} [contentType='plaintext'] The clipboard content type to get.
- * Only PNG images are supported for extraction if set to 'image'.
- * @returns {Promise<string>} base64-encoded content of the clipboard
+ * @param contentType - Clipboard content type to read (only PNG is supported for `image`)
  */
-export async function windowsGetClipboard(contentType = CONTENT_TYPE.plaintext) {
+export async function windowsGetClipboard(
+  this: WindowsDriver,
+  contentType: ContentTypeEnum = CONTENT_TYPE.plaintext,
+): Promise<string> {
   switch (contentType) {
     case CONTENT_TYPE.plaintext: {
       const {stdout} = await exec('powershell', [
@@ -87,7 +86,3 @@ export async function windowsGetClipboard(contentType = CONTENT_TYPE.plaintext) 
       );
   }
 }
-
-/**
- * @typedef {import('../driver').WindowsDriver} WindowsDriver
- */

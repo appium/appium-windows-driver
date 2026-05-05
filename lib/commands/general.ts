@@ -1,22 +1,16 @@
 import _ from 'lodash';
+import type {Position, Rect, Size} from '@appium/types';
 import {util} from 'appium/support';
-
-/**
- * @typedef {Object} Size
- * @property {number} width
- * @property {number} height
- */
+import type {WindowsDriver} from '../driver';
 
 // The next two commands are required
 // for proper `-image` locator functionality
-/**
- * @this {WindowsDriver}
- * @returns {Promise<Size>}
- */
-export async function getWindowSize() {
+
+/** Window size from WAD, or primary screen size via PowerShell if WAD omits it. */
+export async function getWindowSize(this: WindowsDriver): Promise<Size> {
   const size = await this.winAppDriver.sendCommand('/window/size', 'GET');
   if (_.isPlainObject(size)) {
-    return /** @type {Size} */ (size);
+    return size as Size;
   }
   // workaround for https://github.com/microsoft/WinAppDriver/issues/1104
   this.log.info('Cannot retrieve window size from WinAppDriver');
@@ -25,36 +19,34 @@ export async function getWindowSize() {
 }
 
 // a workaround for https://github.com/appium/appium/issues/15923
-/**
- * @this {WindowsDriver}
- * @returns {Promise<import('@appium/types').Rect>}
- */
-export async function getWindowRect() {
+
+/** Window bounding rect (position may default to zero if WAD cannot provide it). */
+export async function getWindowRect(this: WindowsDriver): Promise<Rect> {
   const {width, height} = await getWindowSize.bind(this)();
   let [x, y] = [0, 0];
   try {
     const handle = await this.winAppDriver.sendCommand('/window_handle', 'GET');
-    ({x, y} = /** @type {import('@appium/types').Position} */ (
-      await this.winAppDriver.sendCommand(`/window/${handle}/position`, 'GET')
-    ));
-  } catch (e) {
-    this.log.warn(
-      `Cannot fetch the window position. Defaulting to zeroes. Original error: ${e.message}`,
-    );
+    ({x, y} = (await this.winAppDriver.sendCommand(
+      `/window/${handle}/position`,
+      'GET',
+    )) as Position);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    this.log.warn(`Cannot fetch the window position. Defaulting to zeroes. Original error: ${msg}`);
   }
   return {x, y, width, height};
 }
 
 // a workaround for https://github.com/appium/appium/issues/15923
-/**
- * @this {WindowsDriver}
- * @param {number} x
- * @param {number} y
- * @param {number} width
- * @param {number} height
- * @returns {Promise<import('@appium/types').Rect>}
- */
-export async function setWindowRect(x, y, width, height) {
+
+/** Sets window size and/or position when the corresponding arguments are provided. */
+export async function setWindowRect(
+  this: WindowsDriver,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): Promise<Rect> {
   let didProcess = false;
   if (!_.isNil(width) && !_.isNil(height)) {
     await this.winAppDriver.sendCommand('/window/size', 'POST', {width, height});
@@ -71,40 +63,31 @@ export async function setWindowRect(x, y, width, height) {
   return {x, y, width, height};
 }
 
-/**
- * @this {WindowsDriver}
- * @returns {Promise<string>}
- */
-export async function getScreenshot() {
+/** Screenshot as base64 PNG (normalized to RFC 4648 padding). */
+export async function getScreenshot(this: WindowsDriver): Promise<string> {
   // TODO: This trick ensures the resulting data is encoded according to RFC4648 standard
   // TODO: remove it as soon as WAD returns the screenshot data being properly encoded
   const originalPayload = await this.winAppDriver.sendCommand('/screenshot', 'GET');
-  return Buffer.from(/** @type {string} */ (originalPayload), 'base64').toString('base64');
+  return Buffer.from(originalPayload as string, 'base64').toString('base64');
 }
 
 // a workaround for https://github.com/appium/appium/issues/16316
-/**
- *
- * @this {WindowsDriver}
- * @param {string} el
- * @returns {Promise<import('@appium/types').Rect>}
- */
-export async function getElementRect(el) {
+
+/** Element bounding rect from separate WAD location and size calls. */
+export async function getElementRect(this: WindowsDriver, el: string): Promise<Rect> {
   const elId = util.unwrapElement(el);
-  const {x, y} = /** @type {import('@appium/types').Position} */ (
-    await this.winAppDriver.sendCommand(`/element/${elId}/location`, 'GET')
-  );
-  const {width, height} = /** @type {import('@appium/types').Size} */ (
-    await this.winAppDriver.sendCommand(`/element/${elId}/size`, 'GET')
-  );
+  const {x, y} = (await this.winAppDriver.sendCommand(
+    `/element/${elId}/location`,
+    'GET',
+  )) as Position;
+  const {width, height} = (await this.winAppDriver.sendCommand(
+    `/element/${elId}/size`,
+    'GET',
+  )) as Size;
   return {x, y, width, height};
 }
 
-/**
- * @this {WindowsDriver}
- * @returns {Promise<Size>}
- */
-async function getScreenSize() {
+async function getScreenSize(this: WindowsDriver): Promise<Size> {
   const dimensions = await this.execPowerShell({
     command:
       'Add-Type -AssemblyName System.Windows.Forms;[System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Size',
@@ -119,7 +102,3 @@ async function getScreenSize() {
     height: parseInt(match[3], 10),
   };
 }
-
-/**
- * @typedef {import('../driver').WindowsDriver} WindowsDriver
- */

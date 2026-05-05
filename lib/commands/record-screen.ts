@@ -3,6 +3,8 @@ import {waitForCondition} from 'asyncbox';
 import {util, fs, net, system, tempDir} from 'appium/support';
 import {SubProcess} from 'teen_process';
 import B from 'bluebird';
+import type {AppiumLogger} from '@appium/types';
+import type {WindowsDriver} from '../driver';
 
 const RETRY_PAUSE = 300;
 const RETRY_TIMEOUT = 5000;
@@ -13,13 +15,54 @@ const FFMPEG_BINARY = `ffmpeg${system.isWindows() ? '.exe' : ''}`;
 const DEFAULT_FPS = 15;
 const DEFAULT_PRESET = 'veryfast';
 
+export interface StartRecordingOptions {
+  videoFilter?: string;
+  fps?: number | string;
+  preset?: string;
+  captureCursor?: boolean;
+  captureClicks?: boolean;
+  audioInput?: string;
+  timeLimit?: string | number;
+  forceRestart?: boolean;
+}
+
+export interface StopRecordingOptions {
+  remotePath?: string;
+  user?: string;
+  pass?: string;
+  method?: string;
+  headers?: Record<string, string>;
+  fileFieldName?: string;
+  formFields?: Array<Record<string, string>> | [string, string][];
+}
+
+interface ScreenRecorderOptions {
+  fps?: number;
+  audioInput?: string;
+  captureCursor?: boolean;
+  captureClicks?: boolean;
+  preset?: string;
+  videoFilter?: string;
+  timeLimit?: number;
+}
+
+interface UploadOptions extends StopRecordingOptions {
+  auth?: {user: string; pass: string};
+}
+
 export class ScreenRecorder {
-  /**
-   * @param {string} videoPath
-   * @param {import('@appium/types').AppiumLogger} log
-   * @param {import('@appium/types').StringRecord} opts
-   */
-  constructor(videoPath, log, opts = {}) {
+  private readonly log: AppiumLogger;
+  private readonly _videoPath: string;
+  private _process: SubProcess | null;
+  private readonly _fps: number;
+  private readonly _audioInput?: string;
+  private readonly _captureCursor?: boolean;
+  private readonly _captureClicks?: boolean;
+  private readonly _preset: string;
+  private readonly _videoFilter?: string;
+  private readonly _timeLimit: number;
+
+  constructor(videoPath: string, log: AppiumLogger, opts: ScreenRecorderOptions = {}) {
     this.log = log;
     this._videoPath = videoPath;
     this._process = null;
@@ -32,7 +75,7 @@ export class ScreenRecorder {
     this._timeLimit = opts.timeLimit && opts.timeLimit > 0 ? opts.timeLimit : DEFAULT_TIME_LIMIT;
   }
 
-  async getVideoPath() {
+  async getVideoPath(): Promise<string> {
     return (await fs.exists(this._videoPath)) ? this._videoPath : '';
   }
 
@@ -139,7 +182,7 @@ export class ScreenRecorder {
     );
   }
 
-  async stop(force = false) {
+  async stop(force = false): Promise<string> {
     if (force) {
       return await this._enforceTermination();
     }
@@ -149,7 +192,7 @@ export class ScreenRecorder {
       return await this.getVideoPath();
     }
 
-    return new B((resolve, reject) => {
+    return new B<string>((resolve, reject) => {
       const timer = setTimeout(async () => {
         await this._enforceTermination();
         reject(
@@ -173,55 +216,35 @@ export class ScreenRecorder {
 }
 
 /**
- * Record the display in background while the automated test is running.
- * This method requires FFMPEG (https://www.ffmpeg.org/download.html) to be installed
- * and present in PATH.
- * The resulting video uses H264 codec and is ready to be played by media players built-in into web browsers.
+ * Records the desktop in the background while the automated test runs.
  *
- * @this {WindowsDriver}
- * @param {string} [videoFilter] - The video filter spec to apply for ffmpeg.
- * See https://trac.ffmpeg.org/wiki/FilteringGuide for more details on the possible values.
- * Example: Set it to `scale=ifnot(gte(iw\,1024)\,iw\,1024):-2` in order to limit the video width
- * to 1024px. The height will be adjusted automatically to match the actual ratio.
- * @param {number|string} [fps=15] - The count of frames per second in the resulting video.
- * The greater fps it has the bigger file size is.
- * @param {string} [preset='veryfast'] - One of the supported encoding presets. Possible values are:
- * - ultrafast
- * - superfast
- * - veryfast
- * - faster
- * - fast
- * - medium
- * - slow
- * - slower
- * - veryslow
- * A preset is a collection of options that will provide a certain encoding speed to compression ratio.
- * A slower preset will provide better compression (compression is quality per filesize).
- * This means that, for example, if you target a certain file size or constant bit rate, you will achieve better
- * quality with a slower preset. Read https://trac.ffmpeg.org/wiki/Encode/H.264 for more details.
- * @param {boolean} [captureCursor=false] - Whether to capture the mouse cursor while recording
- * the screen
- * @param {boolean} [captureClicks=false] - Whether to capture mouse clicks while recording the
- * screen
- * @param {string} [audioInput] - If set then the given audio input will be used to record the computer audio
- * along with the desktop video. The list of available devices could be retrieved using
- * `ffmpeg -list_devices true -f dshow -i dummy` command.
- * @param {string|number} [timeLimit=600] - The maximum recording time, in seconds. The default
- * value is 600 seconds (10 minutes).
- * @param {boolean} [forceRestart=true] - Whether to ignore the call if a screen recording is currently running
- * (`false`) or to start a new recording immediately and terminate the existing one if running (`true`).
- * @throws {Error} If screen recording has failed to start or is not supported on the device under test.
+ * Requires [FFmpeg](https://www.ffmpeg.org/download.html) on PATH. Output is H.264 in an MP4 container suitable for
+ * typical in-browser playback.
+ *
+ * @param timeLimit The maximum recording time, in seconds. Default is 10 minutes.
+ * @param videoFilter The video filter spec to apply for ffmpeg.
+ * See the FFmpeg filtering guide for supported values.
+ * @param fps The number of frames per second in the resulting video.
+ * Higher values produce larger files.
+ * @param preset One of the supported x264 encoding presets.
+ * (For example ultrafast through veryslow; see the FFmpeg H.264 encoding guide.)
+ * @param captureCursor Whether to capture the mouse cursor while recording.
+ * @param captureClicks Whether to capture mouse clicks while recording.
+ * @param audioInput Optional DirectShow audio device name to record alongside the desktop video.
+ * @param forceRestart Whether to stop any in-progress recording before starting a new one.
+ * @throws If recording cannot be started or is unsupported on this host.
  */
 export async function windowsStartRecordingScreen(
-  timeLimit,
-  videoFilter,
-  fps,
-  preset,
-  captureCursor,
-  captureClicks,
-  audioInput,
+  this: WindowsDriver,
+  timeLimit?: string | number,
+  videoFilter?: string,
+  fps?: string | number,
+  preset?: string,
+  captureCursor?: boolean,
+  captureClicks?: boolean,
+  audioInput?: string,
   forceRestart = true,
-) {
+): Promise<void> {
   if (this._screenRecorder?.isRunning?.()) {
     this.log.debug('The screen recording is already running');
     if (!forceRestart) {
@@ -258,39 +281,35 @@ export async function windowsStartRecordingScreen(
 }
 
 /**
- * Stop recording the screen.
- * If no screen recording has been started before then the method returns an empty string.
+ * Stops the current screen recording and returns the result.
  *
- * @this {WindowsDriver}
- * @param {string} [remotePath] - The path to the remote location, where the resulting video should be uploaded.
- * The following protocols are supported: http/https, ftp.
- * Null or empty string value (the default setting) means the content of resulting
- * file should be encoded as Base64 and passed as the endpoint response value.
- * An exception will be thrown if the generated media file is too big to
- * fit into the available process memory.
- * @param {string} [user] - The name of the user for the remote authentication.
- * @param {string} [pass] - The password for the remote authentication.
- * @param {string} [method] - The http multipart upload method name. The 'PUT' one is used by default.
- * @param {Object} [headers] - Additional headers mapping for multipart http(s) uploads
- * @param {string} [fileFieldName='file'] - The name of the form field, where the file content BLOB should be stored for
- *                                            http(s) uploads
- * @param {Object[]|[string, string][]} [formFields] - Additional form fields for multipart http(s) uploads
- * @returns {Promise<string>} Base64-encoded content of the recorded media file if 'remotePath'
- * parameter is falsy or an empty string.
- * @this {import('../driver').WindowsDriver}
- * @throws {Error} If there was an error while getting the name of a media file
- * or the file content cannot be uploaded to the remote location
- * or screen recording is not supported on the device under test.
+ * When no recording was started, returns an empty string. When no remote upload URL is given, the recorded file
+ * is read into memory and returned as Base64 in the response; very large files may exhaust process memory.
+ * When a remote URL is given, the file is uploaded over HTTP(S) or FTP using the optional credentials, HTTP
+ * method, headers, multipart field name, and extra form fields.
+ *
+ * @param remotePath The path to the remote location where the resulting video should be uploaded.
+ * Supported protocols: `http/https`, `ftp`.
+ * If `remotePath` is empty, the result is returned as Base64.
+ * @param user The remote authentication username.
+ * @param pass The remote authentication password.
+ * @param method The multipart upload method (defaults to `PUT`).
+ * @param headers Additional headers mapping for multipart HTTP(S) uploads.
+ * @param fileFieldName The name of the form field holding the uploaded file content.
+ * @param formFields Additional form fields for multipart HTTP(S) uploads.
+ *
+ * @throws If the recording cannot be read, the upload fails, or recording is unsupported.
  */
 export async function windowsStopRecordingScreen(
-  remotePath,
-  user,
-  pass,
-  method,
-  headers,
-  fileFieldName,
-  formFields,
-) {
+  this: WindowsDriver,
+  remotePath?: string,
+  user?: string,
+  pass?: string,
+  method?: string,
+  headers?: Record<string, string>,
+  fileFieldName?: string,
+  formFields?: Array<Record<string, string>> | [string, string][],
+): Promise<string> {
   if (!this._screenRecorder) {
     this.log.debug('No screen recording has been started. Doing nothing');
     return '';
@@ -319,16 +338,15 @@ export async function windowsStopRecordingScreen(
 }
 
 /**
- * Record the display in background while the automated test is running.
- * This method requires FFMPEG (https://www.ffmpeg.org/download.html) to be installed
- * and present in PATH.
- * The resulting video uses H264 codec and is ready to be played by media players built-in into web browsers.
+ * W3C-style entry point for starting a screen recording; delegates to {@link windowsStartRecordingScreen}.
  *
- * @param {StartRecordingOptions} [options] - The available options.
- * @this {import('../driver').WindowsDriver}
- * @throws {Error} If screen recording has failed to start or is not supported on the device under test.
+ * @param options - Recording options (same fields as the positional `windowsStartRecordingScreen` API).
+ * @throws If recording cannot be started or is unsupported on this host.
  */
-export async function startRecordingScreen(options = {}) {
+export async function startRecordingScreen(
+  this: WindowsDriver,
+  options: StartRecordingOptions = {},
+): Promise<void> {
   const {
     timeLimit,
     videoFilter,
@@ -353,18 +371,15 @@ export async function startRecordingScreen(options = {}) {
 }
 
 /**
- * Stop recording the screen.
- * If no screen recording has been started before then the method returns an empty string.
+ * W3C-style entry point for stopping a screen recording; delegates to {@link windowsStopRecordingScreen}.
  *
- * @param {StopRecordingOptions} [options] - The available options.
- * @returns {Promise<string>} Base64-encoded content of the recorded media file if 'remotePath'
- * parameter is falsy or an empty string.
- * @this {import('../driver').WindowsDriver}
- * @throws {Error} If there was an error while getting the name of a media file
- * or the file content cannot be uploaded to the remote location
- * or screen recording is not supported on the device under test.
+ * @param options - Upload and auth options (same fields as the positional `windowsStopRecordingScreen` API).
+ * @throws If the recording cannot be read, the upload fails, or recording is unsupported.
  */
-export async function stopRecordingScreen(options = {}) {
+export async function stopRecordingScreen(
+  this: WindowsDriver,
+  options: StopRecordingOptions = {},
+): Promise<string> {
   const {remotePath, user, pass, method, headers, fileFieldName, formFields} = options;
 
   return await this.windowsStopRecordingScreen(
@@ -378,20 +393,17 @@ export async function stopRecordingScreen(options = {}) {
   );
 }
 
-/**
- *
- * @param {string} localFile
- * @param {string?} remotePath
- * @param {Object} uploadOptions
- * @returns {Promise<string>}
- */
-async function uploadRecordedMedia(localFile, remotePath = null, uploadOptions = {}) {
+async function uploadRecordedMedia(
+  localFile: string,
+  remotePath: string | null = null,
+  uploadOptions: UploadOptions = {},
+): Promise<string> {
   if (_.isEmpty(remotePath) || !remotePath) {
     return (await util.toInMemoryBase64(localFile)).toString();
   }
 
   const {user, pass, method, headers, fileFieldName, formFields} = uploadOptions;
-  const options = {
+  const options: UploadOptions = {
     method: method || 'PUT',
     headers,
     fileFieldName,
@@ -413,38 +425,3 @@ async function requireFfmpegPath() {
     );
   }
 }
-
-/**
- * @typedef {import('../driver').WindowsDriver} WindowsDriver
- */
-
-/**
- * For detailed explanations of each property,
- * please refer to the parameters of the {@linkcode windowsStartRecordingScreen} function.
- *
- * @typedef {Object} StartRecordingOptions
- *
- * @property {string} [videoFilter]
- * @property {number|string} [fps=15]
- * @property {string} [preset='veryfast']
- * @property {boolean} [captureCursor=false]
- * @property {boolean} [captureClicks=false]
- * @property {string} [audioInput]
- * @property {string|number} [timeLimit=600]
- * @property {boolean} [forceRestart=true]
- */
-
-/**
- * For detailed explanations of each property,
- * please refer to the parameters of the {@linkcode windowsStopRecordingScreen} function.
- *
- * @typedef {Object} StopRecordingOptions
- *
- * @property {string} [remotePath]
- * @property {string} [user]
- * @property {string} [pass]
- * @property {string} [method]
- * @property {Object} [headers]
- * @property {string} [fileFieldName='file']
- * @property {Object[]|[string, string][]} [formFields]
- */
