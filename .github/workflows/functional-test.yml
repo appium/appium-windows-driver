@@ -41,6 +41,43 @@ jobs:
         popd
       shell: bash
       name: Start Appium server
+    - run: |
+        $HostName = if ([string]::IsNullOrWhiteSpace($env:APPIUM_TEST_SERVER_HOST)) { '127.0.0.1' } else { $env:APPIUM_TEST_SERVER_HOST }
+        $Port = [int]$env:APPIUM_TEST_SERVER_PORT
+        $TimeoutMs = 60000
+        $IntervalMs = 1000
+
+        if ($Port -le 0 -or $Port -gt 65535) {
+          throw "Invalid port '$Port'"
+        }
+
+        $startedAt = Get-Date
+        while (((Get-Date) - $startedAt).TotalMilliseconds -lt $TimeoutMs) {
+          $client = $null
+          try {
+            $client = [System.Net.Sockets.TcpClient]::new()
+            $async = $client.BeginConnect($HostName, $Port, $null, $null)
+            if ($async.AsyncWaitHandle.WaitOne($IntervalMs) -and $client.Connected) {
+              $elapsed = [int](((Get-Date) - $startedAt).TotalMilliseconds)
+              Write-Output "Port ${HostName}:${Port} is reachable after ${elapsed}ms"
+              break
+            }
+          } catch {
+            # Keep waiting until timeout.
+          } finally {
+            if ($client) {
+              $client.Close()
+              $client.Dispose()
+            }
+          }
+          Start-Sleep -Milliseconds $IntervalMs
+        }
+
+        if (((Get-Date) - $startedAt).TotalMilliseconds -ge $TimeoutMs) {
+          throw "Timed out waiting for ${HostName}:${Port} after ${TimeoutMs}ms"
+        }
+      shell: pwsh
+      name: Wait for Appium server port
     - run: npm run e2e-test
       name: Run e2e tests
     - name: Save server output
