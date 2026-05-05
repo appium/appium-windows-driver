@@ -3,7 +3,7 @@ import B from 'bluebird';
 import {createInvalidArgumentError} from './errors';
 import {util} from 'appium/support';
 import nodeUtil from 'node:util';
-import type {Size} from '@appium/types';
+import type {Position, Size} from '@appium/types';
 
 let ffi: typeof import('koffi') | undefined;
 try {
@@ -224,7 +224,11 @@ type KeybdInputFields = Partial<{
   dwExtraInfo: number;
 }>;
 
-/** Builds an INPUT structure for keyboard injection via SendInput. */
+/**
+ * Builds an INPUT structure for keyboard injection via SendInput.
+ *
+ * @param params Key input field overrides merged into the default keyboard payload.
+ */
 export function createKeyInput(params: KeybdInputFields = {}): KeyInput {
   return {
     type: INPUT_KEYBOARD,
@@ -244,7 +248,12 @@ export function createKeyInput(params: KeybdInputFields = {}): KeyInput {
 // Mostly ported from
 // https://chromium.googlesource.com/chromium/src/+/refs/heads/main/remoting/host/input_injector_win.cc
 
-/** Sends input structure(s) to the SendInput WinAPI (prefer batching keyboard inputs). */
+/**
+ * Sends input structure(s) to the SendInput WinAPI (prefer batching keyboard inputs).
+ *
+ * @param inputs A single INPUT payload or an array of INPUT payloads.
+ * @returns Number of successfully sent input payloads.
+ */
 export async function handleInputs(inputs: object | object[]): Promise<number> {
   const inputsArr = _.isArray(inputs) ? inputs : [inputs];
   const cbSize = ffi ? ffi.sizeof(INPUT) : 0;
@@ -274,7 +283,12 @@ const isLeftMouseButtonSwapped = _.memoize(
   },
 );
 
-/** Builds a mouse button SendInput structure (click, press, or release). */
+/**
+ * Builds a mouse button SendInput structure (click, press, or release).
+ *
+ * @param opts Mouse button and action pair to convert.
+ * @returns SendInput payload for the requested button action.
+ */
 export async function toMouseButtonInput({
   button,
   action,
@@ -343,6 +357,10 @@ export async function toMouseButtonInput({
 /**
  * Transforms mouse move parameters into a SendInput structure.
  *
+ * @param x Absolute horizontal cursor coordinate.
+ * @param y Absolute vertical cursor coordinate.
+ * @param screenSize Optional virtual screen size cache; fetched when omitted.
+ * @returns SendInput payload for moving the mouse to the target coordinates.
  * @see https://www.reddit.com/r/cpp_questions/comments/1eslzdv/difficulty_with_win32_mouse_position/
  */
 export async function toMouseMoveInput(
@@ -368,7 +386,13 @@ export async function toMouseMoveInput(
   });
 }
 
-/** Builds a mouse wheel SendInput structure, or returns null when the delta is zero. */
+/**
+ * Builds a mouse wheel SendInput structure, or returns null when the delta is zero.
+ *
+ * @param dx Horizontal scroll delta. Provide either this or `dy`.
+ * @param dy Vertical scroll delta. Provide either this or `dx`.
+ * @returns SendInput payload, or null when effective scroll delta is zero.
+ */
 export function toMouseWheelInput(dx?: number, dy?: number): MouseInput | null {
   const hasHorizontalScroll = _.isInteger(dx);
   const hasVerticalScroll = _.isInteger(dy);
@@ -398,7 +422,12 @@ export function toMouseWheelInput(dx?: number, dy?: number): MouseInput | null {
   return null;
 }
 
-/** Expands Unicode text into key-down/key-up SendInput pairs (Unicode mode). */
+/**
+ * Expands Unicode text into key-down/key-up SendInput pairs (Unicode mode).
+ *
+ * @param text Text to emit as keyboard input.
+ * @returns Sequence of keyboard INPUT payloads.
+ */
 export function toUnicodeKeyInputs(text: string): KeyInput[] {
   const utf16Text = Buffer.from(text, 'ucs2');
   const charCodes = new Uint16Array(utf16Text.buffer, utf16Text.byteOffset, utf16Text.length / 2);
@@ -430,7 +459,7 @@ export async function getVirtualScreenSize(): Promise<Size> {
 }
 
 /** Virtual monitor origin from GetSystemMetrics. */
-export async function getVirtualScreenPosition(): Promise<import('@appium/types').Position> {
+export async function getVirtualScreenPosition(): Promise<Position> {
   const [x, y] = await B.all([SM_XVIRTUALSCREEN, SM_YVIRTUALSCREEN].map(getSystemMetrics));
   return {x, y};
 }
