@@ -1,18 +1,26 @@
 import _ from 'lodash';
+import type {load, sizeof, struct, union} from 'koffi';
 import {createInvalidArgumentError} from './errors';
 import {util} from 'appium/support';
 import nodeUtil from 'node:util';
 import type {Position, Size} from '@appium/types';
 
-let ffi: typeof import('koffi') | undefined;
+type KoffiModule = {
+  load: typeof load;
+  struct: typeof struct;
+  union: typeof union;
+  sizeof: typeof sizeof;
+};
+
+let ffi: KoffiModule | undefined;
 try {
-  ffi = require('koffi');
+  ffi = require('koffi') as KoffiModule;
 } catch {}
-let StructType: typeof import('koffi').struct | undefined;
+let StructType: typeof struct | undefined;
 try {
   StructType = ffi?.struct;
 } catch {}
-let UnionType: typeof import('koffi').union | undefined;
+let UnionType: typeof union | undefined;
 try {
   UnionType = ffi?.union;
 } catch {}

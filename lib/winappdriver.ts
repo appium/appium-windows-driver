@@ -9,7 +9,7 @@ import {waitForCondition} from 'asyncbox';
 import {execSync} from 'node:child_process';
 import {util} from 'appium/support';
 import {findAPortNotInUse, checkPortStatus} from 'portscanner';
-import {desiredCapConstraints} from './desired-caps';
+import type {DesiredCapConstraintKeys} from './desired-caps';
 
 const DEFAULT_BASE_PATH = '/wd/hub';
 const DEFAULT_HOST = '127.0.0.1';
@@ -158,7 +158,7 @@ export interface WinAppDriverOptions {
 }
 
 export type WindowsDriverCaps = {
-  [K in keyof typeof desiredCapConstraints]?: any;
+  [K in DesiredCapConstraintKeys]?: any;
 } & {
   'ms:forcequit'?: boolean;
   createSessionTimeout?: number;
@@ -262,11 +262,12 @@ export class WinAppDriver {
               await this.proxy.command('/status', 'GET');
               return true;
             }
-          } catch (err: any) {
+          } catch (err: unknown) {
             if (this.proxy?.didProcessExit) {
-              throw new Error(err.message);
+              const message = err instanceof Error ? err.message : String(err);
+              throw new Error(message, {cause: err});
             }
-            lastError = err;
+            lastError = err instanceof Error ? err : new Error(String(err), {cause: err});
             return false;
           }
         },
@@ -275,7 +276,7 @@ export class WinAppDriver {
           intervalMs: 1000,
         },
       );
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (!lastError || this.proxy.didProcessExit) {
         throw e;
       }
@@ -285,13 +286,15 @@ export class WinAppDriver {
         `WinAppDriver server '${executablePath}' is not listening at ${serverUrl} ` +
         `after ${STARTUP_TIMEOUT_MS}ms timeout. Make sure it could be started manually.`;
       if (await this.proxy.isListening()) {
+        const orig = lastError ?? e;
+        const origMsg = orig instanceof Error ? orig.message : String(orig);
         errorMessage =
           `WinAppDriver server '${executablePath}' is listening at ${serverUrl}, ` +
           `but fails to respond with a proper status. It is an issue with the server itself. ` +
           `Consider checking the troubleshooting guide at ${TROUBLESHOOTING_LINK}. ` +
-          `Original error: ${(lastError ?? e).message}`;
+          `Original error: ${origMsg}`;
       }
-      throw new Error(errorMessage);
+      throw new Error(errorMessage, {cause: e});
     }
     const pid = this.process.proc?.pid;
     if (pid) {
@@ -306,9 +309,11 @@ export class WinAppDriver {
     let parsedUrl: URL;
     try {
       parsedUrl = new URL(url);
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
       throw new Error(
-        `Cannot parse the provided WinAppDriver URL '${url}'. Original error: ${e.message}`,
+        `Cannot parse the provided WinAppDriver URL '${url}'. Original error: ${message}`,
+        {cause: e},
       );
     }
     const proxyOpts: ProxyOptions = {
@@ -325,7 +330,8 @@ export class WinAppDriver {
 
     try {
       await this.proxy.command('/status', 'GET');
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
       let errorMessage =
         `WinAppDriver server is not listening at ${url}. ` +
         `Make sure it is running and the provided wadUrl is correct`;
@@ -334,9 +340,9 @@ export class WinAppDriver {
           `WinAppDriver server is listening at ${url}, but fails to respond with a proper status. ` +
           `It is an issue with the server itself. ` +
           `Consider checking the troubleshooting guide at ${TROUBLESHOOTING_LINK}. ` +
-          `Original error: ${e.message}`;
+          `Original error: ${message}`;
       }
-      throw new Error(errorMessage);
+      throw new Error(errorMessage, {cause: e});
     }
   }
 
@@ -366,12 +372,16 @@ export class WinAppDriver {
         waitMs: createSessionTimeout,
         intervalMs: 500,
       });
-    } catch (timeoutError: any) {
-      this.log.debug(`timeoutError was ${timeoutError.message}`);
+    } catch (timeoutError: unknown) {
+      const timeoutMsg =
+        timeoutError instanceof Error ? timeoutError.message : String(timeoutError);
+      this.log.debug(`timeoutError was ${timeoutMsg}`);
       if (lastError) {
         throw lastError;
       }
-      throw new Error(`Could not start WinAppDriver session within ${createSessionTimeout} ms.`);
+      throw new Error(`Could not start WinAppDriver session within ${createSessionTimeout} ms.`, {
+        cause: timeoutError,
+      });
     }
   }
 }

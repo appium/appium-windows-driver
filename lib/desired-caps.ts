@@ -50,3 +50,5 @@ export const desiredCapConstraints = {
     isString: true,
   },
 } as const satisfies Constraints;
+
+export type DesiredCapConstraintKeys = keyof typeof desiredCapConstraints;

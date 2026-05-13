@@ -85,7 +85,7 @@ export async function execPowerShell(
       return stdout;
     } catch (e: unknown) {
       const err = e as {stderr?: string; message?: string};
-      throw new Error(err.stderr || err.message || String(e));
+      throw new Error(err.stderr || err.message || String(e), {cause: e});
     }
   } finally {
     await Promise.all([
