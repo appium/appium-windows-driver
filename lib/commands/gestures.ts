@@ -486,7 +486,7 @@ export async function windowsHover(
           startAbsoluteY + Math.trunc(((endAbsoluteY - startAbsoluteY) * step) / stepsCount),
           screenSize,
         ),
-      { concurrency: maxChunkSize },
+      {concurrency: maxChunkSize},
     );
   } catch (e) {
     throw preprocessError(e);
