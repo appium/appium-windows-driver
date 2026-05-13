@@ -2,7 +2,6 @@ import _ from 'lodash';
 import {waitForCondition} from 'asyncbox';
 import {util, fs, net, system, tempDir} from 'appium/support';
 import {SubProcess} from 'teen_process';
-import B from 'bluebird';
 import type {AppiumLogger} from '@appium/types';
 import type {WindowsDriver} from '../driver';
 
@@ -192,7 +191,7 @@ export class ScreenRecorder {
       return await this.getVideoPath();
     }
 
-    return new B<string>((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       const timer = setTimeout(async () => {
         await this._enforceTermination();
         reject(

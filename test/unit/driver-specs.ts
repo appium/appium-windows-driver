@@ -1,6 +1,5 @@
 import {WindowsDriver} from '../../lib/driver';
 import sinon from 'sinon';
-import B from 'bluebird';
 import {system} from 'appium/support';
 import {expect} from 'chai';
 import * as chai from 'chai';
@@ -29,7 +28,7 @@ describe('driver', function () {
   describe('createSession', function () {
     it('should set sessionId', async function () {
       const driver = new WindowsDriver({app: 'myapp'} as any, false);
-      sinon.mock(driver).expects('startWinAppDriverSession').once().returns(B.resolve());
+      sinon.mock(driver).expects('startWinAppDriverSession').once().returns(Promise.resolve());
       await driver.createSession({
         alwaysMatch: {
           platformName: 'Windows',

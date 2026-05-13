@@ -3,7 +3,7 @@ import {net} from 'appium/support';
 import {promisify} from 'node:util';
 import {exec} from 'node:child_process';
 import type {ExecOptions} from 'node:child_process';
-import B from 'bluebird';
+import {withTimeout} from 'asyncbox';
 import {log} from './logger';
 
 const execAsync = promisify(exec);
@@ -40,7 +40,8 @@ export async function runElevated(
   // We avoid additional interpolation here by using only single-quoted literals inside the PS command.
   const fullCmd = `powershell -NoProfile -Command "${psCommand}"`;
   log.debug(`Executing command: ${fullCmd}`);
-  const {stdout, stderr} = await B.resolve(execAsync(fullCmd, opts)).timeout(
+  const {stdout, stderr} = await withTimeout(
+    execAsync(fullCmd, opts),
     timeoutMs,
     `The command '${fullCmd}' timed out after ${timeoutMs}ms`,
   );

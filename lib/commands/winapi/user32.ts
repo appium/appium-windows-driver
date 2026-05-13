@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import B from 'bluebird';
 import {createInvalidArgumentError} from './errors';
 import {util} from 'appium/support';
 import nodeUtil from 'node:util';
@@ -452,7 +451,7 @@ export function toUnicodeKeyInputs(text: string): KeyInput[] {
 
 /** Virtual monitor width/height from GetSystemMetrics. */
 export async function getVirtualScreenSize(): Promise<Size> {
-  const [width, height] = await B.all(
+  const [width, height] = await Promise.all(
     [SM_CXVIRTUALSCREEN, SM_CYVIRTUALSCREEN].map(getSystemMetrics),
   );
   return {width, height};
@@ -460,7 +459,7 @@ export async function getVirtualScreenSize(): Promise<Size> {
 
 /** Virtual monitor origin from GetSystemMetrics. */
 export async function getVirtualScreenPosition(): Promise<Position> {
-  const [x, y] = await B.all([SM_XVIRTUALSCREEN, SM_YVIRTUALSCREEN].map(getSystemMetrics));
+  const [x, y] = await Promise.all([SM_XVIRTUALSCREEN, SM_YVIRTUALSCREEN].map(getSystemMetrics));
   return {x, y};
 }
 
