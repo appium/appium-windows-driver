@@ -11,7 +11,7 @@ import type {
   DriverOpts,
   W3CDriverCaps,
 } from '@appium/types';
-import {BaseDriver} from 'appium/driver';
+import {BaseDriver, type JWProxy} from 'appium/driver';
 import {system} from 'appium/support';
 import {WinAppDriver} from './winappdriver';
 import type {WindowsDriverCaps} from './winappdriver';
@@ -81,8 +81,8 @@ export class WindowsDriver
   static newMethodMap = newMethodMap;
   static executeMethodMap = executeMethodMap;
 
-  _screenRecorder: recordScreenCommands.ScreenRecorder | null;
-  public proxyReqRes: (...args: any) => any;
+  _screenRecorder: recordScreenCommands.ScreenRecorder | null = null;
+  public proxyReqRes!: JWProxy['proxyReqRes'];
 
   windowsLaunchApp = appManagementCommands.windowsLaunchApp;
   windowsCloseApp = appManagementCommands.windowsCloseApp;
@@ -127,9 +127,9 @@ export class WindowsDriver
 
   supportedLogTypes = logCommands.supportedLogTypes;
 
-  private isProxyActive: boolean;
-  private jwpProxyAvoid: RouteMatcher[];
-  private _winAppDriver: WinAppDriver | null;
+  private isProxyActive = false;
+  private jwpProxyAvoid: RouteMatcher[] = NO_PROXY;
+  private _winAppDriver: WinAppDriver | null = null;
 
   constructor(opts: InitialOpts, shouldValidateCaps = true) {
     super(opts, shouldValidateCaps);
@@ -213,8 +213,8 @@ export class WindowsDriver
     await super.deleteSession();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override proxyActive(sessionId: string): boolean {
+    void sessionId;
     return this.isProxyActive;
   }
 
@@ -223,8 +223,8 @@ export class WindowsDriver
     return true;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override getProxyAvoidList(sessionId: string): RouteMatcher[] {
+    void sessionId;
     return this.jwpProxyAvoid;
   }
 

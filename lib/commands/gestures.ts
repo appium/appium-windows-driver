@@ -124,6 +124,10 @@ async function toAbsoluteCoordinates(
   return [absoluteX as number, absoluteY as number];
 }
 
+function isModifierKeyName(name: string): name is keyof typeof MODIFIER_KEY {
+  return name in MODIFIER_KEY;
+}
+
 function isKeyDown(action: string): boolean {
   switch (_.toLower(action)) {
     case KEY_ACTION.UP:
@@ -146,12 +150,12 @@ function toModifierInputs(modifierKeys: string | string[], action: string): KeyI
       continue;
     }
 
-    const virtualKeyCode = MODIFIER_KEY[lowerKeyName];
-    if (_.isUndefined(virtualKeyCode)) {
+    if (!isModifierKeyName(lowerKeyName)) {
       throw new errors.InvalidArgumentError(
         `Modifier key name '${keyName}' is unknown. Supported key names are: ${_.keys(MODIFIER_KEY)}`,
       );
     }
+    const virtualKeyCode = MODIFIER_KEY[lowerKeyName];
     events.push({virtualKeyCode, action});
     usedKeys.add(lowerKeyName);
   }
