@@ -1,7 +1,7 @@
-import _ from 'lodash';
 import type {Position, Rect, Size} from '@appium/types';
 import {util} from 'appium/support';
 import type {WindowsDriver} from '../driver';
+import {isPlainObject} from '../utils';
 
 // The next two commands are required
 // for proper `-image` locator functionality
@@ -9,7 +9,7 @@ import type {WindowsDriver} from '../driver';
 /** Window size from WAD, or primary screen size via PowerShell if WAD omits it. */
 export async function getWindowSize(this: WindowsDriver): Promise<Size> {
   const size = await this.winAppDriver.sendCommand('/window/size', 'GET');
-  if (_.isPlainObject(size)) {
+  if (isPlainObject(size)) {
     return size as Size;
   }
   // workaround for https://github.com/microsoft/WinAppDriver/issues/1104
@@ -48,11 +48,11 @@ export async function setWindowRect(
   height: number,
 ): Promise<Rect> {
   let didProcess = false;
-  if (!_.isNil(width) && !_.isNil(height)) {
+  if (width != null && height != null) {
     await this.winAppDriver.sendCommand('/window/size', 'POST', {width, height});
     didProcess = true;
   }
-  if (!_.isNil(x) && !_.isNil(y)) {
+  if (x != null && y != null) {
     const handle = await this.winAppDriver.sendCommand('/window_handle', 'GET');
     await this.winAppDriver.sendCommand(`/window/${handle}/position`, 'POST', {x, y});
     didProcess = true;

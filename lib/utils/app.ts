@@ -1,10 +1,9 @@
-import _ from 'lodash';
 import {net} from 'appium/support';
 import {promisify} from 'node:util';
 import {exec} from 'node:child_process';
 import type {ExecOptions} from 'node:child_process';
 import {withTimeout} from 'asyncbox';
-import {log} from './logger';
+import {log} from '../logger';
 
 const execAsync = promisify(exec);
 
@@ -33,7 +32,7 @@ export async function runElevated(
 
   const escapePSSingleQuoted = (str: string): string => `'${String(str).replace(/'/g, "''")}'`;
   const psFilePath = escapePSSingleQuoted(cmd);
-  const psArgList = _.isEmpty(args) ? "''" : args.map(escapePSSingleQuoted).join(',');
+  const psArgList = args.length === 0 ? "''" : args.map(escapePSSingleQuoted).join(',');
   // Build the PowerShell Start-Process command (safe quoting for inner tokens)
   const psCommand = `Start-Process -FilePath ${psFilePath} -ArgumentList ${psArgList} -Verb RunAs`;
   // Wrap the PowerShell command in double-quotes for the outer shell call.
@@ -46,8 +45,8 @@ export async function runElevated(
     `The command '${fullCmd}' timed out after ${timeoutMs}ms`,
   );
   return {
-    stdout: _.isString(stdout) ? stdout : stdout.toString(),
-    stderr: _.isString(stderr) ? stderr : stderr.toString(),
+    stdout: typeof stdout === 'string' ? stdout : stdout.toString(),
+    stderr: typeof stderr === 'string' ? stderr : stderr.toString(),
   };
 }
 

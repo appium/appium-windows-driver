@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import {isEmpty} from './utils';
 import os from 'node:os';
 import path from 'node:path';
 import type {AppiumLogger, ProxyOptions, HTTPMethod, HTTPBody} from '@appium/types';
@@ -106,7 +106,7 @@ class WADProcess {
       encoding: 'ucs2',
     });
     this.proc.on('output', (stdout, stderr) => {
-      const line = _.trim(stderr || stdout);
+      const line = String(stderr || stdout).trim();
       if (line) {
         this.log.debug(line);
       }
@@ -134,7 +134,7 @@ class WADProcess {
 
 const RUNNING_PROCESS_IDS: (number | undefined)[] = [];
 process.once('exit', () => {
-  if (_.isEmpty(RUNNING_PROCESS_IDS)) {
+  if (isEmpty(RUNNING_PROCESS_IDS)) {
     return;
   }
 
@@ -299,7 +299,12 @@ export class WinAppDriver {
     const pid = this.process.proc?.pid;
     if (pid) {
       RUNNING_PROCESS_IDS.push(pid);
-      this.process.proc?.on('exit', () => void _.pull(RUNNING_PROCESS_IDS, pid));
+      this.process.proc?.on('exit', () => {
+        const i = RUNNING_PROCESS_IDS.indexOf(pid);
+        if (i >= 0) {
+          RUNNING_PROCESS_IDS.splice(i, 1);
+        }
+      });
     }
   }
 
@@ -318,10 +323,10 @@ export class WinAppDriver {
     }
     const proxyOpts: ProxyOptions = {
       log: this.log,
-      base: _.trimEnd(parsedUrl.pathname, '/'),
+      base: parsedUrl.pathname.replace(/\/+$/, ''),
       server: parsedUrl.hostname,
       port: parseInt(parsedUrl.port, 10),
-      scheme: _.trimEnd(parsedUrl.protocol, ':') as 'http' | 'https',
+      scheme: parsedUrl.protocol.replace(/:+$/, '') as 'http' | 'https',
     };
     if (this.opts.reqBasePath) {
       proxyOpts.reqBasePath = this.opts.reqBasePath;

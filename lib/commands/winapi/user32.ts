@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import {memoize} from '../../utils';
 import type {load, sizeof, struct, union} from 'koffi';
 import {createInvalidArgumentError} from './errors';
 import {util} from 'appium/support';
@@ -63,7 +63,7 @@ const NATIVE_LIBS_LOAD_ERROR =
   `Afterwards reinstall the Windows driver.`;
 
 function requireNativeType<T>(typ: T | undefined): T {
-  if (_.isNil(typ)) {
+  if (typ == null) {
     const throwingFactory = () => () => {
       throw new Error(NATIVE_LIBS_LOAD_ERROR);
     };
@@ -72,7 +72,7 @@ function requireNativeType<T>(typ: T | undefined): T {
   return typ;
 }
 
-const getUser32 = _.memoize(function getUser32(): User32 {
+const getUser32 = memoize(function getUser32(): User32 {
   if (!ffi) {
     throw new Error(NATIVE_LIBS_LOAD_ERROR);
   }
@@ -262,7 +262,7 @@ export function createKeyInput(params: KeybdInputFields = {}): KeyInput {
  * @returns Number of successfully sent input payloads.
  */
 export async function handleInputs(inputs: object | object[]): Promise<number> {
-  const inputsArr = _.isArray(inputs) ? inputs : [inputs];
+  const inputsArr = Array.isArray(inputs) ? inputs : [inputs];
   const cbSize = ffi ? ffi.sizeof(INPUT) : 0;
   const uSent = await getUser32().SendInput(inputsArr.length, inputsArr, cbSize);
   if (uSent !== inputsArr.length) {
@@ -274,7 +274,7 @@ export async function handleInputs(inputs: object | object[]): Promise<number> {
 }
 
 /** Ensures DPI awareness for the current process. */
-export const ensureDpiAwareness = _.memoize(async function ensureDpiAwareness(): Promise<boolean> {
+export const ensureDpiAwareness = memoize(async function ensureDpiAwareness(): Promise<boolean> {
   return Boolean(
     await getUser32().SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2),
   );
@@ -284,7 +284,7 @@ async function getSystemMetrics(nIndex: number): Promise<number> {
   return await getUser32().GetSystemMetrics(nIndex);
 }
 
-const isLeftMouseButtonSwapped = _.memoize(
+const isLeftMouseButtonSwapped = memoize(
   async function isLeftMouseButtonSwapped(): Promise<boolean> {
     return Boolean(await getSystemMetrics(SM_SWAPBUTTON));
   },
@@ -313,7 +313,7 @@ export async function toMouseButtonInput({
   let evtDown: number;
   let evtUp: number;
   let mouseData: number | undefined;
-  switch (_.toLower(button)) {
+  switch (button.toLowerCase()) {
     case MOUSE_BUTTON.LEFT:
       [evtDown, evtUp] = [MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP];
       break;
@@ -333,12 +333,12 @@ export async function toMouseButtonInput({
       break;
     default:
       throw createInvalidArgumentError(
-        `Mouse button '${button}' is unknown. Only ${_.values(MOUSE_BUTTON)} buttons are supported`,
+        `Mouse button '${button}' is unknown. Only ${Object.values(MOUSE_BUTTON)} buttons are supported`,
       );
   }
 
   let dwFlags: number;
-  switch (_.toLower(action)) {
+  switch (action.toLowerCase()) {
     case MOUSE_BUTTON_ACTION.UP:
       dwFlags = evtUp;
       break;
@@ -357,7 +357,7 @@ export async function toMouseButtonInput({
 
   return createMouseInput({
     dwFlags,
-    ...(_.isNil(mouseData) ? {} : {mouseData}),
+    ...(mouseData == null ? {} : {mouseData}),
   });
 }
 
@@ -375,7 +375,7 @@ export async function toMouseMoveInput(
   y: number,
   screenSize: Size | null = null,
 ): Promise<MouseInput> {
-  if (!_.isInteger(x) || !_.isInteger(y)) {
+  if (!Number.isInteger(x) || !Number.isInteger(y)) {
     throw createInvalidArgumentError('Both move coordinates must be provided');
   }
 
@@ -401,8 +401,8 @@ export async function toMouseMoveInput(
  * @returns SendInput payload, or null when effective scroll delta is zero.
  */
 export function toMouseWheelInput(dx?: number, dy?: number): MouseInput | null {
-  const hasHorizontalScroll = _.isInteger(dx);
-  const hasVerticalScroll = _.isInteger(dy);
+  const hasHorizontalScroll = Number.isInteger(dx);
+  const hasVerticalScroll = Number.isInteger(dy);
   if (!hasHorizontalScroll && !hasVerticalScroll) {
     throw createInvalidArgumentError('Either horizontal or vertical scroll delta must be provided');
   }

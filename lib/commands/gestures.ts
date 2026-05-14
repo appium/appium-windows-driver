@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {
   MOUSE_BUTTON_ACTION,
   MOUSE_BUTTON,
@@ -20,6 +19,7 @@ import {errors} from 'appium/driver';
 import {sleep, asyncmap} from 'asyncbox';
 import {util} from 'appium/support';
 import type {WindowsDriver} from '../driver';
+import {isEmpty} from '../utils';
 import {isInvalidArgumentError} from './winapi/errors';
 
 const EVENT_INJECTION_DELAY_MS = 5;
@@ -46,7 +46,7 @@ function preprocessError(e: unknown): unknown {
 }
 
 function modifierKeysToInputs(this: WindowsDriver, modifierKeys?: string | string[]) {
-  if (_.isEmpty(modifierKeys)) {
+  if (isEmpty(modifierKeys)) {
     return [[], []] as [KeyInput[], KeyInput[]];
   }
 
@@ -63,7 +63,7 @@ function modifierKeysToInputs(this: WindowsDriver, modifierKeys?: string | strin
   modifierKeyDownInputs.push(...parsedDownInputs);
   // depressing keys in the reversed order
   modifierKeyUpInputs.push(...toModifierInputs(keys, KEY_ACTION.UP));
-  _.reverse(modifierKeyUpInputs);
+  modifierKeyUpInputs.reverse();
   return [modifierKeyDownInputs, modifierKeyUpInputs];
 }
 
@@ -74,8 +74,8 @@ async function toAbsoluteCoordinates(
   y?: number,
   msgPrefix = '',
 ): Promise<[number, number]> {
-  const hasX = _.isInteger(x);
-  const hasY = _.isInteger(y);
+  const hasX = Number.isInteger(x);
+  const hasY = Number.isInteger(y);
   if (msgPrefix) {
     msgPrefix += ': ';
   }
@@ -129,14 +129,14 @@ function isModifierKeyName(name: string): name is keyof typeof MODIFIER_KEY {
 }
 
 function isKeyDown(action: string): boolean {
-  switch (_.toLower(action)) {
+  switch (action.toLowerCase()) {
     case KEY_ACTION.UP:
       return false;
     case KEY_ACTION.DOWN:
       return true;
     default:
       throw new errors.InvalidArgumentError(
-        `Key action '${action}' is unknown. Only ${_.values(KEY_ACTION)} actions are supported`,
+        `Key action '${action}' is unknown. Only ${Object.values(KEY_ACTION)} actions are supported`,
       );
   }
 }
@@ -144,15 +144,15 @@ function isKeyDown(action: string): boolean {
 function toModifierInputs(modifierKeys: string | string[], action: string): KeyInput[] {
   const events: Array<{virtualKeyCode: number; action: string}> = [];
   const usedKeys = new Set();
-  for (const keyName of _.isArray(modifierKeys) ? modifierKeys : [modifierKeys]) {
-    const lowerKeyName = _.toLower(keyName);
+  for (const keyName of Array.isArray(modifierKeys) ? modifierKeys : [modifierKeys]) {
+    const lowerKeyName = keyName.toLowerCase();
     if (usedKeys.has(lowerKeyName)) {
       continue;
     }
 
     if (!isModifierKeyName(lowerKeyName)) {
       throw new errors.InvalidArgumentError(
-        `Modifier key name '${keyName}' is unknown. Supported key names are: ${_.keys(MODIFIER_KEY)}`,
+        `Modifier key name '${keyName}' is unknown. Supported key names are: ${Object.keys(MODIFIER_KEY)}`,
       );
     }
     const virtualKeyCode = MODIFIER_KEY[lowerKeyName];
@@ -232,12 +232,12 @@ export async function windowsClick(
   }
 
   try {
-    if (!_.isEmpty(modifierKeyDownInputs)) {
+    if (!isEmpty(modifierKeyDownInputs)) {
       await handleInputs(modifierKeyDownInputs);
     }
     await handleInputs(moveInput);
-    const hasDuration = _.isInteger(durationMs) && (durationMs as number) > 0;
-    const hasInterClickDelay = _.isInteger(interClickDelayMs) && interClickDelayMs > 0;
+    const hasDuration = Number.isInteger(durationMs) && (durationMs as number) > 0;
+    const hasInterClickDelay = Number.isInteger(interClickDelayMs) && interClickDelayMs > 0;
     for (let i = 0; i < times; ++i) {
       if (hasDuration) {
         await handleInputs(clickDownInput);
@@ -251,7 +251,7 @@ export async function windowsClick(
       }
     }
   } finally {
-    if (!_.isEmpty(modifierKeyUpInputs)) {
+    if (!isEmpty(modifierKeyUpInputs)) {
       await handleInputs(modifierKeyUpInputs);
     }
   }
@@ -306,7 +306,7 @@ export async function windowsScroll(
     throw preprocessError(e);
   }
   try {
-    if (!_.isEmpty(modifierKeyDownInputs)) {
+    if (!isEmpty(modifierKeyDownInputs)) {
       await handleInputs(modifierKeyDownInputs);
     }
     await handleInputs(moveInput);
@@ -315,11 +315,11 @@ export async function windowsScroll(
     } else {
       this.log.info(
         'There is no need to actually perform scroll with the given ' +
-          (_.isNil(deltaX) ? 'deltaY' : 'deltaX'),
+          (deltaX == null ? 'deltaY' : 'deltaX'),
       );
     }
   } finally {
-    if (!_.isEmpty(modifierKeyUpInputs)) {
+    if (!isEmpty(modifierKeyUpInputs)) {
       await handleInputs(modifierKeyUpInputs);
     }
   }
@@ -398,7 +398,7 @@ export async function windowsClickAndDrag(
   }
 
   try {
-    if (!_.isEmpty(modifierKeyDownInputs)) {
+    if (!isEmpty(modifierKeyDownInputs)) {
       await handleInputs(modifierKeyDownInputs);
     }
     await handleInputs(moveStartInput);
@@ -410,7 +410,7 @@ export async function windowsClickAndDrag(
     await sleep(10);
     await handleInputs(clickUpInput);
   } finally {
-    if (!_.isEmpty(modifierKeyUpInputs)) {
+    if (!isEmpty(modifierKeyUpInputs)) {
       await handleInputs(modifierKeyUpInputs);
     }
   }
@@ -475,7 +475,7 @@ export async function windowsHover(
   ]);
   const stepsCount = Math.max(Math.trunc(durationMs / EVENT_INJECTION_DELAY_MS), 1);
   const maxChunkSize = 10;
-  const steps = _.range(0, stepsCount + 1);
+  const steps = Array.from({length: stepsCount + 1}, (_, i) => i);
   let inputs: MouseInput[];
   try {
     inputs = await asyncmap(
@@ -493,7 +493,7 @@ export async function windowsHover(
   }
 
   try {
-    if (!_.isEmpty(modifierKeyDownInputs)) {
+    if (!isEmpty(modifierKeyDownInputs)) {
       await handleInputs(modifierKeyDownInputs);
     }
     for (let i = 0; i < inputs.length; ++i) {
@@ -503,7 +503,7 @@ export async function windowsHover(
       }
     }
   } finally {
-    if (!_.isEmpty(modifierKeyUpInputs)) {
+    if (!isEmpty(modifierKeyUpInputs)) {
       await handleInputs(modifierKeyUpInputs);
     }
   }
@@ -519,10 +519,10 @@ export async function windowsKeys(
   this: WindowsDriver,
   actions: KeyAction | KeyAction[],
 ): Promise<void> {
-  const parsedItems = parseKeyActions(_.isArray(actions) ? actions : [actions]);
+  const parsedItems = parseKeyActions(Array.isArray(actions) ? actions : [actions]);
   this.log.debug(`Parsed ${util.pluralize('key action', parsedItems.length, true)}`);
   for (const item of parsedItems) {
-    if (_.isArray(item)) {
+    if (Array.isArray(item)) {
       await handleInputs(item);
     } else {
       await sleep(item);
@@ -531,9 +531,9 @@ export async function windowsKeys(
 }
 
 function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
-  const hasPause = _.has(action, 'pause');
-  const hasText = _.has(action, 'text');
-  const hasVirtualKeyCode = _.has(action, 'virtualKeyCode');
+  const hasPause = Object.hasOwn(action, 'pause');
+  const hasText = Object.hasOwn(action, 'text');
+  const hasVirtualKeyCode = Object.hasOwn(action, 'virtualKeyCode');
   const definedPropertiesCount = Number(hasPause) + Number(hasText) + Number(hasVirtualKeyCode);
   const actionPrefix = `Key Action #${index + 1} (${JSON.stringify(action)}): `;
   if (definedPropertiesCount === 0) {
@@ -550,7 +550,7 @@ function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
 
   if (hasPause) {
     const durationMs = pause as number;
-    if (!_.isInteger(durationMs) || durationMs < 0) {
+    if (!Number.isInteger(durationMs) || durationMs < 0) {
       throw new errors.InvalidArgumentError(
         `${actionPrefix}Pause value must be a valid positive integer number of milliseconds`,
       );
@@ -558,7 +558,7 @@ function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
     return durationMs;
   }
   if (hasText) {
-    if (!_.isString(text) || _.isEmpty(text)) {
+    if (typeof text !== 'string' || text.length === 0) {
       throw new errors.InvalidArgumentError(
         `${actionPrefix}Text value must be a valid non-empty string`,
       );
@@ -567,8 +567,8 @@ function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
   }
 
   // has virtual code
-  if (_.has(action, 'down')) {
-    if (!_.isBoolean(down)) {
+  if (Object.hasOwn(action, 'down')) {
+    if (typeof down !== 'boolean') {
       throw new errors.InvalidArgumentError(
         `${actionPrefix}The down argument must be of type boolean if provided`,
       );
@@ -596,7 +596,7 @@ function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
 }
 
 function parseKeyActions(actions: KeyAction[]): Array<number | KeyInput[]> {
-  if (_.isEmpty(actions)) {
+  if (isEmpty(actions)) {
     throw new errors.InvalidArgumentError('Key actions must not be empty');
   }
 
@@ -604,8 +604,13 @@ function parseKeyActions(actions: KeyAction[]): Array<number | KeyInput[]> {
   const allActions = actions.map(parseKeyAction);
   for (let i = 0; i < allActions.length; ++i) {
     const item = allActions[i];
-    const last = _.last(combinedArray);
-    if (_.isArray(item) && combinedArray.length > 0 && last !== undefined && _.isArray(last)) {
+    const last = combinedArray[combinedArray.length - 1];
+    if (
+      Array.isArray(item) &&
+      combinedArray.length > 0 &&
+      last !== undefined &&
+      Array.isArray(last)
+    ) {
       last.push(...item);
     } else {
       combinedArray.push(item);

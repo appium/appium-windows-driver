@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {fs, tempDir} from 'appium/support';
 import {exec} from 'teen_process';
 import path from 'node:path';
@@ -61,7 +60,7 @@ export async function execPowerShell(
         '-command',
         'Get-ExecutionPolicy -Scope CurrentUser',
       ]);
-      userExecutionPolicy = _.trim(stdout);
+      userExecutionPolicy = stdout.trim();
       if ([EXECUTION_POLICY.RESTRICTED, EXECUTION_POLICY.UNDEFINED].includes(userExecutionPolicy)) {
         this.log.debug(
           `Temporarily changing Power Shell execution policy to ${EXECUTION_POLICY.REMOTE_SIGNED} ` +

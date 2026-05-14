@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import type {StringRecord} from '@appium/types';
 import {POWER_SHELL_FEATURE} from '../constants';
 import type {WindowsDriver} from '../driver';
@@ -21,13 +20,14 @@ export async function execute(
   }
 
   this.log.info(`Executing extension command '${script}'`);
-  const formattedScript = _.isString(script)
-    ? script.trim().replace(/^windows:\s*/, `${EXECUTE_SCRIPT_PREFIX} `)
-    : String(script);
+  const formattedScript =
+    typeof script === 'string'
+      ? script.trim().replace(/^windows:\s*/, `${EXECUTE_SCRIPT_PREFIX} `)
+      : String(script);
   const preprocessedArgs = preprocessExecuteMethodArgs(args);
   return await this.executeMethod(formattedScript, [preprocessedArgs]);
 }
 
 function preprocessExecuteMethodArgs(args?: ExecuteMethodArgs): StringRecord {
-  return (_.isArray(args) ? _.first(args) : args) ?? {};
+  return (Array.isArray(args) ? args[0] : args) ?? {};
 }

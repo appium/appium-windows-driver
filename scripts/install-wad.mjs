@@ -1,10 +1,9 @@
 import axios from 'axios';
 import * as semver from 'semver';
-import _ from 'lodash';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { log } from '../build/lib/logger.js';
-import { runElevated, downloadToFile } from '../build/lib/utils.js';
+import { runElevated, downloadToFile } from '../build/lib/utils/index.js';
 import fs from 'node:fs/promises';
 
 const OWNER = 'microsoft';
@@ -31,7 +30,7 @@ function parseNextPageUrl(headers) {
   }
 
   for (const part of headers.link.split(';')) {
-    const [rel, pageUrl] = part.split(',').map(_.trim);
+    const [rel, pageUrl] = part.split(',').map((s) => s.trim());
     if (rel === 'rel="next"' && pageUrl) {
       return pageUrl.replace(/^<|>$/g, '');
     }
@@ -69,7 +68,10 @@ async function listReleases() {
     for (const asset of (releaseInfo.assets ?? [])) {
       const assetName = asset?.name;
       const downloadUrl = asset?.browser_download_url;
-      if (!(_.endsWith(assetName, EXT_MSI) || _.endsWith(assetName, EXT_EXE)) || !downloadUrl) {
+      if (
+        !(typeof assetName === 'string' && (assetName.endsWith(EXT_MSI) || assetName.endsWith(EXT_EXE))) ||
+        !downloadUrl
+      ) {
         continue;
       }
       releaseAssets.push({
@@ -97,7 +99,7 @@ function selectRelease(releases, version) {
     const stableReleasesAsc = releases
       .filter(({isDraft, isPrerelease}) => !isDraft && !isPrerelease)
       .toSorted((a, b) => a.version.compare(b.version));
-    const dstRelease = _.last(stableReleasesAsc);
+    const dstRelease = stableReleasesAsc[stableReleasesAsc.length - 1];
     if (!dstRelease) {
       throw new Error(`Cannot find any stable WinAppDriver release: ${JSON.stringify(releases)}`);
     }
@@ -123,7 +125,7 @@ function selectRelease(releases, version) {
  * @returns {ReleaseAsset}
  */
 function selectAsset(release) {
-  if (_.isEmpty(release.assets)) {
+  if (release.assets.length === 0) {
     throw new Error(`WinAppDriver v${release.version} does not contain any matching releases`);
   }
   if (release.assets.length === 1) {
@@ -131,7 +133,7 @@ function selectAsset(release) {
   }
   // Since v 1.2.99 installers for multiple OS architectures are provided
   for (const asset of release.assets) {
-    if (_.includes(asset.name, `win-${ARCH_MAPPING[process.arch]}.`)) {
+    if (asset.name.includes(`win-${ARCH_MAPPING[process.arch]}.`)) {
       return asset;
     }
   }
@@ -167,9 +169,9 @@ async function installWad(version) {
   log.info(`Will download and install v${release.version} from ${asset.url}`);
   try {
     await downloadToFile(asset.url, installerPath);
-    if (_.toLower(parsedName.ext) === EXT_MSI) {
+    if (parsedName.ext.toLowerCase() === EXT_MSI) {
       await runElevated('msiexec.exe', ['/i', installerPath, '/quiet', '/norestart']);
-    } else if (_.toLower(parsedName.ext) === EXT_EXE) {
+    } else if (parsedName.ext.toLowerCase() === EXT_EXE) {
       await runElevated(installerPath, ['/install', '/quiet', '/norestart']);
     } else {
       throw new Error(`Unsupported WAD installer: ${asset.name}`);

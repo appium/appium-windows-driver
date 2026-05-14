@@ -1,6 +1,6 @@
-import _ from 'lodash';
 import {waitForCondition} from 'asyncbox';
 import {util, fs, net, system, tempDir} from 'appium/support';
+import {isEmpty} from '../utils';
 import {SubProcess} from 'teen_process';
 import type {AppiumLogger} from '@appium/types';
 import type {WindowsDriver} from '../driver';
@@ -139,7 +139,7 @@ export class ScreenRecorder {
     });
     this.log.debug(`Starting ${FFMPEG_BINARY}: ${util.quote(fullCmd)}`);
     this._process.on('output', (stdout, stderr) => {
-      if (_.trim(stdout || stderr)) {
+      if (String(stdout || stderr).trim()) {
         this.log.debug(`[${FFMPEG_BINARY}] ${stdout || stderr}`);
       }
     });
@@ -320,7 +320,7 @@ export async function windowsStopRecordingScreen(
     this.log.debug('No video data is found. Returning an empty string');
     return '';
   }
-  if (_.isEmpty(remotePath)) {
+  if (isEmpty(remotePath)) {
     const {size} = await fs.stat(videoPath);
     this.log.debug(
       `The size of the resulting screen recording is ${util.toReadableSizeString(size)}`,
@@ -397,10 +397,11 @@ async function uploadRecordedMedia(
   remotePath: string | null = null,
   uploadOptions: UploadOptions = {},
 ): Promise<string> {
-  if (_.isEmpty(remotePath) || !remotePath) {
+  if (isEmpty(remotePath)) {
     return (await util.toInMemoryBase64(localFile)).toString();
   }
 
+  const uploadUrl = remotePath as string;
   const {user, pass, method, headers, fileFieldName, formFields} = uploadOptions;
   const options: UploadOptions = {
     method: method || 'PUT',
@@ -411,7 +412,7 @@ async function uploadRecordedMedia(
   if (user && pass) {
     options.auth = {user, pass};
   }
-  await net.uploadFile(localFile, remotePath, options);
+  await net.uploadFile(localFile, uploadUrl, options);
   return '';
 }
 

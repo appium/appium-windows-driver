@@ -1,6 +1,6 @@
-import _ from 'lodash';
-import type {WindowsDriver} from '../driver';
 import type {LogDefRecord, StringRecord} from '@appium/types';
+import type {WindowsDriver} from '../driver';
+import {isEmpty} from '../utils';
 
 const COLOR_CODE_PATTERN = /\u001b\[(\d+(;\d+)*)?m/g; // eslint-disable-line no-control-regex
 const GET_SERVER_LOGS_FEATURE = 'get_server_logs';
@@ -23,8 +23,8 @@ interface LogEntry {
 }
 
 function nativeLogEntryToSeleniumEntry(x: StringRecord): LogEntry {
-  const msg = _.isEmpty(x.prefix) ? x.message : `[${x.prefix}] ${x.message}`;
-  return toLogEntry(_.replace(msg, COLOR_CODE_PATTERN, ''), x.timestamp ?? Date.now());
+  const msg = isEmpty(x.prefix) ? x.message : `[${x.prefix}] ${x.message}`;
+  return toLogEntry(msg.replace(COLOR_CODE_PATTERN, ''), x.timestamp ?? Date.now());
 }
 
 function toLogEntry(

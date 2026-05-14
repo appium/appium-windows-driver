@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import type {
   RouteMatcher,
   HTTPMethod,
@@ -162,7 +161,7 @@ export class WindowsDriver
       if (caps.prerun) {
         this.log.info('Executing prerun PowerShell script');
         const prerun = caps.prerun as PrerunCapability;
-        if (!_.isString(prerun.command) && !_.isString(prerun.script)) {
+        if (typeof prerun.command !== 'string' && typeof prerun.script !== 'string') {
           throw new Error(
             `'prerun' capability value must either contain ` +
               `'script' or 'command' entry of string type`,
@@ -189,7 +188,7 @@ export class WindowsDriver
 
     const postrun = this.opts.postrun as PostrunCapability | undefined;
     if (postrun) {
-      if (!_.isString(postrun.command) && !_.isString(postrun.script)) {
+      if (typeof postrun.command !== 'string' && typeof postrun.script !== 'string') {
         this.log.error(
           `'postrun' capability value must either contain ` +
             `'script' or 'command' entry of string type`,

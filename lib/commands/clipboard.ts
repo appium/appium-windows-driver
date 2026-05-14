@@ -1,6 +1,5 @@
 import {exec} from 'teen_process';
 import {errors} from 'appium/driver';
-import _ from 'lodash';
 import type {WindowsDriver} from '../driver';
 import type {TeenProcessExecResult} from 'teen_process';
 
@@ -45,7 +44,7 @@ export async function windowsSetClipboard(
     default:
       throw new errors.InvalidArgumentError(
         `The clipboard content type '${contentType}' is not known. ` +
-          `Only the following content types are supported: ${_.values(CONTENT_TYPE)}`,
+          `Only the following content types are supported: ${Object.values(CONTENT_TYPE)}`,
       );
   }
 }
@@ -68,7 +67,7 @@ export async function windowsGetClipboard(
         '$str=Get-Clipboard;',
         '[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($str));',
       ]);
-      return _.trim(stdout);
+      return stdout.trim();
     }
     case CONTENT_TYPE.image: {
       const {stdout} = await exec('powershell', [
@@ -77,12 +76,12 @@ export async function windowsGetClipboard(
         '[System.Windows.Forms.Clipboard]::GetImage().Save($s,[System.Drawing.Imaging.ImageFormat]::Png);',
         '[System.Convert]::ToBase64String($s.ToArray());',
       ]);
-      return _.trim(stdout);
+      return stdout.trim();
     }
     default:
       throw new errors.InvalidArgumentError(
         `The clipboard content type '${contentType}' is not known. ` +
-          `Only the following content types are supported: ${_.values(CONTENT_TYPE)}`,
+          `Only the following content types are supported: ${Object.values(CONTENT_TYPE)}`,
       );
   }
 }

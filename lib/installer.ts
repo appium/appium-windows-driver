@@ -1,10 +1,9 @@
-import _ from 'lodash';
+import {memoize, runElevated} from './utils';
 import {fs, tempDir} from 'appium/support';
 import path from 'node:path';
 import {exec} from 'teen_process';
 import {log} from './logger';
 import {queryRegistry, type RegEntry} from './registry';
-import {runElevated} from './utils';
 
 const POSSIBLE_WAD_INSTALL_ROOTS = [
   process.env['ProgramFiles(x86)'],
@@ -39,13 +38,13 @@ async function fetchMsiInstallLocation(installerGuid: string): Promise<string> {
   try {
     await fs.writeFile(scriptPath, INST_LOCATION_SCRIPT_BY_GUID(installerGuid), 'latin1');
     const {stdout} = await runElevated('cscript.exe', ['/Nologo', scriptPath]);
-    return _.trim(stdout);
+    return stdout.trim();
   } finally {
     await fs.rimraf(tmpRoot);
   }
 }
 
-export const getWADExecutablePath = _.memoize(async function getWADInstallPath(): Promise<string> {
+export const getWADExecutablePath = memoize(async function getWADInstallPath(): Promise<string> {
   const wadPath = process.env.APPIUM_WAD_PATH ?? '';
   if (await fs.exists(wadPath)) {
     log.debug(`Loaded WinAppDriver path from the APPIUM_WAD_PATH environment variable: ${wadPath}`);
@@ -75,7 +74,8 @@ export const getWADExecutablePath = _.memoize(async function getWADInstallPath()
     );
     if (wadEntry) {
       log.debug(`Found MSI entry: ${JSON.stringify(wadEntry)}`);
-      const installerGuid = _.last(wadEntry.root.split('\\')) as string;
+      const parts = wadEntry.root.split('\\');
+      const installerGuid = parts[parts.length - 1] as string;
       // WAD MSI installer leaves InstallLocation registry value empty,
       // so we need to be hacky here
       const result = path.join(await fetchMsiInstallLocation(installerGuid), WAD_EXE_NAME);

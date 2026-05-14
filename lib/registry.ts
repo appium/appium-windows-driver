@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import {runElevated} from './utils';
+import {runElevated, isEmpty} from './utils';
 
 const REG = 'reg.exe';
 const ENTRY_PATTERN = /^\s+(\w+)\s+([A-Z_]+)\s*(.*)/;
@@ -26,13 +25,13 @@ export function parseRegQueryOutput(output: string): RegEntry[] {
   const result: RegEntry[] = [];
   let root: string | undefined;
   let regEntriesBlock: string[] = [];
-  const lines = output.split('\n').map((l: string) => _.trimEnd(l));
+  const lines = output.split('\n').map((l: string) => l.trimEnd());
   for (const line of lines) {
     if (!line) {
       continue;
     }
 
-    const curIndent = line.length - _.trimStart(line).length;
+    const curIndent = line.length - line.trimStart().length;
     if (curIndent === 0) {
       result.push(...parseRegEntries(root, regEntriesBlock));
       root = line;
@@ -67,7 +66,7 @@ export async function queryRegistry(root: string): Promise<RegEntry[]> {
 }
 
 function parseRegEntries(root: string | undefined, block: string[]): RegEntry[] {
-  if (_.isEmpty(block) || !root || _.isEmpty(root)) {
+  if (isEmpty(block) || !root || isEmpty(root)) {
     return [];
   }
   return block.reduce((acc: RegEntry[], line: string) => {
