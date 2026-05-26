@@ -73,7 +73,7 @@
     "appium": "^3.0.0-rc.2"
   },
   "optionalDependencies": {
-    "koffi": "^2.8.1"
+    "koffi": "^3.0.2"
   },
   "devDependencies": {
     "@appium/eslint-config-appium-ts": "^3.0.0",
