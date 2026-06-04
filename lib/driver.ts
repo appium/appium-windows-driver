@@ -30,6 +30,7 @@ import * as logCommands from './commands/log';
 import {POWER_SHELL_FEATURE} from './constants';
 import {newMethodMap} from './method-map';
 import {executeMethodMap} from './execute-method-map';
+import {ensureDpiAwareness} from './commands/winapi/user32';
 
 const NO_PROXY: RouteMatcher[] = [
   ['GET', new RegExp('^/session/[^/]+/appium/(?!app/)[^/]+')],
@@ -158,6 +159,12 @@ export class WindowsDriver
       const [sessionId, caps] = await super.createSession(w3cCaps1, w3cCaps2, w3cCaps3, driverData);
       this.caps = caps;
       this.opts = this.opts as WindowsDriverOpts;
+      if (!(await ensureDpiAwareness())) {
+        this.log.info(
+          `The call to SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) API has failed. ` +
+            `Mouse cursor coordinates calculation for scaled displays might not work as expected.`,
+        );
+      }
       if (caps.prerun) {
         this.log.info('Executing prerun PowerShell script');
         const prerun = caps.prerun as PrerunCapability;

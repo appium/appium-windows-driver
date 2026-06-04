@@ -12,6 +12,7 @@ import {
   toMouseWheelInput,
   getVirtualScreenSize,
   ensureDpiAwareness as _ensureDpiAwareness,
+  toPhysicalScreenCoordinates,
   type MouseInput,
   type KeyInput,
 } from './winapi/user32';
@@ -120,8 +121,14 @@ async function toAbsoluteCoordinates(
     absoluteX += left;
     absoluteY += top;
   }
-  this.log.debug(`${msgPrefix}Absolute coordinates: (${absoluteX}, ${absoluteY})`);
-  return [absoluteX as number, absoluteY as number];
+  const [physicalX, physicalY] = await toPhysicalScreenCoordinates(
+    absoluteX as number,
+    absoluteY as number,
+  );
+  this.log.debug(
+    `${msgPrefix}Absolute coordinates: (${absoluteX}, ${absoluteY}) -> physical (${physicalX}, ${physicalY})`,
+  );
+  return [physicalX, physicalY];
 }
 
 function isModifierKeyName(name: string): name is keyof typeof MODIFIER_KEY {

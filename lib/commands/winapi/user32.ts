@@ -25,10 +25,20 @@ try {
   UnionType = ffi?.union;
 } catch {}
 
+const POINT_STRUCT_DEF = {
+  x: 'long',
+  y: 'long',
+} as const;
+
+export type Point = {[K in keyof typeof POINT_STRUCT_DEF]: number};
+
 export type User32 = {
   SendInput: (cInputs: number, pInputs: unknown, cbSize: number) => Promise<number>;
   GetSystemMetrics: (nIndex: number) => Promise<number>;
   SetProcessDpiAwarenessContext: (value: number) => Promise<number>;
+  LogicalToPhysicalPointForPerMonitorDPI: (hwnd: number, point: Point) => Promise<number>;
+  WindowFromPoint: (point: Point) => Promise<number>;
+  GetDpiForSystem: () => Promise<number>;
 };
 export type KeyInput = {
   type: number;
@@ -88,6 +98,17 @@ const getUser32 = memoize(function getUser32(): User32 {
     ),
     SetProcessDpiAwarenessContext: nodeUtil.promisify(
       user32.func('int __stdcall SetProcessDpiAwarenessContext(int value)').async,
+    ),
+    LogicalToPhysicalPointForPerMonitorDPI: nodeUtil.promisify(
+      user32.func(
+        'int __stdcall LogicalToPhysicalPointForPerMonitorDPI(void *hwnd, POINT *lpPoint)',
+      ).async,
+    ),
+    WindowFromPoint: nodeUtil.promisify(
+      user32.func('void * __stdcall WindowFromPoint(POINT point)').async,
+    ),
+    GetDpiForSystem: nodeUtil.promisify(
+      user32.func('unsigned int __stdcall GetDpiForSystem()').async,
     ),
   };
   return raw as User32;
@@ -158,6 +179,8 @@ const INPUT = requireNativeType(StructType)('INPUT', {
   union: INPUT_UNION,
 });
 
+export const POINT = requireNativeType(StructType)('POINT', POINT_STRUCT_DEF);
+
 const INPUT_KEYBOARD = 1;
 export const KEYEVENTF_KEYUP = 0x0002;
 const KEYEVENTF_UNICODE = 0x0004;
@@ -217,6 +240,7 @@ const WHEEL_DELTA = 120;
 // const DPI_AWARENESS_CONTEXT_SYSTEM_AWARE = 17;
 // const DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE = 18;
 const DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = 34;
+const USER_DEFAULT_SCREEN_DPI = 96;
 
 export interface MouseButtonOptions {
   button: (typeof MOUSE_BUTTON)[keyof typeof MOUSE_BUTTON];
@@ -274,11 +298,43 @@ export async function handleInputs(inputs: object | object[]): Promise<number> {
 }
 
 /** Ensures DPI awareness for the current process. */
-export const ensureDpiAwareness = memoize(async function ensureDpiAwareness(): Promise<boolean> {
-  return Boolean(
+export const ensureDpiAwareness = memoize(async (): Promise<boolean> => {
+  const ok = Boolean(
     await getUser32().SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2),
   );
+  if (!ok) {
+    ensureDpiAwareness.cache.clear();
+  }
+  return ok;
 });
+
+/**
+ * Converts logical screen coordinates (as returned by a DPI-unaware WinAppDriver)
+ * to physical coordinates for SendInput.
+ *
+ * @see https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-screenscaling
+ */
+export async function toPhysicalScreenCoordinates(x: number, y: number): Promise<[number, number]> {
+  if (!(await ensureDpiAwareness())) {
+    return [x, y];
+  }
+
+  const point: Point = {x, y};
+  const hwnd = Number(await getUser32().WindowFromPoint(point));
+  const converted = Boolean(await getUser32().LogicalToPhysicalPointForPerMonitorDPI(hwnd, point));
+  if (converted) {
+    return [point.x, point.y];
+  }
+
+  const dpi = await getUser32().GetDpiForSystem();
+  if (dpi <= USER_DEFAULT_SCREEN_DPI) {
+    return [x, y];
+  }
+  return [
+    Math.round((x * dpi) / USER_DEFAULT_SCREEN_DPI),
+    Math.round((y * dpi) / USER_DEFAULT_SCREEN_DPI),
+  ];
+}
 
 async function getSystemMetrics(nIndex: number): Promise<number> {
   return await getUser32().GetSystemMetrics(nIndex);
