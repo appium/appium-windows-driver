@@ -299,13 +299,21 @@ export async function handleInputs(inputs: object | object[]): Promise<number> {
 
 /** Ensures DPI awareness for the current process. */
 export const ensureDpiAwareness = memoize(async (): Promise<boolean> => {
-  const ok = Boolean(
-    await getUser32().SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2),
-  );
-  if (!ok) {
-    ensureDpiAwareness.cache.clear();
+  if (process.platform !== 'win32' || !ffi) {
+    return false;
   }
-  return ok;
+  try {
+    const ok = Boolean(
+      await getUser32().SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2),
+    );
+    if (!ok) {
+      ensureDpiAwareness.cache.clear();
+    }
+    return ok;
+  } catch {
+    ensureDpiAwareness.cache.clear();
+    return false;
+  }
 });
 
 /**
