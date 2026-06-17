@@ -56,12 +56,15 @@ describe('winapi', () => {
 
     it('fails if wrong input is provided', async () => {
       const errDatas = [
+        // Missing/wrong coordinate
         {y: 10},
         {x: 0},
         {elementId: '1234', y: 10},
         {},
         {x: 10, y: 'yolo'},
+        // wrong button name
         {x: 10, y: 10, button: 'yolo'},
+        // wrong modifier key name
         {x: 10, y: 10, modifierKeys: 'yolo'},
       ];
 
@@ -99,6 +102,7 @@ describe('winapi', () => {
 
     it('fails if wrong input is provided', async () => {
       const errDatas = [
+        // Wrong/missing deltas
         {x: 10, y: 10, deltaX: '10'},
         {x: 10, y: 10, deltaX: 0, deltaY: 40},
         {x: 10, y: 10},
@@ -150,9 +154,12 @@ describe('winapi', () => {
 
     it('fails if wrong input is provided', async () => {
       const errDatas = [
+        // Wrong properties
         {pause: 10, text: 'sdfd'},
         {},
+        // empty text
         {text: ''},
+        // down is not boolean
         {virtualKeyCode: 0x10, down: 'false'},
       ];
 
