@@ -1,4 +1,4 @@
-import {runElevated, isEmpty} from './utils';
+import {runElevated, isEmpty} from './utils/index.js';
 
 const REG = 'reg.exe';
 const ENTRY_PATTERN = /^\s+(\w+)\s+([A-Z_]+)\s*(.*)/;

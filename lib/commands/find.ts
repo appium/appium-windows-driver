@@ -1,5 +1,5 @@
-import {util} from 'appium/support';
-import type {WindowsDriver} from '../driver';
+import {util} from 'appium/support.js';
+import type {WindowsDriver} from '../driver.js';
 
 /** Proxies find-element request to WinAppDriver (`/element` or `/elements`). */
 export async function findElOrEls(

@@ -1,8 +1,9 @@
-import {parseRegQueryOutput} from '../../lib/registry';
-import {expect} from 'chai';
+import {describe, it} from 'node:test';
+import assert from 'node:assert/strict';
+import {parseRegQueryOutput} from '../../lib/registry.js';
 
-describe('registry', function () {
-  it('should parse reg query output', function () {
+describe('registry', () => {
+  it('should parse reg query output', () => {
     const output = `
 HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AddressBook
 
@@ -87,26 +88,25 @@ HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29
 
     `;
     const result = parseRegQueryOutput(output);
-    expect(
-      Boolean(
-        result.find(
-          ({root, key, type, value}) =>
-            root ===
-              'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29DA7679-80B6-452A-B264-349BAEE7CC0E}' &&
-            key === 'DisplayName' &&
-            type === 'REG_SZ' &&
-            value === 'Windows Application Driver',
-        ),
+    assert.ok(
+      result.some(
+        ({root, key, type, value}) =>
+          root ===
+            'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{29DA7679-80B6-452A-B264-349BAEE7CC0E}' &&
+          key === 'DisplayName' &&
+          type === 'REG_SZ' &&
+          value === 'Windows Application Driver',
       ),
-    ).to.be.true;
+    );
   });
-  it('should return empty array if no matches found', function () {
+
+  it('should return empty array if no matches found', () => {
     const output = `
 HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AddressBook
 
 HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\DirectDrawEx
     `;
     const result = parseRegQueryOutput(output);
-    expect(result.length).to.eql(0);
+    assert.equal(result.length, 0);
   });
 });

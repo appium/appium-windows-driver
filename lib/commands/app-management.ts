@@ -1,6 +1,6 @@
 // https://github.com/microsoft/WinAppDriver/blob/master/Docs/SupportedAPIs.md
 
-import type {WindowsDriver} from '../driver';
+import type {WindowsDriver} from '../driver.js';
 
 /**
  * (Re)launch app under test in the same session using the same capabilities configuration.

@@ -1,7 +1,8 @@
-import {memoize} from '../../utils';
+import {memoize} from '../../utils/index.js';
 import type {load, sizeof, struct, union} from 'koffi';
-import {createInvalidArgumentError} from './errors';
-import {util} from 'appium/support';
+import {createInvalidArgumentError} from './errors.js';
+import {util} from 'appium/support.js';
+import {createRequire} from 'node:module';
 import nodeUtil from 'node:util';
 import type {Position, Size} from '@appium/types';
 
@@ -13,6 +14,7 @@ type KoffiModule = {
 };
 
 let ffi: KoffiModule | undefined;
+const require = createRequire(import.meta.url);
 try {
   ffi = require('koffi') as KoffiModule;
 } catch {}

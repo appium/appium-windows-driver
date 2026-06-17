@@ -1,6 +1,6 @@
 //This is needed to make clicks on -image elements work properly
 import type {ActionSequence} from '@appium/types';
-import type {WindowsDriver} from '../driver';
+import type {WindowsDriver} from '../driver.js';
 
 /** Forwards W3C actions to WinAppDriver (needed for `-image` locator clicks). */
 export async function performActions(

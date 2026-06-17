@@ -1,7 +1,7 @@
 import type {StringRecord} from '@appium/types';
-import {POWER_SHELL_FEATURE} from '../constants';
-import type {WindowsDriver} from '../driver';
-import type {ExecPowerShellOptions} from './powershell';
+import {POWER_SHELL_FEATURE} from '../constants.js';
+import type {WindowsDriver} from '../driver.js';
+import type {ExecPowerShellOptions} from './powershell.js';
 
 const POWER_SHELL_SCRIPT = 'powerShell';
 const EXECUTE_SCRIPT_PREFIX = 'windows:';

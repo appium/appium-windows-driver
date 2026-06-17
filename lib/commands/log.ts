@@ -1,6 +1,6 @@
 import type {LogDefRecord, StringRecord} from '@appium/types';
-import type {WindowsDriver} from '../driver';
-import {isEmpty} from '../utils';
+import type {WindowsDriver} from '../driver.js';
+import {isEmpty} from '../utils/index.js';
 
 const COLOR_CODE_PATTERN = /\u001b\[(\d+(;\d+)*)?m/g; // eslint-disable-line no-control-regex
 const GET_SERVER_LOGS_FEATURE = 'get_server_logs';

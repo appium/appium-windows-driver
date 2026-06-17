@@ -10,27 +10,27 @@ import type {
   DriverOpts,
   W3CDriverCaps,
 } from '@appium/types';
-import {BaseDriver, type JWProxy} from 'appium/driver';
-import {system} from 'appium/support';
-import {WinAppDriver} from './winappdriver';
-import type {WindowsDriverCaps} from './winappdriver';
-import {desiredCapConstraints} from './desired-caps';
-import * as appManagementCommands from './commands/app-management';
-import * as clipboardCommands from './commands/clipboard';
-import * as executeCommands from './commands/execute';
-import * as fileCommands from './commands/file-movement';
-import * as findCommands from './commands/find';
-import * as generalCommands from './commands/general';
-import * as gestureCommands from './commands/gestures';
-import * as powershellCommands from './commands/powershell';
-import * as recordScreenCommands from './commands/record-screen';
-import * as touchCommands from './commands/touch';
-import * as contextCommands from './commands/context';
-import * as logCommands from './commands/log';
-import {POWER_SHELL_FEATURE} from './constants';
-import {newMethodMap} from './method-map';
-import {executeMethodMap} from './execute-method-map';
-import {ensureDpiAwareness} from './commands/winapi/user32';
+import {BaseDriver, type JWProxy} from 'appium/driver.js';
+import {system} from 'appium/support.js';
+import {WinAppDriver} from './winappdriver.js';
+import type {WindowsDriverCaps} from './winappdriver.js';
+import {desiredCapConstraints} from './desired-caps.js';
+import * as appManagementCommands from './commands/app-management.js';
+import * as clipboardCommands from './commands/clipboard.js';
+import * as executeCommands from './commands/execute.js';
+import * as fileCommands from './commands/file-movement.js';
+import * as findCommands from './commands/find.js';
+import * as generalCommands from './commands/general.js';
+import * as gestureCommands from './commands/gestures.js';
+import * as powershellCommands from './commands/powershell.js';
+import * as recordScreenCommands from './commands/record-screen.js';
+import * as touchCommands from './commands/touch.js';
+import * as contextCommands from './commands/context.js';
+import * as logCommands from './commands/log.js';
+import {POWER_SHELL_FEATURE} from './constants.js';
+import {newMethodMap} from './method-map.js';
+import {executeMethodMap} from './execute-method-map.js';
+import {ensureDpiAwareness} from './commands/winapi/user32.js';
 
 const NO_PROXY: RouteMatcher[] = [
   ['GET', new RegExp('^/session/[^/]+/appium/(?!app/)[^/]+')],

@@ -1,6 +1,6 @@
 import {exec} from 'teen_process';
-import {errors} from 'appium/driver';
-import type {WindowsDriver} from '../driver';
+import {errors} from 'appium/driver.js';
+import type {WindowsDriver} from '../driver.js';
 import type {TeenProcessExecResult} from 'teen_process';
 
 const CONTENT_TYPE = Object.freeze({

@@ -1,9 +1,9 @@
-import {memoize, runElevated} from './utils';
-import {fs, tempDir} from 'appium/support';
+import {memoize, runElevated} from './utils/index.js';
+import {fs, tempDir} from 'appium/support.js';
 import path from 'node:path';
 import {exec} from 'teen_process';
-import {log} from './logger';
-import {queryRegistry, type RegEntry} from './registry';
+import {log} from './logger.js';
+import {queryRegistry, type RegEntry} from './registry.js';
 
 const POSSIBLE_WAD_INSTALL_ROOTS = [
   process.env['ProgramFiles(x86)'],

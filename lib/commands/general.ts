@@ -1,7 +1,7 @@
 import type {Position, Rect, Size} from '@appium/types';
-import {util} from 'appium/support';
-import type {WindowsDriver} from '../driver';
-import {isPlainObject} from '../utils';
+import {util} from 'appium/support.js';
+import type {WindowsDriver} from '../driver.js';
+import {isPlainObject} from '../utils/index.js';
 
 // The next two commands are required
 // for proper `-image` locator functionality

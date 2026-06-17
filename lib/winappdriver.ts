@@ -1,15 +1,15 @@
-import {isEmpty} from './utils';
+import {isEmpty} from './utils/index.js';
 import os from 'node:os';
 import path from 'node:path';
 import type {AppiumLogger, ProxyOptions, HTTPMethod, HTTPBody} from '@appium/types';
-import {JWProxy, errors} from 'appium/driver';
+import {JWProxy, errors} from 'appium/driver.js';
 import {SubProcess} from 'teen_process';
-import {getWADExecutablePath} from './installer';
+import {getWADExecutablePath} from './installer.js';
 import {waitForCondition} from 'asyncbox';
 import {execSync} from 'node:child_process';
-import {util} from 'appium/support';
+import {util} from 'appium/support.js';
 import {findAPortNotInUse, checkPortStatus} from 'portscanner';
-import type {DesiredCapConstraintKeys} from './desired-caps';
+import type {DesiredCapConstraintKeys} from './desired-caps.js';
 
 const DEFAULT_BASE_PATH = '/wd/hub';
 const DEFAULT_HOST = '127.0.0.1';

@@ -1,8 +1,8 @@
 import path from 'node:path';
-import {errors} from 'appium/driver';
-import {fs, util, zip} from 'appium/support';
-import {MODIFY_FS_FEATURE} from '../constants';
-import type {WindowsDriver} from '../driver';
+import {errors} from 'appium/driver.js';
+import {fs, util, zip} from 'appium/support.js';
+import {MODIFY_FS_FEATURE} from '../constants.js';
+import type {WindowsDriver} from '../driver.js';
 
 // List of env variables, that can be expanded in path
 const KNOWN_ENV_VARS = [

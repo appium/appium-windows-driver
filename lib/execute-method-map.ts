@@ -1,5 +1,5 @@
 import type {ExecuteMethodMap} from '@appium/types';
-import type {WindowsDriver} from './driver';
+import type {WindowsDriver} from './driver.js';
 
 export const executeMethodMap = {
   'windows: startRecordingScreen': {

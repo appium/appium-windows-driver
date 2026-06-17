@@ -15,13 +15,13 @@ import {
   toPhysicalScreenCoordinates,
   type MouseInput,
   type KeyInput,
-} from './winapi/user32';
-import {errors} from 'appium/driver';
+} from './winapi/user32.js';
+import {errors} from 'appium/driver.js';
 import {sleep, asyncmap} from 'asyncbox';
-import {util} from 'appium/support';
-import type {WindowsDriver} from '../driver';
-import {isEmpty} from '../utils';
-import {isInvalidArgumentError} from './winapi/errors';
+import {util} from 'appium/support.js';
+import type {WindowsDriver} from '../driver.js';
+import {isEmpty} from '../utils/index.js';
+import {isInvalidArgumentError} from './winapi/errors.js';
 
 const EVENT_INJECTION_DELAY_MS = 5;
 

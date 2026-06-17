@@ -1,9 +1,9 @@
 import {waitForCondition} from 'asyncbox';
-import {util, fs, net, system, tempDir} from 'appium/support';
-import {isEmpty} from '../utils';
+import {util, fs, net, system, tempDir} from 'appium/support.js';
+import {isEmpty} from '../utils/index.js';
 import {SubProcess} from 'teen_process';
 import type {AppiumLogger} from '@appium/types';
-import type {WindowsDriver} from '../driver';
+import type {WindowsDriver} from '../driver.js';
 
 const RETRY_PAUSE = 300;
 const RETRY_TIMEOUT = 5000;

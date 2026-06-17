@@ -1,7 +1,7 @@
-import {fs, tempDir} from 'appium/support';
+import {fs, tempDir} from 'appium/support.js';
 import {exec} from 'teen_process';
 import path from 'node:path';
-import type {WindowsDriver} from '../driver';
+import type {WindowsDriver} from '../driver.js';
 
 const EXECUTION_POLICY = {
   REMOTE_SIGNED: 'RemoteSigned',

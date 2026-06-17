@@ -1,5 +1,5 @@
-import {errors} from 'appium/driver';
-import type {WindowsDriver} from '../driver';
+import {errors} from 'appium/driver.js';
+import type {WindowsDriver} from '../driver.js';
 
 const WINDOWS_CONTEXT = 'NATIVE_APP';
 
