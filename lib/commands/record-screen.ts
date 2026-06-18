@@ -403,11 +403,11 @@ async function uploadRecordedMedia(
 
   const uploadUrl = remotePath as string;
   const {user, pass, method, headers, fileFieldName, formFields} = uploadOptions;
-  const options: UploadOptions = {
-    method: method || 'PUT',
+  const options: net.HttpUploadOptions = {
+    method: (method || 'PUT') as net.HttpUploadOptions['method'],
     headers,
     fileFieldName,
-    formFields,
+    formFields: formFields as net.HttpUploadOptions['formFields'],
   };
   if (user && pass) {
     options.auth = {user, pass};
