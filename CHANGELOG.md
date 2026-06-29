@@ -1,3 +1,5 @@
+## [6.0.3](https://github.com/appium/appium-windows-driver/compare/v6.0.2...v6.0.3) (2026-06-29)
+
 ## [6.0.2](https://github.com/appium/appium-windows-driver/compare/v6.0.1...v6.0.2) (2026-06-19)
 
 ### Miscellaneous Chores
