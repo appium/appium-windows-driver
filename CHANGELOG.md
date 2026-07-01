@@ -1,3 +1,9 @@
+## [6.0.4](https://github.com/appium/appium-windows-driver/compare/v6.0.3...v6.0.4) (2026-07-01)
+
+### Miscellaneous Chores
+
+* downgrade conventional-changelog-conventionalcommits to v9 ([#366](https://github.com/appium/appium-windows-driver/issues/366)) ([f207815](https://github.com/appium/appium-windows-driver/commit/f20781562e6a9eae9c83ead21533bfd97953a935))
+
 ## [6.0.3](https://github.com/appium/appium-windows-driver/compare/v6.0.2...v6.0.3) (2026-06-29)
 
 ## [6.0.2](https://github.com/appium/appium-windows-driver/compare/v6.0.1...v6.0.2) (2026-06-19)
