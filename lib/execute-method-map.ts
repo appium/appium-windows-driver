@@ -1,4 +1,5 @@
 import type {ExecuteMethodMap} from '@appium/types';
+
 import type {WindowsDriver} from './driver.js';
 
 export const executeMethodMap = {
@@ -48,16 +49,7 @@ export const executeMethodMap = {
   'windows: click': {
     command: 'windowsClick',
     params: {
-      optional: [
-        'elementId',
-        'x',
-        'y',
-        'button',
-        'modifierKeys',
-        'durationMs',
-        'times',
-        'interClickDelayMs',
-      ],
+      optional: ['elementId', 'x', 'y', 'button', 'modifierKeys', 'durationMs', 'times', 'interClickDelayMs'],
     },
   },
   'windows: scroll': {
@@ -69,31 +61,13 @@ export const executeMethodMap = {
   'windows: clickAndDrag': {
     command: 'windowsClickAndDrag',
     params: {
-      optional: [
-        'startElementId',
-        'startX',
-        'startY',
-        'endElementId',
-        'endX',
-        'endY',
-        'modifierKeys',
-        'durationMs',
-      ],
+      optional: ['startElementId', 'startX', 'startY', 'endElementId', 'endX', 'endY', 'modifierKeys', 'durationMs'],
     },
   },
   'windows: hover': {
     command: 'windowsHover',
     params: {
-      optional: [
-        'startElementId',
-        'startX',
-        'startY',
-        'endElementId',
-        'endX',
-        'endY',
-        'modifierKeys',
-        'durationMs',
-      ],
+      optional: ['startElementId', 'startX', 'startY', 'endElementId', 'endX', 'endY', 'modifierKeys', 'durationMs'],
     },
   },
   'windows: keys': {

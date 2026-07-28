@@ -1,8 +1,10 @@
-import {describe, it, before, after} from 'node:test';
 import assert from 'node:assert/strict';
-import {buildWdIoOptions} from '../helpers.js';
+import {describe, it, before, after} from 'node:test';
+
 import {remote as wdio} from 'webdriverio';
 import type {Browser} from 'webdriverio';
+
+import {buildWdIoOptions} from '../helpers.js';
 
 describe('winapi', () => {
   let driver: Browser | null = null;

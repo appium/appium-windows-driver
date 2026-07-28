@@ -3,28 +3,31 @@
   "version": "6.0.5",
   "description": "Appium bridge to WinAppDriver",
   "keywords": [
+    "WinAppDriver",
     "appium",
-    "windows",
-    "WinAppDriver"
+    "windows"
   ],
-  "author": "Appium Contributors",
+  "bugs": {
+    "url": "https://github.com/appium/appium-windows-driver/issues"
+  },
   "license": "Apache-2.0",
+  "author": "Appium Contributors",
   "repository": {
     "type": "git",
     "url": "https://github.com/appium/appium-windows-driver.git"
   },
-  "bugs": {
-    "url": "https://github.com/appium/appium-windows-driver/issues"
+  "bin": {},
+  "directories": {
+    "lib": "lib"
   },
-  "engines": {
-    "node": "^20.19.0 || ^22.12.0 || >=24.0.0",
-    "npm": ">=10"
-  },
-  "prettier": {
-    "bracketSpacing": false,
-    "printWidth": 100,
-    "singleQuote": true
-  },
+  "files": [
+    "lib",
+    "build/lib",
+    "CHANGELOG.md",
+    "LICENSE",
+    "npm-shrinkwrap.json",
+    "scripts"
+  ],
   "type": "module",
   "main": "./build/lib/index.js",
   "types": "./build/lib/index.d.ts",
@@ -35,9 +38,44 @@
     },
     "./package.json": "./package.json"
   },
-  "bin": {},
-  "directories": {
-    "lib": "lib"
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "npm run build -- --watch",
+    "clean": "npm run build -- --clean",
+    "lint": "oxlint -c oxlint.config.mjs .",
+    "lint:fix": "oxlint -c oxlint.config.mjs --fix .",
+    "format": "oxfmt -c oxfmt.config.mjs .",
+    "format:check": "oxfmt -c oxfmt.config.mjs --check .",
+    "prepare": "npm run build",
+    "test": "node --test --test-timeout=60000 \"build/test/unit/**/*.test.js\"",
+    "e2e-test": "npm run build && node --test --test-concurrency=1 --test-timeout=600000 \"build/test/e2e/**/*.test.js\""
+  },
+  "dependencies": {
+    "asyncbox": "^6.0.1",
+    "axios": "^1.16.0",
+    "portscanner": "^2.2.0",
+    "semver": "^7.6.3",
+    "teen_process": "^4.0.4"
+  },
+  "devDependencies": {
+    "@appium/oxc-config": "^1.1.0",
+    "@appium/semantic-release-config": "^1.1.0",
+    "@appium/tsconfig": "^1.0.0-rc.1",
+    "@appium/types": "^1.0.0-rc.1",
+    "@types/node": "^26.0.0",
+    "@types/portscanner": "^2.1.4",
+    "typescript": "^6.0.2",
+    "webdriverio": "^9.0.1"
+  },
+  "peerDependencies": {
+    "appium": "^3.0.0-rc.2"
+  },
+  "optionalDependencies": {
+    "koffi": "^3.0.2"
+  },
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0",
+    "npm": ">=10"
   },
   "appium": {
     "driverName": "windows",
@@ -49,52 +87,5 @@
       "install-wad": "./scripts/install-wad.mjs"
     },
     "mainClass": "WindowsDriver"
-  },
-  "files": [
-    "lib",
-    "build/lib",
-    "CHANGELOG.md",
-    "LICENSE",
-    "npm-shrinkwrap.json",
-    "scripts"
-  ],
-  "dependencies": {
-    "asyncbox": "^6.0.1",
-    "axios": "^1.16.0",
-    "portscanner": "^2.2.0",
-    "semver": "^7.6.3",
-    "teen_process": "^4.0.4"
-  },
-  "scripts": {
-    "build": "tsc -b",
-    "dev": "npm run build -- --watch",
-    "clean": "npm run build -- --clean",
-    "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
-    "format": "prettier -w ./lib ./test",
-    "format:check": "prettier --check ./lib ./test",
-    "prepare": "npm run build",
-    "test": "node --test --test-timeout=60000 \"build/test/unit/**/*.test.js\"",
-    "e2e-test": "npm run build && node --test --test-concurrency=1 --test-timeout=600000 \"build/test/e2e/**/*.test.js\""
-  },
-  "peerDependencies": {
-    "appium": "^3.0.0-rc.2"
-  },
-  "optionalDependencies": {
-    "koffi": "^3.0.2"
-  },
-  "devDependencies": {
-    "@appium/eslint-config-appium-ts": "^3.0.0",
-    "@appium/tsconfig": "^1.0.0-rc.1",
-    "@appium/types": "^1.0.0-rc.1",
-    "@semantic-release/changelog": "^6.0.1",
-    "@semantic-release/git": "^10.0.1",
-    "@types/node": "^26.0.0",
-    "@types/portscanner": "^2.1.4",
-    "conventional-changelog-conventionalcommits": "^9.3.1",
-    "prettier": "^3.0.3",
-    "semantic-release": "^25.0.2",
-    "typescript": "^6.0.2",
-    "webdriverio": "^9.0.1"
   }
 }

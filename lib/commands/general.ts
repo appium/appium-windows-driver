@@ -1,5 +1,6 @@
 import type {Position, Rect, Size} from '@appium/types';
 import {util} from 'appium/support.js';
+
 import type {WindowsDriver} from '../driver.js';
 import {isPlainObject} from '../utils/index.js';
 
@@ -26,10 +27,7 @@ export async function getWindowRect(this: WindowsDriver): Promise<Rect> {
   let [x, y] = [0, 0];
   try {
     const handle = await this.winAppDriver.sendCommand('/window_handle', 'GET');
-    ({x, y} = (await this.winAppDriver.sendCommand(
-      `/window/${handle}/position`,
-      'GET',
-    )) as Position);
+    ({x, y} = (await this.winAppDriver.sendCommand(`/window/${handle}/position`, 'GET')) as Position);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     this.log.warn(`Cannot fetch the window position. Defaulting to zeroes. Original error: ${msg}`);
@@ -76,21 +74,14 @@ export async function getScreenshot(this: WindowsDriver): Promise<string> {
 /** Element bounding rect from separate WAD location and size calls. */
 export async function getElementRect(this: WindowsDriver, el: string): Promise<Rect> {
   const elId = util.unwrapElement(el);
-  const {x, y} = (await this.winAppDriver.sendCommand(
-    `/element/${elId}/location`,
-    'GET',
-  )) as Position;
-  const {width, height} = (await this.winAppDriver.sendCommand(
-    `/element/${elId}/size`,
-    'GET',
-  )) as Size;
+  const {x, y} = (await this.winAppDriver.sendCommand(`/element/${elId}/location`, 'GET')) as Position;
+  const {width, height} = (await this.winAppDriver.sendCommand(`/element/${elId}/size`, 'GET')) as Size;
   return {x, y, width, height};
 }
 
 async function getScreenSize(this: WindowsDriver): Promise<Size> {
   const dimensions = await this.execPowerShell({
-    command:
-      'Add-Type -AssemblyName System.Windows.Forms;[System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Size',
+    command: 'Add-Type -AssemblyName System.Windows.Forms;[System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Size',
   });
   this.log.debug(`Screen size information retrieved: ${dimensions}`);
   const match = /^\s*(True|False)\s+(\d+)\s+(\d+)/m.exec(dimensions);

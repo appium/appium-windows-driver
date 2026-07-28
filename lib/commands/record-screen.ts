@@ -1,9 +1,10 @@
-import {waitForCondition} from 'asyncbox';
-import {util, fs, net, system, tempDir} from 'appium/support.js';
-import {isEmpty} from '../utils/index.js';
-import {SubProcess} from 'teen_process';
 import type {AppiumLogger} from '@appium/types';
+import {util, fs, net, system, tempDir} from 'appium/support.js';
+import {waitForCondition} from 'asyncbox';
+import {SubProcess} from 'teen_process';
+
 import type {WindowsDriver} from '../driver.js';
+import {isEmpty} from '../utils/index.js';
 
 const RETRY_PAUSE = 300;
 const RETRY_TIMEOUT = 5000;
@@ -194,9 +195,7 @@ export class ScreenRecorder {
     return new Promise<string>((resolve, reject) => {
       const timer = setTimeout(async () => {
         await this._enforceTermination();
-        reject(
-          new Error(`Screen recording has failed to exit after ${PROCESS_SHUTDOWN_TIMEOUT}ms`),
-        );
+        reject(new Error(`Screen recording has failed to exit after ${PROCESS_SHUTDOWN_TIMEOUT}ms`));
       }, PROCESS_SHUTDOWN_TIMEOUT);
 
       this._process?.once('exit', async (code, signal) => {
@@ -322,9 +321,7 @@ export async function windowsStopRecordingScreen(
   }
   if (isEmpty(remotePath)) {
     const {size} = await fs.stat(videoPath);
-    this.log.debug(
-      `The size of the resulting screen recording is ${util.toReadableSizeString(size)}`,
-    );
+    this.log.debug(`The size of the resulting screen recording is ${util.toReadableSizeString(size)}`);
   }
   return await uploadRecordedMedia(videoPath, remotePath, {
     user,
@@ -342,20 +339,8 @@ export async function windowsStopRecordingScreen(
  * @param options - Recording options (same fields as the positional `windowsStartRecordingScreen` API).
  * @throws If recording cannot be started or is unsupported on this host.
  */
-export async function startRecordingScreen(
-  this: WindowsDriver,
-  options: StartRecordingOptions = {},
-): Promise<void> {
-  const {
-    timeLimit,
-    videoFilter,
-    fps,
-    preset,
-    captureCursor,
-    captureClicks,
-    audioInput,
-    forceRestart = true,
-  } = options;
+export async function startRecordingScreen(this: WindowsDriver, options: StartRecordingOptions = {}): Promise<void> {
+  const {timeLimit, videoFilter, fps, preset, captureCursor, captureClicks, audioInput, forceRestart = true} = options;
 
   await this.windowsStartRecordingScreen(
     timeLimit,
@@ -375,21 +360,10 @@ export async function startRecordingScreen(
  * @param options - Upload and auth options (same fields as the positional `windowsStopRecordingScreen` API).
  * @throws If the recording cannot be read, the upload fails, or recording is unsupported.
  */
-export async function stopRecordingScreen(
-  this: WindowsDriver,
-  options: StopRecordingOptions = {},
-): Promise<string> {
+export async function stopRecordingScreen(this: WindowsDriver, options: StopRecordingOptions = {}): Promise<string> {
   const {remotePath, user, pass, method, headers, fileFieldName, formFields} = options;
 
-  return await this.windowsStopRecordingScreen(
-    remotePath,
-    user,
-    pass,
-    method,
-    headers,
-    fileFieldName,
-    formFields,
-  );
+  return await this.windowsStopRecordingScreen(remotePath, user, pass, method, headers, fileFieldName, formFields);
 }
 
 async function uploadRecordedMedia(
@@ -420,8 +394,6 @@ async function requireFfmpegPath() {
   try {
     return await fs.which(FFMPEG_BINARY);
   } catch {
-    throw new Error(
-      `${FFMPEG_BINARY} has not been found in PATH. ` + `Please make sure it is installed`,
-    );
+    throw new Error(`${FFMPEG_BINARY} has not been found in PATH. ` + `Please make sure it is installed`);
   }
 }

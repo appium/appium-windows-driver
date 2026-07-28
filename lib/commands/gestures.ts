@@ -1,3 +1,10 @@
+import {errors} from 'appium/driver.js';
+import {util} from 'appium/support.js';
+import {sleep, asyncmap} from 'asyncbox';
+
+import type {WindowsDriver} from '../driver.js';
+import {isEmpty} from '../utils/index.js';
+import {isInvalidArgumentError} from './winapi/errors.js';
 import {
   MOUSE_BUTTON_ACTION,
   MOUSE_BUTTON,
@@ -16,12 +23,6 @@ import {
   type MouseInput,
   type KeyInput,
 } from './winapi/user32.js';
-import {errors} from 'appium/driver.js';
-import {sleep, asyncmap} from 'asyncbox';
-import {util} from 'appium/support.js';
-import type {WindowsDriver} from '../driver.js';
-import {isEmpty} from '../utils/index.js';
-import {isInvalidArgumentError} from './winapi/errors.js';
 
 const EVENT_INJECTION_DELAY_MS = 5;
 
@@ -89,31 +90,21 @@ async function toAbsoluteCoordinates(
 
   if (!elementId) {
     if (!hasX || !hasY) {
-      throw new errors.InvalidArgumentError(
-        `${msgPrefix}Both absolute coordinates must be provided`,
-      );
+      throw new errors.InvalidArgumentError(`${msgPrefix}Both absolute coordinates must be provided`);
     }
     this.log.debug(`${msgPrefix}Absolute coordinates: (${x}, ${y})`);
     return [x as number, y as number];
   }
 
   if ((hasX && !hasY) || (!hasX && hasY)) {
-    throw new errors.InvalidArgumentError(
-      `${msgPrefix}Both relative element coordinates must be provided`,
-    );
+    throw new errors.InvalidArgumentError(`${msgPrefix}Both relative element coordinates must be provided`);
   }
 
   let absoluteX = x;
   let absoluteY = y;
-  const {x: left, y: top} = await this.winAppDriver.sendCommand(
-    `/element/${elementId}/location`,
-    'GET',
-  );
+  const {x: left, y: top} = await this.winAppDriver.sendCommand(`/element/${elementId}/location`, 'GET');
   if (!hasX && !hasY) {
-    const {width, height} = await this.winAppDriver.sendCommand(
-      `/element/${elementId}/size`,
-      'GET',
-    );
+    const {width, height} = await this.winAppDriver.sendCommand(`/element/${elementId}/size`, 'GET');
     absoluteX = left + Math.trunc(width / 2);
     absoluteY = top + Math.trunc(height / 2);
   } else {
@@ -121,10 +112,7 @@ async function toAbsoluteCoordinates(
     absoluteX += left;
     absoluteY += top;
   }
-  const [physicalX, physicalY] = await toPhysicalScreenCoordinates(
-    absoluteX as number,
-    absoluteY as number,
-  );
+  const [physicalX, physicalY] = await toPhysicalScreenCoordinates(absoluteX as number, absoluteY as number);
   this.log.debug(
     `${msgPrefix}Absolute coordinates: (${absoluteX}, ${absoluteY}) -> physical (${physicalX}, ${physicalY})`,
   );
@@ -216,13 +204,11 @@ export async function windowsClick(
 ): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
-  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
-    modifierKeys,
-  ) as [KeyInput[], KeyInput[]];
-  const [absoluteX, absoluteY] = (await toAbsoluteCoordinates.bind(this)(elementId, x, y)) as [
-    number,
-    number,
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(modifierKeys) as [
+    KeyInput[],
+    KeyInput[],
   ];
+  const [absoluteX, absoluteY] = (await toAbsoluteCoordinates.bind(this)(elementId, x, y)) as [number, number];
   let clickDownInput: MouseInput;
   let clickUpInput: MouseInput;
   let clickInput: MouseInput;
@@ -297,13 +283,11 @@ export async function windowsScroll(
 ): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
-  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
-    modifierKeys,
-  ) as [KeyInput[], KeyInput[]];
-  const [absoluteX, absoluteY] = (await toAbsoluteCoordinates.bind(this)(elementId, x, y)) as [
-    number,
-    number,
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(modifierKeys) as [
+    KeyInput[],
+    KeyInput[],
   ];
+  const [absoluteX, absoluteY] = (await toAbsoluteCoordinates.bind(this)(elementId, x, y)) as [number, number];
   let moveInput: MouseInput;
   let scrollInput: MouseInput | null;
   try {
@@ -321,8 +305,7 @@ export async function windowsScroll(
       await handleInputs(scrollInput);
     } else {
       this.log.info(
-        'There is no need to actually perform scroll with the given ' +
-          (deltaX == null ? 'deltaY' : 'deltaX'),
+        'There is no need to actually perform scroll with the given ' + (deltaX == null ? 'deltaY' : 'deltaX'),
       );
     }
   } finally {
@@ -375,19 +358,15 @@ export async function windowsClickAndDrag(
   await ensureDpiAwareness.bind(this)();
 
   const screenSize = await getVirtualScreenSize();
-  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
-    modifierKeys,
-  ) as [KeyInput[], KeyInput[]];
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(modifierKeys) as [
+    KeyInput[],
+    KeyInput[],
+  ];
   const [[startAbsoluteX, startAbsoluteY], [endAbsoluteX, endAbsoluteY]] = await Promise.all([
-    toAbsoluteCoordinates.bind(this)(
-      startElementId,
-      startX,
-      startY,
-      'Starting drag point',
-    ) as Promise<[number, number]>,
-    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending drag point') as Promise<
+    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting drag point') as Promise<
       [number, number]
     >,
+    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending drag point') as Promise<[number, number]>,
   ]);
   let clickDownInput: MouseInput;
   let clickUpInput: MouseInput;
@@ -466,19 +445,15 @@ export async function windowsHover(
   await ensureDpiAwareness.bind(this)();
 
   const screenSize = await getVirtualScreenSize();
-  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(
-    modifierKeys,
-  ) as [KeyInput[], KeyInput[]];
+  const [modifierKeyDownInputs, modifierKeyUpInputs] = modifierKeysToInputs.bind(this)(modifierKeys) as [
+    KeyInput[],
+    KeyInput[],
+  ];
   const [[startAbsoluteX, startAbsoluteY], [endAbsoluteX, endAbsoluteY]] = await Promise.all([
-    toAbsoluteCoordinates.bind(this)(
-      startElementId,
-      startX,
-      startY,
-      'Starting hover point',
-    ) as Promise<[number, number]>,
-    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending hover point') as Promise<
+    toAbsoluteCoordinates.bind(this)(startElementId, startX, startY, 'Starting hover point') as Promise<
       [number, number]
     >,
+    toAbsoluteCoordinates.bind(this)(endElementId, endX, endY, 'Ending hover point') as Promise<[number, number]>,
   ]);
   const stepsCount = Math.max(Math.trunc(durationMs / EVENT_INJECTION_DELAY_MS), 1);
   const maxChunkSize = 10;
@@ -522,10 +497,7 @@ export async function windowsHover(
  * @param actions - One or more key actions.
  * @throws If given options are not acceptable or the gesture has failed.
  */
-export async function windowsKeys(
-  this: WindowsDriver,
-  actions: KeyAction | KeyAction[],
-): Promise<void> {
+export async function windowsKeys(this: WindowsDriver, actions: KeyAction | KeyAction[]): Promise<void> {
   const parsedItems = parseKeyActions(Array.isArray(actions) ? actions : [actions]);
   this.log.debug(`Parsed ${util.pluralize('key action', parsedItems.length, true)}`);
   for (const item of parsedItems) {
@@ -566,9 +538,7 @@ function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
   }
   if (hasText) {
     if (typeof text !== 'string' || text.length === 0) {
-      throw new errors.InvalidArgumentError(
-        `${actionPrefix}Text value must be a valid non-empty string`,
-      );
+      throw new errors.InvalidArgumentError(`${actionPrefix}Text value must be a valid non-empty string`);
     }
     return toUnicodeKeyInputs(text);
   }
@@ -576,9 +546,7 @@ function parseKeyAction(action: KeyAction, index: number): number | KeyInput[] {
   // has virtual code
   if (Object.hasOwn(action, 'down')) {
     if (typeof down !== 'boolean') {
-      throw new errors.InvalidArgumentError(
-        `${actionPrefix}The down argument must be of type boolean if provided`,
-      );
+      throw new errors.InvalidArgumentError(`${actionPrefix}The down argument must be of type boolean if provided`);
     }
 
     // only depress or release the key if `down` is provided
@@ -612,12 +580,7 @@ function parseKeyActions(actions: KeyAction[]): Array<number | KeyInput[]> {
   for (let i = 0; i < allActions.length; ++i) {
     const item = allActions[i];
     const last = combinedArray[combinedArray.length - 1];
-    if (
-      Array.isArray(item) &&
-      combinedArray.length > 0 &&
-      last !== undefined &&
-      Array.isArray(last)
-    ) {
+    if (Array.isArray(item) && combinedArray.length > 0 && last !== undefined && Array.isArray(last)) {
       last.push(...item);
     } else {
       combinedArray.push(item);

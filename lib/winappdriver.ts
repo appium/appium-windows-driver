@@ -1,15 +1,17 @@
-import {isEmpty} from './utils/index.js';
+import {execSync} from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
+
 import type {AppiumLogger, ProxyOptions, HTTPMethod, HTTPBody} from '@appium/types';
 import {JWProxy, errors} from 'appium/driver.js';
-import {SubProcess} from 'teen_process';
-import {getWADExecutablePath} from './installer.js';
-import {waitForCondition} from 'asyncbox';
-import {execSync} from 'node:child_process';
 import {util} from 'appium/support.js';
+import {waitForCondition} from 'asyncbox';
 import {findAPortNotInUse, checkPortStatus} from 'portscanner';
+import {SubProcess} from 'teen_process';
+
 import type {DesiredCapConstraintKeys} from './desired-caps.js';
+import {getWADExecutablePath} from './installer.js';
+import {isEmpty} from './utils/index.js';
 
 const DEFAULT_BASE_PATH = '/wd/hub';
 const DEFAULT_HOST = '127.0.0.1';
@@ -22,8 +24,7 @@ const PORT_ALLOCATION_GUARD = util.getLockFileGuard(path.resolve(os.tmpdir(), 'w
   timeout: 5,
   tryRecovery: true,
 });
-const TROUBLESHOOTING_LINK =
-  'https://github.com/appium/appium-windows-driver?tab=readme-ov-file#troubleshooting';
+const TROUBLESHOOTING_LINK = 'https://github.com/appium/appium-windows-driver?tab=readme-ov-file#troubleshooting';
 
 class WADProxy extends JWProxy {
   didProcessExit?: boolean;
@@ -40,11 +41,7 @@ class WADProxy extends JWProxy {
     }
   }
 
-  override async proxyCommand(
-    url: string,
-    method: HTTPMethod,
-    body: HTTPBody = null,
-  ): Promise<any> {
+  override async proxyCommand(url: string, method: HTTPMethod, body: HTTPBody = null): Promise<any> {
     if (this.didProcessExit) {
       throw new errors.InvalidContextError(
         `'${method} ${url}' cannot be proxied to WinAppDriver server because ` +
@@ -124,8 +121,7 @@ class WADProcess {
         await this.proc?.stop();
       } catch (e: any) {
         this.log.warn(
-          `WinAppDriver process with PID ${this.proc?.pid} cannot be stopped. ` +
-            `Original error: ${e.message}`,
+          `WinAppDriver process with PID ${this.proc?.pid} cannot be stopped. ` + `Original error: ${e.message}`,
         );
       }
     }
@@ -208,10 +204,7 @@ export class WinAppDriver {
       try {
         await this.proxy.command('', 'DELETE');
       } catch (err: any) {
-        this.log.warn(
-          `Did not get confirmation WinAppDriver deleteSession worked; ` +
-            `Error was: ${err.message}`,
-        );
+        this.log.warn(`Did not get confirmation WinAppDriver deleteSession worked; ` + `Error was: ${err.message}`);
       }
     }
 
@@ -316,10 +309,7 @@ export class WinAppDriver {
       parsedUrl = new URL(url);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
-      throw new Error(
-        `Cannot parse the provided WinAppDriver URL '${url}'. Original error: ${message}`,
-        {cause: e},
-      );
+      throw new Error(`Cannot parse the provided WinAppDriver URL '${url}'. Original error: ${message}`, {cause: e});
     }
     const proxyOpts: ProxyOptions = {
       log: this.log,
@@ -365,9 +355,7 @@ export class WinAppDriver {
         return true;
       } catch (error: any) {
         lastError = error;
-        this.log.warn(
-          `Could not start WinAppDriver session error = '${error.message}', attempt = ${retryIteration}`,
-        );
+        this.log.warn(`Could not start WinAppDriver session error = '${error.message}', attempt = ${retryIteration}`);
         return false;
       }
     };
@@ -378,8 +366,7 @@ export class WinAppDriver {
         intervalMs: 500,
       });
     } catch (timeoutError: unknown) {
-      const timeoutMsg =
-        timeoutError instanceof Error ? timeoutError.message : String(timeoutError);
+      const timeoutMsg = timeoutError instanceof Error ? timeoutError.message : String(timeoutError);
       this.log.debug(`timeoutError was ${timeoutMsg}`);
       if (lastError) {
         throw lastError;

@@ -1,7 +1,9 @@
-import {describe, it, before, after} from 'node:test';
 import assert from 'node:assert/strict';
-import {WindowsDriver} from '../../lib/driver.js';
+import {describe, it, before, after} from 'node:test';
+
 import {system} from 'appium/support.js';
+
+import {WindowsDriver} from '../../lib/driver.js';
 
 describe('driver', () => {
   let originalIsWindows: typeof system.isWindows;

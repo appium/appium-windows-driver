@@ -1,9 +1,11 @@
-import {describe, it, beforeEach, afterEach} from 'node:test';
 import assert from 'node:assert/strict';
+import path from 'node:path';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
+import {tempDir, fs} from 'appium/support.js';
 import {remote as wdio} from 'webdriverio';
 import type {Browser} from 'webdriverio';
-import path from 'node:path';
-import {tempDir, fs} from 'appium/support.js';
+
 import {isAdmin} from '../../../lib/installer.js';
 import {buildWdIoOptions} from '../helpers.js';
 

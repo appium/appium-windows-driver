@@ -1,8 +1,10 @@
-import {net} from 'appium/support.js';
-import {promisify} from 'node:util';
 import {exec} from 'node:child_process';
 import type {ExecOptions} from 'node:child_process';
+import {promisify} from 'node:util';
+
+import {net} from 'appium/support.js';
 import {withTimeout} from 'asyncbox';
+
 import {log} from '../logger.js';
 
 const execAsync = promisify(exec);

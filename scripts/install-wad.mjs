@@ -1,10 +1,12 @@
+import fs from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+
 import axios from 'axios';
 import * as semver from 'semver';
-import path from 'node:path';
-import { tmpdir } from 'node:os';
-import { log } from '../build/lib/logger.js';
-import { runElevated, downloadToFile } from '../build/lib/utils/index.js';
-import fs from 'node:fs/promises';
+
+import {log} from '../build/lib/logger.js';
+import {runElevated, downloadToFile} from '../build/lib/utils/index.js';
 
 const OWNER = 'microsoft';
 const REPO = 'winappdriver';
@@ -49,7 +51,7 @@ async function listReleases() {
   let currentUrl = `${API_ROOT}/releases`;
   do {
     const {data, headers} = await axios.get(currentUrl, {
-      timeout: API_TIMEOUT_MS
+      timeout: API_TIMEOUT_MS,
     });
     allReleases.push(...data);
     currentUrl = parseNextPageUrl(headers);
@@ -65,7 +67,7 @@ async function listReleases() {
     }
     /** @type {ReleaseAsset[]} */
     const releaseAssets = [];
-    for (const asset of (releaseInfo.assets ?? [])) {
+    for (const asset of releaseInfo.assets ?? []) {
       const assetName = asset?.name;
       const downloadUrl = asset?.browser_download_url;
       if (
@@ -113,7 +115,7 @@ function selectRelease(releases, version) {
   if (!dstRelease) {
     throw new Error(
       `The provided version string '${version}' cannot be matched to any available WinAppDriver releases: ` +
-      JSON.stringify(releases)
+        JSON.stringify(releases),
     );
   }
   return dstRelease;
@@ -139,7 +141,7 @@ function selectAsset(release) {
   }
   throw new Error(
     `WinAppDriver v${release.version} does not contain any release matching the ` +
-    `current OS architecture ${process.arch}. Available packages: ${release.assets.map(({name}) => name)}`
+      `current OS architecture ${process.arch}. Available packages: ${release.assets.map(({name}) => name)}`,
   );
 }
 
@@ -164,7 +166,7 @@ async function installWad(version) {
   const realPath = await fs.realpath(tmpdir());
   const installerPath = path.join(
     realPath,
-    `${parsedName.name}_${(Math.random() + 1).toString(36).substring(7)}${parsedName.ext}`
+    `${parsedName.name}_${(Math.random() + 1).toString(36).substring(7)}${parsedName.ext}`,
   );
   log.info(`Will download and install v${release.version} from ${asset.url}`);
   try {

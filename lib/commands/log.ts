@@ -1,4 +1,5 @@
 import type {LogDefRecord, StringRecord} from '@appium/types';
+
 import type {WindowsDriver} from '../driver.js';
 import {isEmpty} from '../utils/index.js';
 
@@ -27,10 +28,6 @@ function nativeLogEntryToSeleniumEntry(x: StringRecord): LogEntry {
   return toLogEntry(msg.replace(COLOR_CODE_PATTERN, ''), x.timestamp ?? Date.now());
 }
 
-function toLogEntry(
-  message: string,
-  timestamp: number,
-  level: string = DEFAULT_LOG_LEVEL,
-): LogEntry {
+function toLogEntry(message: string, timestamp: number, level: string = DEFAULT_LOG_LEVEL): LogEntry {
   return {timestamp, level, message};
 }

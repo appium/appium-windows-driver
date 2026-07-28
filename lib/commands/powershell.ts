@@ -1,6 +1,8 @@
+import path from 'node:path';
+
 import {fs, tempDir} from 'appium/support.js';
 import {exec} from 'teen_process';
-import path from 'node:path';
+
 import type {WindowsDriver} from '../driver.js';
 
 const EXECUTION_POLICY = {
@@ -30,10 +32,7 @@ export interface ExecPowerShellOptions {
  * @returns The stdout of the given command or script
  * @throws If the exit code of the given command or script is not zero (stderr is used as the message when present).
  */
-export async function execPowerShell(
-  this: WindowsDriver,
-  opts?: ExecPowerShellOptions,
-): Promise<string> {
+export async function execPowerShell(this: WindowsDriver, opts?: ExecPowerShellOptions): Promise<string> {
   const {script, command} = opts ?? {};
   if (!script && !command) {
     throw this.log.errorWithException('Power Shell script/command must not be empty');
@@ -56,10 +55,7 @@ export async function execPowerShell(
     if (command) {
       psArgs.push('-command', command);
     } else {
-      const {stdout} = await exec(POWER_SHELL, [
-        '-command',
-        'Get-ExecutionPolicy -Scope CurrentUser',
-      ]);
+      const {stdout} = await exec(POWER_SHELL, ['-command', 'Get-ExecutionPolicy -Scope CurrentUser']);
       userExecutionPolicy = stdout.trim();
       if ([EXECUTION_POLICY.RESTRICTED, EXECUTION_POLICY.UNDEFINED].includes(userExecutionPolicy)) {
         this.log.debug(

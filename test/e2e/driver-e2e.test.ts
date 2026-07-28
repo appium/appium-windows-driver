@@ -1,7 +1,9 @@
-import {describe, it, beforeEach, afterEach} from 'node:test';
 import assert from 'node:assert/strict';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+
 import {remote as wdio} from 'webdriverio';
 import type {Browser} from 'webdriverio';
+
 import {isAdmin} from '../../lib/installer.js';
 import {buildWdIoOptions} from './helpers.js';
 

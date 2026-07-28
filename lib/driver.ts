@@ -7,30 +7,30 @@ import type {
   InitialOpts,
   StringRecord,
   ExternalDriver,
-  DriverOpts,
   W3CDriverCaps,
 } from '@appium/types';
 import {BaseDriver, type JWProxy} from 'appium/driver.js';
 import {system} from 'appium/support.js';
-import {WinAppDriver} from './winappdriver.js';
-import type {WindowsDriverCaps} from './winappdriver.js';
-import {desiredCapConstraints} from './desired-caps.js';
+
 import * as appManagementCommands from './commands/app-management.js';
 import * as clipboardCommands from './commands/clipboard.js';
+import * as contextCommands from './commands/context.js';
 import * as executeCommands from './commands/execute.js';
 import * as fileCommands from './commands/file-movement.js';
 import * as findCommands from './commands/find.js';
 import * as generalCommands from './commands/general.js';
 import * as gestureCommands from './commands/gestures.js';
+import * as logCommands from './commands/log.js';
 import * as powershellCommands from './commands/powershell.js';
 import * as recordScreenCommands from './commands/record-screen.js';
 import * as touchCommands from './commands/touch.js';
-import * as contextCommands from './commands/context.js';
-import * as logCommands from './commands/log.js';
-import {POWER_SHELL_FEATURE} from './constants.js';
-import {newMethodMap} from './method-map.js';
-import {executeMethodMap} from './execute-method-map.js';
 import {ensureDpiAwareness} from './commands/winapi/user32.js';
+import {POWER_SHELL_FEATURE} from './constants.js';
+import {desiredCapConstraints} from './desired-caps.js';
+import {executeMethodMap} from './execute-method-map.js';
+import {newMethodMap} from './method-map.js';
+import {WinAppDriver} from './winappdriver.js';
+import type {WindowsDriverCaps} from './winappdriver.js';
 
 const NO_PROXY: RouteMatcher[] = [
   ['GET', new RegExp('^/session/[^/]+/appium/(?!app/)[^/]+')],
@@ -71,7 +71,6 @@ interface PostrunCapability {
 
 type WindowsDriverConstraints = typeof desiredCapConstraints;
 
-type WindowsDriverOpts = DriverOpts<WindowsDriverConstraints>;
 type W3CWindowsDriverCaps = W3CDriverCaps<WindowsDriverConstraints>;
 // Appium instantiates this class
 export class WindowsDriver
@@ -158,7 +157,6 @@ export class WindowsDriver
     try {
       const [sessionId, caps] = await super.createSession(w3cCaps1, w3cCaps2, w3cCaps3, driverData);
       this.caps = caps;
-      this.opts = this.opts as WindowsDriverOpts;
       if (!(await ensureDpiAwareness())) {
         this.log.info(
           `The call to SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2) API has failed. ` +
@@ -170,8 +168,7 @@ export class WindowsDriver
         const prerun = caps.prerun as PrerunCapability;
         if (typeof prerun.command !== 'string' && typeof prerun.script !== 'string') {
           throw new Error(
-            `'prerun' capability value must either contain ` +
-              `'script' or 'command' entry of string type`,
+            `'prerun' capability value must either contain ` + `'script' or 'command' entry of string type`,
           );
         }
         this.assertFeatureEnabled(POWER_SHELL_FEATURE);
@@ -197,8 +194,7 @@ export class WindowsDriver
     if (postrun) {
       if (typeof postrun.command !== 'string' && typeof postrun.script !== 'string') {
         this.log.error(
-          `'postrun' capability value must either contain ` +
-            `'script' or 'command' entry of string type`,
+          `'postrun' capability value must either contain ` + `'script' or 'command' entry of string type`,
         );
       } else {
         this.log.info('Executing postrun PowerShell script');

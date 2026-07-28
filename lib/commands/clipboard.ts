@@ -1,7 +1,8 @@
-import {exec} from 'teen_process';
 import {errors} from 'appium/driver.js';
-import type {WindowsDriver} from '../driver.js';
+import {exec} from 'teen_process';
 import type {TeenProcessExecResult} from 'teen_process';
+
+import type {WindowsDriver} from '../driver.js';
 
 const CONTENT_TYPE = Object.freeze({
   plaintext: 'plaintext',
@@ -23,9 +24,7 @@ export async function windowsSetClipboard(
   contentType: ContentTypeEnum = CONTENT_TYPE.plaintext,
 ): Promise<TeenProcessExecResult<string>> {
   if (b64Content && Buffer.from(b64Content, 'base64').toString('base64') !== b64Content) {
-    throw new errors.InvalidArgumentError(
-      `The 'b64Content' argument must be a valid base64-encoded string`,
-    );
+    throw new errors.InvalidArgumentError(`The 'b64Content' argument must be a valid base64-encoded string`);
   }
   switch (contentType) {
     case CONTENT_TYPE.plaintext:

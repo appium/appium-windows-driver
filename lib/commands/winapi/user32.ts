@@ -1,10 +1,12 @@
-import {memoize} from '../../utils/index.js';
-import type {load, sizeof, struct, union} from 'koffi';
-import {createInvalidArgumentError} from './errors.js';
-import {util} from 'appium/support.js';
 import {createRequire} from 'node:module';
 import nodeUtil from 'node:util';
+
 import type {Position, Size} from '@appium/types';
+import {util} from 'appium/support.js';
+import type {load, sizeof, struct, union} from 'koffi';
+
+import {memoize} from '../../utils/index.js';
+import {createInvalidArgumentError} from './errors.js';
 
 type KoffiModule = {
   load: typeof load;
@@ -91,27 +93,17 @@ const getUser32 = memoize(function getUser32(): User32 {
   const user32 = ffi.load('user32.dll');
   const raw = {
     SendInput: nodeUtil.promisify(
-      user32.func(
-        'unsigned int __stdcall SendInput(unsigned int cInputs, INPUT *pInputs, int cbSize)',
-      ).async,
+      user32.func('unsigned int __stdcall SendInput(unsigned int cInputs, INPUT *pInputs, int cbSize)').async,
     ),
-    GetSystemMetrics: nodeUtil.promisify(
-      user32.func('int __stdcall GetSystemMetrics(int nIndex)').async,
-    ),
+    GetSystemMetrics: nodeUtil.promisify(user32.func('int __stdcall GetSystemMetrics(int nIndex)').async),
     SetProcessDpiAwarenessContext: nodeUtil.promisify(
       user32.func('int __stdcall SetProcessDpiAwarenessContext(int value)').async,
     ),
     LogicalToPhysicalPointForPerMonitorDPI: nodeUtil.promisify(
-      user32.func(
-        'int __stdcall LogicalToPhysicalPointForPerMonitorDPI(void *hwnd, POINT *lpPoint)',
-      ).async,
+      user32.func('int __stdcall LogicalToPhysicalPointForPerMonitorDPI(void *hwnd, POINT *lpPoint)').async,
     ),
-    WindowFromPoint: nodeUtil.promisify(
-      user32.func('void * __stdcall WindowFromPoint(POINT point)').async,
-    ),
-    GetDpiForSystem: nodeUtil.promisify(
-      user32.func('unsigned int __stdcall GetDpiForSystem()').async,
-    ),
+    WindowFromPoint: nodeUtil.promisify(user32.func('void * __stdcall WindowFromPoint(POINT point)').async),
+    GetDpiForSystem: nodeUtil.promisify(user32.func('unsigned int __stdcall GetDpiForSystem()').async),
   };
   return raw as User32;
 });
@@ -305,9 +297,7 @@ export const ensureDpiAwareness = memoize(async (): Promise<boolean> => {
     return false;
   }
   try {
-    const ok = Boolean(
-      await getUser32().SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2),
-    );
+    const ok = Boolean(await getUser32().SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2));
     if (!ok) {
       ensureDpiAwareness.cache.clear();
     }
@@ -340,21 +330,16 @@ export async function toPhysicalScreenCoordinates(x: number, y: number): Promise
   if (dpi <= USER_DEFAULT_SCREEN_DPI) {
     return [x, y];
   }
-  return [
-    Math.round((x * dpi) / USER_DEFAULT_SCREEN_DPI),
-    Math.round((y * dpi) / USER_DEFAULT_SCREEN_DPI),
-  ];
+  return [Math.round((x * dpi) / USER_DEFAULT_SCREEN_DPI), Math.round((y * dpi) / USER_DEFAULT_SCREEN_DPI)];
 }
 
 async function getSystemMetrics(nIndex: number): Promise<number> {
   return await getUser32().GetSystemMetrics(nIndex);
 }
 
-const isLeftMouseButtonSwapped = memoize(
-  async function isLeftMouseButtonSwapped(): Promise<boolean> {
-    return Boolean(await getSystemMetrics(SM_SWAPBUTTON));
-  },
-);
+const isLeftMouseButtonSwapped = memoize(async function isLeftMouseButtonSwapped(): Promise<boolean> {
+  return Boolean(await getSystemMetrics(SM_SWAPBUTTON));
+});
 
 /**
  * Builds a mouse button SendInput structure (click, press, or release).
@@ -362,10 +347,7 @@ const isLeftMouseButtonSwapped = memoize(
  * @param opts Mouse button and action pair to convert.
  * @returns SendInput payload for the requested button action.
  */
-export async function toMouseButtonInput({
-  button,
-  action,
-}: MouseButtonOptions): Promise<MouseInput> {
+export async function toMouseButtonInput({button, action}: MouseButtonOptions): Promise<MouseInput> {
   // If the host is configured to swap left & right buttons, inject swapped
   // events to un-do that re-mapping.
   if (await isLeftMouseButtonSwapped()) {
@@ -436,11 +418,7 @@ export async function toMouseButtonInput({
  * @returns SendInput payload for moving the mouse to the target coordinates.
  * @see https://www.reddit.com/r/cpp_questions/comments/1eslzdv/difficulty_with_win32_mouse_position/
  */
-export async function toMouseMoveInput(
-  x: number,
-  y: number,
-  screenSize: Size | null = null,
-): Promise<MouseInput> {
+export async function toMouseMoveInput(x: number, y: number, screenSize: Size | null = null): Promise<MouseInput> {
   if (!Number.isInteger(x) || !Number.isInteger(y)) {
     throw createInvalidArgumentError('Both move coordinates must be provided');
   }
@@ -473,9 +451,7 @@ export function toMouseWheelInput(dx?: number, dy?: number): MouseInput | null {
     throw createInvalidArgumentError('Either horizontal or vertical scroll delta must be provided');
   }
   if (hasHorizontalScroll && hasVerticalScroll) {
-    throw createInvalidArgumentError(
-      'Either horizontal or vertical scroll delta must be provided, but not both',
-    );
+    throw createInvalidArgumentError('Either horizontal or vertical scroll delta must be provided, but not both');
   }
 
   if (hasHorizontalScroll && dx !== 0) {
@@ -525,9 +501,7 @@ export function toUnicodeKeyInputs(text: string): KeyInput[] {
 
 /** Virtual monitor width/height from GetSystemMetrics. */
 export async function getVirtualScreenSize(): Promise<Size> {
-  const [width, height] = await Promise.all(
-    [SM_CXVIRTUALSCREEN, SM_CYVIRTUALSCREEN].map(getSystemMetrics),
-  );
+  const [width, height] = await Promise.all([SM_CXVIRTUALSCREEN, SM_CYVIRTUALSCREEN].map(getSystemMetrics));
   return {width, height};
 }
 

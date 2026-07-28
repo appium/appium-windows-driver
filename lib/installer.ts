@@ -1,9 +1,11 @@
-import {memoize, runElevated} from './utils/index.js';
-import {fs, tempDir} from 'appium/support.js';
 import path from 'node:path';
+
+import {fs, tempDir} from 'appium/support.js';
 import {exec} from 'teen_process';
+
 import {log} from './logger.js';
 import {queryRegistry, type RegEntry} from './registry.js';
+import {memoize, runElevated} from './utils/index.js';
 
 const POSSIBLE_WAD_INSTALL_ROOTS = [
   process.env['ProgramFiles(x86)'],
@@ -68,9 +70,7 @@ export const getWADExecutablePath = memoize(async function getWADInstallPath(): 
     const uninstallEntries = await queryRegistry(UNINSTALL_REG_ROOT);
     const wadEntry = uninstallEntries.find(
       (entry: RegEntry) =>
-        entry.key === REG_ENTRY_KEY &&
-        entry.value === REG_ENTRY_VALUE &&
-        entry.type === REG_ENTRY_TYPE,
+        entry.key === REG_ENTRY_KEY && entry.value === REG_ENTRY_VALUE && entry.type === REG_ENTRY_TYPE,
     );
     if (wadEntry) {
       log.debug(`Found MSI entry: ${JSON.stringify(wadEntry)}`);

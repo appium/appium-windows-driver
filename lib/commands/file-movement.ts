@@ -1,6 +1,8 @@
 import path from 'node:path';
+
 import {errors} from 'appium/driver.js';
 import {fs, util, zip} from 'appium/support.js';
+
 import {MODIFY_FS_FEATURE} from '../constants.js';
 import type {WindowsDriver} from '../driver.js';
 
@@ -28,8 +30,7 @@ export async function pushFile(
   this.assertFeatureEnabled(MODIFY_FS_FEATURE);
   if (remotePath.endsWith(path.sep)) {
     throw new errors.InvalidArgumentError(
-      'It is expected that remote path points to a file rather than a folder. ' +
-        `'${remotePath}' is given instead`,
+      'It is expected that remote path points to a file rather than a folder. ' + `'${remotePath}' is given instead`,
     );
   }
 
@@ -98,9 +99,7 @@ export async function windowsDeleteFolder(this: WindowsDriver, remotePath: strin
 
 function resolveToAbsolutePath(remotePath: string): string {
   const resolvedPath = remotePath.replace(/%([^%]+)%/g, (_, key: string) =>
-    KNOWN_ENV_VARS.includes(key.toUpperCase())
-      ? (process.env[key.toUpperCase()] as string)
-      : `%${key}%`,
+    KNOWN_ENV_VARS.includes(key.toUpperCase()) ? (process.env[key.toUpperCase()] as string) : `%${key}%`,
   );
 
   if (!path.isAbsolute(resolvedPath)) {
@@ -118,8 +117,7 @@ async function checkFileExists(remotePath: string): Promise<void> {
   const stat = await fs.stat(remotePath);
   if (!stat.isFile()) {
     throw new errors.InvalidArgumentError(
-      'It is expected that remote path points to a file rather than a folder. ' +
-        `'${remotePath}' is given instead`,
+      'It is expected that remote path points to a file rather than a folder. ' + `'${remotePath}' is given instead`,
     );
   }
 }
@@ -131,8 +129,7 @@ async function checkFolderExists(remotePath: string): Promise<void> {
   const stat = await fs.stat(remotePath);
   if (!stat.isDirectory()) {
     throw new errors.InvalidArgumentError(
-      'It is expected that remote path points to a folder rather than a file. ' +
-        `'${remotePath}' is given instead`,
+      'It is expected that remote path points to a folder rather than a file. ' + `'${remotePath}' is given instead`,
     );
   }
 }

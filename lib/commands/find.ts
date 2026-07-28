@@ -1,4 +1,5 @@
 import {util} from 'appium/support.js';
+
 import type {WindowsDriver} from '../driver.js';
 
 /** Proxies find-element request to WinAppDriver (`/element` or `/elements`). */
