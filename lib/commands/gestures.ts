@@ -305,7 +305,7 @@ export async function windowsScroll(
       await handleInputs(scrollInput);
     } else {
       this.log.info(
-        'There is no need to actually perform scroll with the given ' + (deltaX == null ? 'deltaY' : 'deltaX'),
+        `There is no need to actually perform scroll with the given ${deltaX == null ? 'deltaY' : 'deltaX'}`,
       );
     }
   } finally {

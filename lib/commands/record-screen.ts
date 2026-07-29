@@ -394,6 +394,6 @@ async function requireFfmpegPath() {
   try {
     return await fs.which(FFMPEG_BINARY);
   } catch {
-    throw new Error(`${FFMPEG_BINARY} has not been found in PATH. ` + `Please make sure it is installed`);
+    throw new Error(`${FFMPEG_BINARY} has not been found in PATH. Please make sure it is installed`);
   }
 }

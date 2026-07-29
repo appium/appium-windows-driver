@@ -30,7 +30,7 @@ export async function pushFile(
   this.assertFeatureEnabled(MODIFY_FS_FEATURE);
   if (remotePath.endsWith(path.sep)) {
     throw new errors.InvalidArgumentError(
-      'It is expected that remote path points to a file rather than a folder. ' + `'${remotePath}' is given instead`,
+      `It is expected that remote path points to a file rather than a folder. '${remotePath}' is given instead`,
     );
   }
 
@@ -104,7 +104,7 @@ function resolveToAbsolutePath(remotePath: string): string {
 
   if (!path.isAbsolute(resolvedPath)) {
     throw new errors.InvalidArgumentError(
-      'It is expected that remote path is absolute. ' + `'${resolvedPath}' is given instead`,
+      `It is expected that remote path is absolute. '${resolvedPath}' is given instead`,
     );
   }
   return resolvedPath;
@@ -117,7 +117,7 @@ async function checkFileExists(remotePath: string): Promise<void> {
   const stat = await fs.stat(remotePath);
   if (!stat.isFile()) {
     throw new errors.InvalidArgumentError(
-      'It is expected that remote path points to a file rather than a folder. ' + `'${remotePath}' is given instead`,
+      `It is expected that remote path points to a file rather than a folder. '${remotePath}' is given instead`,
     );
   }
 }
@@ -129,7 +129,7 @@ async function checkFolderExists(remotePath: string): Promise<void> {
   const stat = await fs.stat(remotePath);
   if (!stat.isDirectory()) {
     throw new errors.InvalidArgumentError(
-      'It is expected that remote path points to a folder rather than a file. ' + `'${remotePath}' is given instead`,
+      `It is expected that remote path points to a folder rather than a file. '${remotePath}' is given instead`,
     );
   }
 }

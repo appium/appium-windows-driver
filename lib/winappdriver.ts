@@ -121,7 +121,7 @@ class WADProcess {
         await this.proc?.stop();
       } catch (e: any) {
         this.log.warn(
-          `WinAppDriver process with PID ${this.proc?.pid} cannot be stopped. ` + `Original error: ${e.message}`,
+          `WinAppDriver process with PID ${this.proc?.pid} cannot be stopped. Original error: ${e.message}`,
         );
       }
     }
@@ -204,7 +204,7 @@ export class WinAppDriver {
       try {
         await this.proxy.command('', 'DELETE');
       } catch (err: any) {
-        this.log.warn(`Did not get confirmation WinAppDriver deleteSession worked; ` + `Error was: ${err.message}`);
+        this.log.warn(`Did not get confirmation WinAppDriver deleteSession worked; Error was: ${err.message}`);
       }
     }
 

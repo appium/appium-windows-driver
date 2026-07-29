@@ -167,9 +167,7 @@ export class WindowsDriver
         this.log.info('Executing prerun PowerShell script');
         const prerun = caps.prerun as PrerunCapability;
         if (typeof prerun.command !== 'string' && typeof prerun.script !== 'string') {
-          throw new Error(
-            `'prerun' capability value must either contain ` + `'script' or 'command' entry of string type`,
-          );
+          throw new Error(`'prerun' capability value must either contain 'script' or 'command' entry of string type`);
         }
         this.assertFeatureEnabled(POWER_SHELL_FEATURE);
         const output = await this.execPowerShell(prerun);
@@ -193,9 +191,7 @@ export class WindowsDriver
     const postrun = this.opts.postrun as PostrunCapability | undefined;
     if (postrun) {
       if (typeof postrun.command !== 'string' && typeof postrun.script !== 'string') {
-        this.log.error(
-          `'postrun' capability value must either contain ` + `'script' or 'command' entry of string type`,
-        );
+        this.log.error(`'postrun' capability value must either contain 'script' or 'command' entry of string type`);
       } else {
         this.log.info('Executing postrun PowerShell script');
         try {
