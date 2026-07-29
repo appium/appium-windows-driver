@@ -47,8 +47,8 @@
     "format": "oxfmt -c oxfmt.config.mjs .",
     "format:check": "oxfmt -c oxfmt.config.mjs --check .",
     "prepare": "npm run build",
-    "test": "node --test --test-timeout=60000 \"build/test/unit/**/*.test.js\"",
-    "e2e-test": "npm run build && node --test --test-concurrency=1 --test-timeout=600000 \"build/test/e2e/**/*.test.js\""
+    "test": "node --test --enable-source-maps --test-timeout=60000 \"build/test/unit/**/*.test.js\"",
+    "e2e-test": "npm run build && node --test --enable-source-maps --test-concurrency=1 --test-timeout=600000 \"build/test/e2e/**/*.test.js\""
   },
   "dependencies": {
     "asyncbox": "^6.0.1",
