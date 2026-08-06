@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import type {AppiumLogger, ProxyOptions, HTTPMethod, HTTPBody} from '@appium/types';
-import {JWProxy, errors} from 'appium/driver.js';
+import {WebDriverProxy, errors} from 'appium/driver.js';
 import {util} from 'appium/support.js';
 import {waitForCondition} from 'asyncbox';
 import {findAPortNotInUse, checkPortStatus} from 'portscanner';
@@ -26,7 +26,7 @@ const PORT_ALLOCATION_GUARD = util.getLockFileGuard(path.resolve(os.tmpdir(), 'w
 });
 const TROUBLESHOOTING_LINK = 'https://github.com/appium/appium-windows-driver?tab=readme-ov-file#troubleshooting';
 
-class WADProxy extends JWProxy {
+class WADProxy extends WebDriverProxy {
   didProcessExit?: boolean;
 
   async isListening(): Promise<boolean> {

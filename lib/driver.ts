@@ -9,7 +9,7 @@ import type {
   ExternalDriver,
   W3CDriverCaps,
 } from '@appium/types';
-import {BaseDriver, type JWProxy} from 'appium/driver.js';
+import {BaseDriver, type WebDriverProxy} from 'appium/driver.js';
 import {system} from 'appium/support.js';
 
 import * as appManagementCommands from './commands/app-management.js';
@@ -81,7 +81,7 @@ export class WindowsDriver
   static executeMethodMap = executeMethodMap;
 
   _screenRecorder: recordScreenCommands.ScreenRecorder | null = null;
-  public proxyReqRes!: JWProxy['proxyReqRes'];
+  public proxyReqRes!: WebDriverProxy['proxyReqRes'];
 
   windowsLaunchApp = appManagementCommands.windowsLaunchApp;
   windowsCloseApp = appManagementCommands.windowsCloseApp;
