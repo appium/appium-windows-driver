@@ -127,7 +127,7 @@ export class WindowsDriver
   supportedLogTypes = logCommands.supportedLogTypes;
 
   private isProxyActive = false;
-  private jwpProxyAvoid: RouteMatcher[] = NO_PROXY;
+  private wdProxyAvoid: RouteMatcher[] = NO_PROXY;
   private _winAppDriver: WinAppDriver | null = null;
 
   constructor(opts: InitialOpts, shouldValidateCaps = true) {
@@ -223,7 +223,7 @@ export class WindowsDriver
 
   override getProxyAvoidList(sessionId: string): RouteMatcher[] {
     void sessionId;
-    return this.jwpProxyAvoid;
+    return this.wdProxyAvoid;
   }
 
   async proxyCommand(url: string, method: HTTPMethod, body: HTTPBody = null): Promise<any> {
@@ -247,7 +247,7 @@ export class WindowsDriver
   }
 
   private resetState(): void {
-    this.jwpProxyAvoid = NO_PROXY;
+    this.wdProxyAvoid = NO_PROXY;
     this.isProxyActive = false;
     this._winAppDriver = null;
     this._screenRecorder = null;

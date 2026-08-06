@@ -83,11 +83,11 @@ describe('driver', () => {
         assert.equal(typeof driver.getProxyAvoidList, 'function');
       });
 
-      it('should return jwpProxyAvoid array', () => {
+      it('should return wdProxyAvoid array', () => {
         const avoidList = (driver.getProxyAvoidList as any)('abc');
         assert.ok(Array.isArray(avoidList));
         // eslint-disable-next-line dot-notation
-        assert.deepEqual(avoidList, driver['jwpProxyAvoid']);
+        assert.deepEqual(avoidList, driver['wdProxyAvoid']);
       });
     });
 
