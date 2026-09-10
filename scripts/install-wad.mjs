@@ -23,15 +23,16 @@ const ARCH_MAPPING = Object.freeze({
 
 /**
  *
- * @param {import('axios').AxiosResponseHeaders} headers
+ * @param {import('axios').AxiosResponse['headers']} headers
  * @returns {string|null}
  */
 function parseNextPageUrl(headers) {
-  if (!headers.link) {
+  const {link} = headers;
+  if (typeof link !== 'string') {
     return null;
   }
 
-  for (const part of headers.link.split(';')) {
+  for (const part of link.split(';')) {
     const [rel, pageUrl] = part.split(',').map((s) => s.trim());
     if (rel === 'rel="next"' && pageUrl) {
       return pageUrl.replace(/^<|>$/g, '');
@@ -48,6 +49,7 @@ function parseNextPageUrl(headers) {
 async function listReleases() {
   /** @type {Record<string, any>[]} */
   const allReleases = [];
+  /** @type {string|null} */
   let currentUrl = `${API_ROOT}/releases`;
   do {
     const {data, headers} = await axios.get(currentUrl, {
@@ -133,9 +135,13 @@ function selectAsset(release) {
   if (release.assets.length === 1) {
     return release.assets[0];
   }
+  if (!(process.arch in ARCH_MAPPING)) {
+    throw new Error(`WinAppDriver does not support the current OS architecture ${process.arch}`);
+  }
+  const arch = ARCH_MAPPING[/** @type {keyof typeof ARCH_MAPPING} */ (process.arch)];
   // Since v 1.2.99 installers for multiple OS architectures are provided
   for (const asset of release.assets) {
-    if (asset.name.includes(`win-${ARCH_MAPPING[process.arch]}.`)) {
+    if (asset.name.includes(`win-${arch}.`)) {
       return asset;
     }
   }

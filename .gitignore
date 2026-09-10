@@ -3,3 +3,4 @@ build
 *.log
 .vscode
 package-lock.json*
+.release-pkg

@@ -25,7 +25,6 @@
     "build/lib",
     "CHANGELOG.md",
     "LICENSE",
-    "npm-shrinkwrap.json",
     "scripts"
   ],
   "type": "module",
@@ -39,7 +38,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && tsc --noEmit -p tsconfig.scripts.json",
     "dev": "npm run build -- --watch",
     "clean": "npm run build -- --clean",
     "lint": "oxlint -c oxlint.config.mjs .",
@@ -64,6 +63,7 @@
     "@appium/types": "^1.0.0-rc.1",
     "@types/node": "^26.0.0",
     "@types/portscanner": "^2.1.4",
+    "@types/semver": "^7.8.0",
     "webdriverio": "^9.0.1"
   },
   "peerDependencies": {
