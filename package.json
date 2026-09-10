@@ -39,8 +39,8 @@
   },
   "scripts": {
     "build": "tsc -b && tsc --noEmit -p tsconfig.scripts.json",
-    "dev": "npm run build -- --watch",
-    "clean": "npm run build -- --clean",
+    "dev": "tsc -b --watch",
+    "clean": "tsc -b --clean",
     "lint": "oxlint -c oxlint.config.mjs .",
     "lint:fix": "oxlint -c oxlint.config.mjs --fix .",
     "format": "oxfmt -c oxfmt.config.mjs .",
