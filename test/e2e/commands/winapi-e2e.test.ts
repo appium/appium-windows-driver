@@ -126,6 +126,17 @@ describe('winapi', () => {
         modifierKeys: ['ctrl', 'shift'],
       });
     });
+
+    it('performs drag gesture with a non-left mouse button', async () => {
+      await driver!.execute('windows: clickAndDrag', {
+        startX: 600,
+        startY: 300,
+        endX: 500,
+        endY: 400,
+        durationMs: 100,
+        button: 'right',
+      });
+    });
   });
 
   describe('windowsHover', () => {
