@@ -1,3 +1,9 @@
+## [6.3.0](https://github.com/appium/appium-windows-driver/compare/v6.2.0...v6.3.0) (2026-09-14)
+
+### Features
+
+* allow mouse button selection for clickAndDrag ([#379](https://github.com/appium/appium-windows-driver/issues/379)) ([6959048](https://github.com/appium/appium-windows-driver/commit/69590481d675be42274c90b471c9337da8560b23))
+
 ## [6.2.0](https://github.com/appium/appium-windows-driver/compare/v6.1.2...v6.2.0) (2026-09-10)
 
 ### Features
