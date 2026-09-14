@@ -61,7 +61,17 @@ export const executeMethodMap = {
   'windows: clickAndDrag': {
     command: 'windowsClickAndDrag',
     params: {
-      optional: ['startElementId', 'startX', 'startY', 'endElementId', 'endX', 'endY', 'modifierKeys', 'durationMs'],
+      optional: [
+        'startElementId',
+        'startX',
+        'startY',
+        'endElementId',
+        'endX',
+        'endY',
+        'modifierKeys',
+        'durationMs',
+        'button',
+      ],
     },
   },
   'windows: hover': {

@@ -341,7 +341,8 @@ export async function windowsScroll(
  * For example, in order to keep Ctrl+Alt depressed while clicking, provide the value of
  * ['ctrl', 'alt']
  * @param durationMs The number of milliseconds to wait between pressing
- * the left mouse button and moving the cursor to the ending drag point.
+ * the selected mouse button and moving the cursor to the ending drag point.
+ * @param button Name of the mouse button to press while dragging. Defaults to left.
  * @throws If given options are not acceptable or the gesture has failed.
  */
 export async function windowsClickAndDrag(
@@ -354,6 +355,7 @@ export async function windowsClickAndDrag(
   endY?: number,
   modifierKeys?: string | string[],
   durationMs = 5000,
+  button: MouseButtonName = MOUSE_BUTTON.LEFT,
 ): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
@@ -375,9 +377,9 @@ export async function windowsClickAndDrag(
   try {
     [moveStartInput, clickDownInput, moveEndInput, clickUpInput] = await Promise.all([
       toMouseMoveInput(startAbsoluteX, startAbsoluteY, screenSize),
-      toMouseButtonInput({button: MOUSE_BUTTON.LEFT, action: MOUSE_BUTTON_ACTION.DOWN}),
+      toMouseButtonInput({button, action: MOUSE_BUTTON_ACTION.DOWN}),
       toMouseMoveInput(endAbsoluteX, endAbsoluteY, screenSize),
-      toMouseButtonInput({button: MOUSE_BUTTON.LEFT, action: MOUSE_BUTTON_ACTION.UP}),
+      toMouseButtonInput({button, action: MOUSE_BUTTON_ACTION.UP}),
     ]);
   } catch (e) {
     throw preprocessError(e);
