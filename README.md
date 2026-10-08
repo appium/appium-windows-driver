@@ -10,9 +10,9 @@ Appium Windows Driver is a test automation tool for Windows devices and acts as 
 
 > [!CAUTION]
 > This driver is deprecated and is not compatible with Appium 4 and later, since
-> the WinAppDriver server only speaks the legacy JSONWP protocol. Its replacement is
-> [Appium WinCore Driver](https://github.com/appium/appium-wincore-driver), installable via
-> `appium driver install wincore` on Appium 4. See the
+> the WinAppDriver server only speaks the legacy JSONWP protocol. Its official replacement is
+> the [Appium WinCore Driver](https://github.com/appium/appium-wincore-driver), which is
+> compatible with both Appium 3 and 4. See the
 > [Appium 3 to 4 migration guide](https://appium.io/docs/en/latest/guides/migrating-3-to-4/)
 > for the recommended migration steps.
 
