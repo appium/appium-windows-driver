@@ -8,6 +8,14 @@ Appium Windows Driver
 
 Appium Windows Driver is a test automation tool for Windows devices and acts as a proxy to Microsoft's [WinAppDriver server](https://github.com/microsoft/WinAppDriver). Appium Windows Driver supports testing Universal Windows Platform (UWP), Windows Forms (WinForms), Windows Presentation Foundation (WPF), and Classic Windows (Win32) apps on Windows 10 PCs. The server itself is maintained by Microsoft at https://github.com/microsoft/WinAppDriver. Check its [release notes](https://github.com/microsoft/WinAppDriver/releases) and the [vendor documentation](https://github.com/microsoft/WinAppDriver/tree/master/Docs) to get more details on the supported features and possible pitfalls.
 
+> [!CAUTION]
+> This driver is deprecated and is not compatible with Appium 4 and later, since
+> the WinAppDriver server only speaks the legacy JSONWP protocol. Its replacement is
+> [Appium WinCore Driver](https://github.com/appium/appium-wincore-driver), installable via
+> `appium driver install wincore` on Appium 4. See the
+> [Appium 3 to 4 migration guide](https://appium.io/docs/en/latest/guides/migrating-3-to-4/)
+> for the recommended migration steps.
+
 > [!IMPORTANT]
 > Since major version *5.0.0*, this driver is only compatible with Appium 3. Use the `appium driver install windows`
 > command to add it to your distribution.
