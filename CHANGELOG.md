@@ -1,3 +1,9 @@
+## [6.3.1](https://github.com/appium/appium-windows-driver/compare/v6.3.0...v6.3.1) (2026-10-08)
+
+### Bug Fixes
+
+* **winapi:** report the real koffi load error ([#381](https://github.com/appium/appium-windows-driver/issues/381)) ([758a64f](https://github.com/appium/appium-windows-driver/commit/758a64f16eb83db30802a955a93ee4e9c90d4c26)), closes [#361](https://github.com/appium/appium-windows-driver/issues/361) [#361](https://github.com/appium/appium-windows-driver/issues/361) [#376](https://github.com/appium/appium-windows-driver/issues/376)
+
 ## [6.3.0](https://github.com/appium/appium-windows-driver/compare/v6.2.0...v6.3.0) (2026-09-14)
 
 ### Features
