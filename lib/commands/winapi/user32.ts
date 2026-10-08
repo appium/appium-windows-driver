@@ -15,11 +15,19 @@ type KoffiModule = {
   sizeof: typeof sizeof;
 };
 
-let ffi: KoffiModule | undefined;
-const require = createRequire(import.meta.url);
-try {
-  ffi = require('koffi') as KoffiModule;
-} catch {}
+/**
+ * Loads the optional koffi module. A failure is kept, so that the error thrown on the first
+ * native call can name its real cause (for example a missing prebuilt koffi binary).
+ */
+export function loadFfi(requireFn: (id: string) => unknown): {ffi?: KoffiModule; loadError?: Error} {
+  try {
+    return {ffi: requireFn('koffi') as KoffiModule};
+  } catch (e) {
+    return {loadError: e instanceof Error ? e : new Error(String(e))};
+  }
+}
+
+const {ffi, loadError: ffiLoadError} = loadFfi(createRequire(import.meta.url));
 let StructType: typeof struct | undefined;
 try {
   StructType = ffi?.struct;
@@ -70,16 +78,24 @@ export type MouseInput = {
   };
 };
 
-const NATIVE_LIBS_LOAD_ERROR =
-  `Native Windows API calls cannot be invoked. ` +
-  `Please make sure you have the latest version of Visual Studio` +
-  `including the "Desktop development with C++" workload. ` +
-  `Afterwards reinstall the Windows driver.`;
+/**
+ * Builds the error thrown when a native Windows API call is requested but koffi is not available.
+ *
+ * @param cause - The error that prevented koffi from loading, if known
+ */
+export function createNativeLibsLoadError(cause?: Error): Error {
+  return new Error(
+    `Native Windows API calls cannot be invoked, because the optional 'koffi' module could not be loaded` +
+      (cause ? ` (${cause.message.split('\n')[0]})` : '') +
+      `. Reinstall the Windows driver, or run 'npm install koffi' in the folder where the driver is installed.`,
+    cause ? {cause} : undefined,
+  );
+}
 
 function requireNativeType<T>(typ: T | undefined): T {
   if (typ == null) {
     const throwingFactory = () => () => {
-      throw new Error(NATIVE_LIBS_LOAD_ERROR);
+      throw createNativeLibsLoadError(ffiLoadError);
     };
     return throwingFactory as unknown as T;
   }
@@ -88,7 +104,7 @@ function requireNativeType<T>(typ: T | undefined): T {
 
 const getUser32 = memoize(function getUser32(): User32 {
   if (!ffi) {
-    throw new Error(NATIVE_LIBS_LOAD_ERROR);
+    throw createNativeLibsLoadError(ffiLoadError);
   }
   const user32 = ffi.load('user32.dll');
   const raw = {
