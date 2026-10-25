@@ -71,6 +71,7 @@ export const executeMethodMap = {
         'modifierKeys',
         'durationMs',
         'button',
+        'holdDurationMs',
       ],
     },
   },

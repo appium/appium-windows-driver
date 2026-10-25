@@ -340,6 +340,7 @@ endY | number | no | Same as in [windows: click](#windows-click) | 100
 modifierKeys | string[] or string | no | Same as in [windows: click](#windows-click) | win
 durationMs | number | no | The number of milliseconds to wait between pressing the selected mouse button and moving the cursor to the ending drag point. 5000ms by default. | 7000
 button | string | no | Same as in [windows: click](#windows-click). `left` by default. | right
+holdDurationMs | number | no | The number of milliseconds to wait between moving the cursor to the ending drag point and releasing the selected mouse button. 10ms by default. | 500
 
 ### windows: hover
 
