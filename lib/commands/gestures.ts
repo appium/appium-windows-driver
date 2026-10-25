@@ -343,6 +343,8 @@ export async function windowsScroll(
  * @param durationMs The number of milliseconds to wait between pressing
  * the selected mouse button and moving the cursor to the ending drag point.
  * @param button Name of the mouse button to press while dragging. Defaults to left.
+ * @param holdDurationMs The number of milliseconds to wait between moving the cursor
+ * to the ending drag point and releasing the selected mouse button.
  * @throws If given options are not acceptable or the gesture has failed.
  */
 export async function windowsClickAndDrag(
@@ -356,6 +358,7 @@ export async function windowsClickAndDrag(
   modifierKeys?: string | string[],
   durationMs = 5000,
   button: MouseButtonName = MOUSE_BUTTON.LEFT,
+  holdDurationMs = 10,
 ): Promise<void> {
   await ensureDpiAwareness.bind(this)();
 
@@ -395,7 +398,7 @@ export async function windowsClickAndDrag(
     await handleInputs(clickDownInput);
     await sleep(durationMs);
     await handleInputs(moveEndInput);
-    await sleep(10);
+    await sleep(holdDurationMs);
     await handleInputs(clickUpInput);
   } finally {
     if (!isEmpty(modifierKeyUpInputs)) {

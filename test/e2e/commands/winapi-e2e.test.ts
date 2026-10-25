@@ -135,6 +135,7 @@ describe('winapi', () => {
         endY: 400,
         durationMs: 100,
         button: 'right',
+        holdDurationMs: 100,
       });
     });
   });
