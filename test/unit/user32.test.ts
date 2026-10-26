@@ -1,9 +1,22 @@
 import assert from 'node:assert/strict';
-import {describe, it} from 'node:test';
+import {afterEach, describe, it} from 'node:test';
 
-import {createNativeLibsLoadError, loadFfi} from '../../lib/commands/winapi/user32.js';
+import {
+  createNativeLibsLoadError,
+  ensureDpiAwareness,
+  getUser32,
+  loadFfi,
+  toPhysicalScreenCoordinates,
+  type Point,
+  type User32,
+} from '../../lib/commands/winapi/user32.js';
 
 describe('user32 native library loading', () => {
+  afterEach(() => {
+    ensureDpiAwareness.cache.clear();
+    getUser32.cache.clear();
+  });
+
   it('keeps the error that prevented koffi from loading', () => {
     const {ffi, loadError} = loadFfi(() => {
       throw new Error('Cannot find the native Koffi module; did you bundle it correctly?');
@@ -26,5 +39,48 @@ describe('user32 native library loading', () => {
     const {ffi, loadError} = loadFfi(() => fake);
     assert.equal(ffi, fake);
     assert.equal(loadError, undefined);
+  });
+
+  it('returns mutated point from LogicalToPhysicalPointForPerMonitorDPI when conversion succeeds', async () => {
+    const hwnd = 0x12345678n;
+    const mockUser32: User32 = {
+      SendInput: async () => 1,
+      GetSystemMetrics: async () => 0,
+      SetProcessDpiAwarenessContext: async () => 1,
+      WindowFromPoint: async () => hwnd,
+      LogicalToPhysicalPointForPerMonitorDPI: async (passedHwnd: unknown, pt: Point) => {
+        assert.equal(passedHwnd, hwnd);
+        pt.x = Math.round(pt.x * 1.25);
+        pt.y = Math.round(pt.y * 1.25);
+        return 1;
+      },
+      GetDpiForSystem: async () => 96,
+    };
+    ensureDpiAwareness.cache.set(undefined, Promise.resolve(true));
+    getUser32.cache.set(undefined, mockUser32);
+
+    const coords = await toPhysicalScreenCoordinates(400, 200);
+    assert.deepEqual(coords, [500, 250]);
+  });
+
+  it('falls back to GetDpiForSystem when WindowFromPoint returns null', async () => {
+    let logicalToPhysicalCalled = false;
+    const mockUser32: User32 = {
+      SendInput: async () => 1,
+      GetSystemMetrics: async () => 0,
+      SetProcessDpiAwarenessContext: async () => 1,
+      WindowFromPoint: async () => null,
+      LogicalToPhysicalPointForPerMonitorDPI: async () => {
+        logicalToPhysicalCalled = true;
+        return 0;
+      },
+      GetDpiForSystem: async () => 120,
+    };
+    ensureDpiAwareness.cache.set(undefined, Promise.resolve(true));
+    getUser32.cache.set(undefined, mockUser32);
+
+    const coords = await toPhysicalScreenCoordinates(400, 200);
+    assert.equal(logicalToPhysicalCalled, false);
+    assert.deepEqual(coords, [500, 250]);
   });
 });
