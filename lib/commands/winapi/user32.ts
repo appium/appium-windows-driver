@@ -42,14 +42,14 @@ const POINT_STRUCT_DEF = {
   y: 'long',
 } as const;
 
-export type Point = {[K in keyof typeof POINT_STRUCT_DEF]: number};
+export type Point = {-readonly [K in keyof typeof POINT_STRUCT_DEF]: number};
 
 export type User32 = {
   SendInput: (cInputs: number, pInputs: unknown, cbSize: number) => Promise<number>;
   GetSystemMetrics: (nIndex: number) => Promise<number>;
   SetProcessDpiAwarenessContext: (value: number) => Promise<number>;
-  LogicalToPhysicalPointForPerMonitorDPI: (hwnd: number, point: Point) => Promise<number>;
-  WindowFromPoint: (point: Point) => Promise<number>;
+  LogicalToPhysicalPointForPerMonitorDPI: (hwnd: unknown, point: Point) => Promise<number>;
+  WindowFromPoint: (point: Point) => Promise<unknown>;
   GetDpiForSystem: () => Promise<number>;
 };
 export type KeyInput = {
@@ -102,7 +102,7 @@ function requireNativeType<T>(typ: T | undefined): T {
   return typ;
 }
 
-const getUser32 = memoize(function getUser32(): User32 {
+export const getUser32 = memoize(function getUser32(): User32 {
   if (!ffi) {
     throw createNativeLibsLoadError(ffiLoadError);
   }
@@ -116,7 +116,7 @@ const getUser32 = memoize(function getUser32(): User32 {
       user32.func('int __stdcall SetProcessDpiAwarenessContext(int value)').async,
     ),
     LogicalToPhysicalPointForPerMonitorDPI: nodeUtil.promisify(
-      user32.func('int __stdcall LogicalToPhysicalPointForPerMonitorDPI(void *hwnd, POINT *lpPoint)').async,
+      user32.func('int __stdcall LogicalToPhysicalPointForPerMonitorDPI(void *hwnd, _Inout_ POINT *lpPoint)').async,
     ),
     WindowFromPoint: nodeUtil.promisify(user32.func('void * __stdcall WindowFromPoint(POINT point)').async),
     GetDpiForSystem: nodeUtil.promisify(user32.func('unsigned int __stdcall GetDpiForSystem()').async),
@@ -336,8 +336,8 @@ export async function toPhysicalScreenCoordinates(x: number, y: number): Promise
   }
 
   const point: Point = {x, y};
-  const hwnd = Number(await getUser32().WindowFromPoint(point));
-  const converted = Boolean(await getUser32().LogicalToPhysicalPointForPerMonitorDPI(hwnd, point));
+  const hwnd = await getUser32().WindowFromPoint(point);
+  const converted = Boolean(hwnd && (await getUser32().LogicalToPhysicalPointForPerMonitorDPI(hwnd, point)));
   if (converted) {
     return [point.x, point.y];
   }
